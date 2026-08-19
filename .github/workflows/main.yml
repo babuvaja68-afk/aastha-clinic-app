@@ -21,26 +21,47 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Fix Directory Structure and Resources
+      - name: Fix Directory Structure and Manifest
         run: |
-          # 1. Flatten nested app/app directory if exists
-          if [ -d "app/app" ]; then
-            cp -r app/app/* app/ 2>/dev/null || true
-            rm -rf app/app
-          fi
-
-          # 2. Create proper resource directories
+          # 1. Base directories
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
+          mkdir -p app/src/main/java
           mkdir -p gradle/wrapper
 
-          # 3. Move XML rules to res/xml folder (fixes MergingException)
-          mv app/src/main/res/values/*rules*.xml app/src/main/res/xml/ 2>/dev/null || true
-          mv *rules*.xml app/src/main/res/xml/ 2>/dev/null || true
+          # 2. Check and move nested files if they exist in root
+          if [ -f "AndroidManifest.xml" ]; then
+            mv AndroidManifest.xml app/src/main/AndroidManifest.xml
+          fi
 
-          # 4. Create proper data_extraction_rules.xml & backup_rules.xml
+          # 3. Always ensure a valid AndroidManifest.xml exists
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <application
+                  android:allowBackup="true"
+                  android:dataExtractionRules="@xml/data_extraction_rules"
+                  android:fullBackupContent="@xml/backup_rules"
+                  android:icon="@mipmap/ic_launcher"
+                  android:label="@string/app_name"
+                  android:roundIcon="@mipmap/ic_launcher"
+                  android:supportsRtl="true"
+                  android:theme="@android:style/Theme.Material.Light.NoActionBar">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+
+          # 4. XML Rules
           cat << 'EOF' > app/src/main/res/xml/data_extraction_rules.xml
           <?xml version="1.0" encoding="utf-8"?>
           <data-extraction-rules>
@@ -60,30 +81,47 @@ jobs:
           </full-backup-content>
           EOF
 
-          # 5. Fix gradle.properties
-          cat << 'EOF' > gradle.properties
-          android.useAndroidX=true
-          android.nonTransitiveRClass=true
-          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-          EOF
-
-          # 6. Ensure strings.xml exists in values
+          # 5. Strings & Theme
           cat << 'EOF' > app/src/main/res/values/strings.xml
           <resources>
               <string name="app_name">Aastha Clinic</string>
           </resources>
           EOF
 
-          # 7. Create Dummy environment files
+          # 6. Dummy launcher icon
+          cat << 'EOF' > app/src/main/res/drawable/ic_launcher_foreground.xml
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp"
+              android:height="108dp"
+              android:viewportWidth="108"
+              android:viewportHeight="108">
+              <path
+                  android:fillColor="#6750A4"
+                  android:pathData="M30,30h48v48h-48z"/>
+          </vector>
+          EOF
+
+          cat << 'EOF' > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@drawable/ic_launcher_foreground"/>
+              <foreground android:drawable="@drawable/ic_launcher_foreground"/>
+          </adaptive-icon>
+          EOF
+
+          # 7. gradle.properties
+          cat << 'EOF' > gradle.properties
+          android.useAndroidX=true
+          android.nonTransitiveRClass=true
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          EOF
+
+          # 8. Dummy env files
           touch .env .env.example
           touch app/.env app/.env.example
 
-          # 8. Fix app/build.gradle.kts
-          if [ -f "app/build.gradle.kts" ]; then
-            sed -i 's/compileSdk { version = release(36) { minorApiLevel = 1 } }/compileSdk = 35/g' app/build.gradle.kts
-            sed -i 's/targetSdk = 36/targetSdk = 35/g' app/build.gradle.kts
-          else
-            cat << 'EOF' > app/build.gradle.kts
+          # 9. Force Clean app/build.gradle.kts
+          cat << 'EOF' > app/build.gradle.kts
           plugins {
               id("com.android.application")
               id("org.jetbrains.kotlin.android")
@@ -123,9 +161,8 @@ jobs:
               implementation("androidx.core:core-ktx:1.15.0")
           }
           EOF
-          fi
 
-          # 9. Root settings.gradle.kts
+          # 10. Root settings.gradle.kts
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
@@ -145,7 +182,7 @@ jobs:
           include(":app")
           EOF
 
-          # 10. Root build.gradle.kts
+          # 11. Root build.gradle.kts
           cat << 'EOF' > build.gradle.kts
           plugins {
               id("com.android.application") version "8.7.3" apply false
@@ -154,7 +191,7 @@ jobs:
           }
           EOF
 
-          # 11. Setup Gradle Wrapper
+          # 12. Setup Gradle Wrapper
           gradle wrapper --gradle-version 8.10.2
 
       - name: Build Debug APK
@@ -166,5 +203,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Aastha-Clinic-App
-          path: "**/*.apk"
+          path: app/build/outputs/apk/debug/*.apk
           
