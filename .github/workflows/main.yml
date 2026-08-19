@@ -21,9 +21,10 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Generate Complete Build Configuration
+      - name: Create Version Catalog and Project Config
         run: |
-          mkdir -p gradle
+          mkdir -p gradle app/src/main/res/values
+
           cat << 'EOF' > gradle/libs.versions.toml
           [versions]
           agp = "8.7.3"
@@ -39,6 +40,7 @@ jobs:
           retrofit = "2.11.0"
           okhttp = "4.12.0"
           coroutines = "1.9.0"
+          navigation = "2.8.5"
 
           [libraries]
           androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -55,7 +57,7 @@ jobs:
           androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
           androidx-compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
           androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
-          androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.8.5" }
+          androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
           androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
           androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
           androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
@@ -110,6 +112,10 @@ jobs:
           }
           EOF
 
+          if [ ! -f "app/src/main/res/values/strings.xml" ]; then
+            echo '<resources><string name="app_name">Aastha Clinic</string></resources>' > app/src/main/res/values/strings.xml
+          fi
+
       - name: Build Debug APK
         run: |
           gradle wrapper
@@ -120,4 +126,5 @@ jobs:
         with:
           name: Aastha-Clinic-App
           path: app/build/outputs/apk/debug/*.apk
+          
 
