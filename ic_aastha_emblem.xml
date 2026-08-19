@@ -1,0 +1,67 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="72dp"
+    android:height="72dp"
+    android:viewportWidth="72"
+    android:viewportHeight="72">
+
+    <!-- Circular Badge Background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 36,4 C 53.67,4 68,18.33 68,36 C 68,53.67 53.67,68 36,68 C 18.33,68 4,53.67 4,36 C 4,18.33 18.33,4 36,4 Z" />
+
+    <!-- Thin Navy Rim -->
+    <path
+        android:fillColor="#0D2F62"
+        android:pathData="M 36,6 C 52.57,6 66,19.43 66,36 C 66,52.57 52.57,66 36,66 C 19.43,66 6,52.57 6,36 C 6,19.43 19.43,6 36,6 Z M 36,8 C 20.54,8 8,20.54 8,36 C 8,51.46 20.54,64 36,64 C 51.46,64 64,51.46 64,36 C 64,20.54 51.46,8 36,8 Z" />
+
+    <!-- ======================================================== -->
+    <!-- EMBLEM: Caring Figures (Navy) + Cross (Red) -->
+    <!-- ======================================================== -->
+
+    <!-- Top Left Figure Head (Navy) -->
+    <path
+        android:fillColor="#0D2F62"
+        android:pathData="M 23,17 A 4.5,4.5 0 1,0 32,17 A 4.5,4.5 0 1,0 23,17 Z" />
+
+    <!-- Top Right Figure Head (Navy) -->
+    <path
+        android:fillColor="#0D2F62"
+        android:pathData="M 40,17 A 4.5,4.5 0 1,0 49,17 A 4.5,4.5 0 1,0 40,17 Z" />
+
+    <!-- Apex Meeting Star / Point -->
+    <path
+        android:fillColor="#0D2F62"
+        android:pathData="M 36,12 L 39,18 L 33,18 Z" />
+
+    <!-- Left Caring Arch -->
+    <path
+        android:fillColor="#0D2F62"
+        android:pathData="M 21,34 C 21,26 27,22 31,22 C 34,22 36,25 37,28 C 36,25 33,23 30,23 C 24,25 22,29 22,34 Z" />
+
+    <!-- Right Caring Arch -->
+    <path
+        android:fillColor="#0D2F62"
+        android:pathData="M 51,34 C 51,26 45,22 41,22 C 38,22 36,25 35,28 C 36,25 39,23 42,23 C 48,25 50,29 50,34 Z" />
+
+    <!-- Red Medical Cross Center -->
+    <!-- Vertical Pillar -->
+    <path
+        android:fillColor="#D32F2F"
+        android:pathData="M 32,29 L 40,29 L 40,57 L 32,57 Z" />
+
+    <!-- Horizontal Left Bar -->
+    <path
+        android:fillColor="#D32F2F"
+        android:pathData="M 18,37 L 32,37 L 32,45 L 18,45 Z" />
+
+    <!-- Horizontal Right Bar -->
+    <path
+        android:fillColor="#D32F2F"
+        android:pathData="M 40,37 L 54,37 L 54,45 L 40,45 Z" />
+
+    <!-- Blue Base Arch / Ground Foundation -->
+    <path
+        android:fillColor="#0D2F62"
+        android:pathData="M 16,58 L 56,58 L 56,60.5 L 16,60.5 Z" />
+
+</vector>
