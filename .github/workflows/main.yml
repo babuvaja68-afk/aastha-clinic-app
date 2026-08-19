@@ -23,26 +23,31 @@ jobs:
 
       - name: Setup Complete Android Project Structure
         run: |
-          # 1. Create required folder structure
+          # 1. Folders
           mkdir -p app/src/main/java
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
           mkdir -p gradle/wrapper
 
-          # 2. Move root files to correct Android paths
+          # 2. Fix AndroidX & JVM Memory in gradle.properties
+          cat << 'EOF' > gradle.properties
+          android.useAndroidX=true
+          android.nonTransitiveRClass=true
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          EOF
+
+          # 3. Move files to right paths
           mv backup_rules.xml colors.xml data_extraction_rules.xml strings.xml themes.xml app/src/main/res/values/ 2>/dev/null || true
           mv ic_aastha_*.xml greeting.png app/src/main/res/drawable/ 2>/dev/null || true
           mv ic_launcher*.xml ic_launcher*.webp app/src/main/res/mipmap-anydpi-v26/ 2>/dev/null || true
-          
-          # Move java/kt files if in root
           mv *.kt *.java app/src/main/java/ 2>/dev/null || true
 
-          # 3. Create dummy env files
+          # 4. Dummy env files
           touch .env .env.example
           touch app/.env app/.env.example
 
-          # 4. Ensure strings.xml exists
+          # 5. Strings fallback
           if [ ! -f "app/src/main/res/values/strings.xml" ]; then
             cat << 'EOF' > app/src/main/res/values/strings.xml
           <resources>
@@ -51,7 +56,7 @@ jobs:
           EOF
           fi
 
-          # 5. Ensure AndroidManifest.xml exists
+          # 6. AndroidManifest fallback
           if [ ! -f "app/src/main/AndroidManifest.xml" ]; then
             cat << 'EOF' > app/src/main/AndroidManifest.xml
           <?xml version="1.0" encoding="utf-8"?>
@@ -76,7 +81,7 @@ jobs:
           EOF
           fi
 
-          # 6. Create app/build.gradle.kts if missing
+          # 7. app/build.gradle.kts setup
           if [ ! -f "app/build.gradle.kts" ]; then
             cat << 'EOF' > app/build.gradle.kts
           plugins {
@@ -123,7 +128,7 @@ jobs:
             sed -i 's/targetSdk = 36/targetSdk = 35/g' app/build.gradle.kts
           fi
 
-          # 7. Create Root settings.gradle.kts
+          # 8. Root settings.gradle.kts
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
@@ -143,7 +148,7 @@ jobs:
           include(":app")
           EOF
 
-          # 8. Create Root build.gradle.kts
+          # 9. Root build.gradle.kts
           cat << 'EOF' > build.gradle.kts
           plugins {
               id("com.android.application") version "8.7.3" apply false
@@ -152,7 +157,7 @@ jobs:
           }
           EOF
 
-          # 9. Setup Gradle Wrapper
+          # 10. Setup Gradle Wrapper
           gradle wrapper --gradle-version 8.10.2
 
       - name: Build Debug APK
