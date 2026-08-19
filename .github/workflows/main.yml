@@ -21,68 +21,28 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Fix Missing Android Resources and Config
+      - name: Setup Gradle and Build Files
         run: |
-          # 1. Directories setup
-          mkdir -p gradle
-          mkdir -p app/src/main/res/values
-          mkdir -p app/src/main/res/drawable
-          mkdir -p app/src/main/res/mipmap-hdpi
-          mkdir -p app/src/main/res/mipmap-mdpi
-          mkdir -p app/src/main/res/mipmap-xhdpi
-          mkdir -p app/src/main/res/mipmap-xxhdpi
-          mkdir -p app/src/main/res/mipmap-xxxhdpi
+          mkdir -p gradle/wrapper app/src/main/res/values
 
-          # 2. Environment files
+          # Environment files
           touch .env .env.example
           touch app/.env app/.env.example
 
-          # 3. Create dummy launcher drawable if missing
-          cat << 'EOF' > app/src/main/res/drawable/ic_launcher_foreground.xml
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="108dp"
-              android:height="108dp"
-              android:viewportWidth="108"
-              android:viewportHeight="108">
-              <path
-                  android:fillColor="#6750A4"
-                  android:pathData="M30,30h48v48h-48z"/>
-          </vector>
-          EOF
+          # Fix SDK version in build.gradle.kts
+          if [ -f "app/build.gradle.kts" ]; then
+            sed -i 's/compileSdk { version = release(36) { minorApiLevel = 1 } }/compileSdk = 35/g' app/build.gradle.kts
+            sed -i 's/targetSdk = 36/targetSdk = 35/g' app/build.gradle.kts
+          fi
 
-          cat << 'EOF' > app/src/main/res/drawable/ic_launcher_background.xml
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="108dp"
-              android:height="108dp"
-              android:viewportWidth="108"
-              android:viewportHeight="108">
-              <path
-                  android:fillColor="#FEF7FF"
-                  android:pathData="M0,0h108v108h-108z"/>
-          </vector>
-          EOF
-
-          # 4. Values and Theme files
+          # Strings
           cat << 'EOF' > app/src/main/res/values/strings.xml
           <resources>
               <string name="app_name">Aastha Clinic</string>
           </resources>
           EOF
 
-          cat << 'EOF' > app/src/main/res/values/themes.xml
-          <resources>
-              <style name="Theme.MyApplication" parent="android:Theme.Material.Light.NoActionBar" />
-          </resources>
-          EOF
-
-          # 5. Fix compileSdk and targetSdk in build.gradle.kts
-          if [ -f "app/build.gradle.kts" ]; then
-            sed -i 's/compileSdk { version = release(36) { minorApiLevel = 1 } }/compileSdk = 35/g' app/build.gradle.kts
-            sed -i 's/targetSdk = 36/targetSdk = 35/g' app/build.gradle.kts
-            sed -i 's/alias(libs.plugins.secrets)/id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1"/g' app/build.gradle.kts || true
-          fi
-
-          # 6. Version Catalog Setup
+          # Version Catalog
           cat << 'EOF' > gradle/libs.versions.toml
           [versions]
           agp = "8.7.3"
@@ -140,7 +100,7 @@ jobs:
           roborazzi = { id = "io.github.takahirom.roborazzi", version = "1.38.0" }
           EOF
 
-          # 7. Root settings.gradle.kts
+          # Root Settings
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
@@ -160,7 +120,7 @@ jobs:
           include(":app")
           EOF
 
-          # 8. Root build.gradle.kts
+          # Root Build
           cat << 'EOF' > build.gradle.kts
           plugins {
               alias(libs.plugins.android.application) apply false
@@ -172,10 +132,13 @@ jobs:
           }
           EOF
 
+          # Setup compatible Gradle Wrapper (8.10.2)
+          gradle wrapper --gradle-version 8.10.2
+
       - name: Build Debug APK
         run: |
-          gradle wrapper
-          ./gradlew assembleDebug --stacktrace --no-daemon
+          chmod +x gradlew
+          ./gradlew :app:assembleDebug --stacktrace --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
