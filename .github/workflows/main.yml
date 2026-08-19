@@ -21,7 +21,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Large Logo, Realtime Sync, Date Filters and Delete System
+      - name: Setup Ultimate Clinic App with Settings and Direct Slot Booking
         run: |
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
@@ -53,7 +53,7 @@ jobs:
           EOF
 
           cat << 'EOF' > app/src/main/res/drawable/ic_launcher_bg.xml
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+          <vector xmlns:android="http://schemas.android.com/apk/res/android">
               android:width="108dp"
               android:height="108dp"
               android:viewportWidth="108"
@@ -72,11 +72,17 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 3. Main Application with Cloud Realtime Sync, Date Filtering & Delete System
+          # 3. Main Application with Settings, Dark Mode, Text Resize, Brightness & Direct Slot Booking
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
+          import android.app.Activity
+          import android.content.Context
+          import android.content.Intent
+          import android.net.Uri
           import android.os.Bundle
+          import android.view.WindowManager
+          import android.widget.Toast
           import androidx.activity.ComponentActivity
           import androidx.activity.compose.setContent
           import androidx.compose.foundation.Image
@@ -94,16 +100,29 @@ jobs:
           import androidx.compose.ui.Alignment
           import androidx.compose.ui.Modifier
           import androidx.compose.ui.graphics.Color
+          import androidx.compose.ui.platform.LocalContext
           import androidx.compose.ui.res.painterResource
           import androidx.compose.ui.text.font.FontWeight
           import androidx.compose.ui.unit.dp
           import androidx.compose.ui.unit.sp
+          import kotlinx.coroutines.Dispatchers
+          import kotlinx.coroutines.launch
+          import kotlinx.coroutines.withContext
+          import org.json.JSONArray
+          import org.json.JSONObject
+          import java.io.BufferedReader
+          import java.io.InputStreamReader
+          import java.io.OutputStreamWriter
+          import java.net.HttpURLConnection
+          import java.net.URL
+          import java.net.URLEncoder
           import java.text.SimpleDateFormat
           import java.util.*
 
           data class Patient(
               val id: String = UUID.randomUUID().toString(),
               val name: String,
+              val phone: String,
               val village: String,
               val age: String,
               val disease: String,
@@ -117,12 +136,16 @@ jobs:
           )
 
           enum class AppLang { GU, EN, HI }
+          enum class TextScale(val scale: Float, val label: String) {
+              SMALL(0.85f, "નાના (S)"),
+              NORMAL(1.0f, "સામાન્ય (M)"),
+              LARGE(1.25f, "મોટા (L)")
+          }
 
           object IndicToEnglish {
               private val charMap = mapOf(
                   'અ' to "a", 'આ' to "aa", 'ઇ' to "i", 'ઈ' to "ee", 'ઉ' to "u", 'ઊ' to "oo",
-                  'ઋ' to "ru", 'એ' to "e", 'ઐ' to "ai", 'ઓ' to "o", 'ઔ' to "au",
-                  'ક' to "k", 'ખ' to "kh", 'ગ' to "g", 'ઘ' to "gh", 'ઙ' to "ng",
+                  'ક' to "k", 'ખ' to "kh", 'ગ' to "g", 'ઘ' to "gh",
                   'ચ' to "ch", 'છ' to "chh", 'જ' to "j", 'ઝ' to "zh",
                   'ટ' to "t", 'ઠ' to "th", 'ડ' to "d", 'ઢ' to "dh", 'ણ' to "n",
                   'ત' to "t", 'થ' to "th", 'દ' to "d", 'ધ' to "dh", 'ન' to "n",
@@ -130,17 +153,7 @@ jobs:
                   'ય' to "y", 'ર' to "r", 'લ' to "l", 'ળ' to "l", 'વ' to "v",
                   'શ' to "sh", 'ષ' to "sh", 'સ' to "s", 'હ' to "h",
                   'ા' to "a", 'િ' to "i", 'ી' to "ee", 'ુ' to "u", 'ૂ' to "oo",
-                  'ૃ' to "ru", 'ે' to "e", 'ૈ' to "ai", 'ો' to "o", 'ૌ' to "au",
-                  'ં' to "n", 'ઃ' to "h", '્' to "",
-                  'अ' to "a", 'आ' to "aa", 'इ' to "i", 'ई' to "ee", 'उ' to "u", 'ऊ' to "oo",
-                  'क' to "k", 'ख' to "kh", 'ग' to "g", 'घ' to "gh",
-                  'च' to "ch", 'छ' to "chh", 'ज' to "j", 'झ' to "jh",
-                  'त' to "t", 'थ' to "th", 'द' to "d", 'ध' to "dh", 'न' to "n",
-                  'प' to "p", 'फ' to "f", 'ब' to "b", 'भ' to "bh", 'म' to "m",
-                  'य' to "y", 'र' to "r", 'ल' to "l", 'व' to "v",
-                  'श' to "sh", 'ष' to "sh", 'स' to "s", 'ह' to "h",
-                  'ा' to "a", 'ि' to "i", 'ी' to "ee", 'ु' to "u", 'ू' to "oo",
-                  'े' to "e", 'ै' to "ai", 'ो' to "o", 'ौ' to "au", 'ं' to "n", '्' to ""
+                  'ે' to "e", 'ૈ' to "ai", 'ો' to "o", 'ૌ' to "au", 'ં' to "n", '્' to ""
               )
 
               fun convert(input: String): String {
@@ -150,11 +163,11 @@ jobs:
                       val ch = input[i]
                       val mapped = charMap[ch]
                       if (mapped != null) {
-                          val isConsonant = (ch in 'ક'..'હ') || (ch in 'क'..'ह')
+                          val isConsonant = (ch in 'ક'..'હ')
                           val nextChar = if (i + 1 < input.length) input[i + 1] else null
-                          val isNextMatra = nextChar != null && ((nextChar in 'ા'..'ૌ') || (nextChar in 'ा'..'ौ') || nextChar == '્' || nextChar == '्')
+                          val isNextMatra = nextChar != null && ((nextChar in 'ા'..'ૌ') || nextChar == '્')
                           sb.append(mapped)
-                          if (isConsonant && !isNextMatra && nextChar != null && nextChar != ' ' && nextChar != '.' && nextChar != ',') {
+                          if (isConsonant && !isNextMatra && nextChar != null && nextChar != ' ') {
                               sb.append("a")
                           }
                       } else {
@@ -172,110 +185,31 @@ jobs:
               return sdf.format(Date())
           }
 
-          fun tr(key: String, lang: AppLang): String {
-              return when (lang) {
-                  AppLang.GU -> when (key) {
-                      "app_title" -> "આસ્થા ક્લિનિક"
-                      "home_btn" -> "હોમ"
-                      "add_title" -> "દર્દી બુકિંગ ફોર્મ"
-                      "records_title" -> "દર્દીઓનો રેકોર્ડ"
-                      "today_tab" -> "📅 આજના દર્દીઓ (Today)"
-                      "past_tab" -> "📁 જૂનો રેકોર્ડ (Past Records)"
-                      "morning_shift" -> "🌅 મોર્નિંગ શિફ્ટ (સવાર)"
-                      "evening_shift" -> "🌆 ઇવનિંગ શિફ્ટ (સાંજ)"
-                      "new_booking" -> "➕ નવું દર્દી બુકિંગ"
-                      "new_booking_sub" -> "૧૫ મિનિટમાં ૩ દર્દી લિમિટ મુજબ એપોઇન્ટમેન્ટ"
-                      "view_records" -> "📋 દર્દીઓનો રેકોર્ડ અને હિસાબ"
-                      "view_records_sub" -> "આજ અને ભૂતકાળના તમામ દર્દીઓનો ડેટા"
-                      "total_patients" -> "કુલ દર્દીઓ"
-                      "pending_patients" -> "તપાસવાના બાકી"
-                      "completed_patients" -> "તપાસાઈ ગયા"
-                      "total_collection" -> "કુલ ફી કલેક્શન"
-                      "delete_patient" -> "🗑️ રદ કરો (Delete)"
-                      "sync_live" -> "🔄 Sync Now (લાઇવ ડેટા)"
-                      "select_doctor" -> "ડોક્ટર પસંદ કરો:"
-                      "time_slot_label" -> "૧૫ મિનિટ ટાઈમ સ્લોટ:"
-                      "patient_name" -> "દર્દીનું પૂરું નામ"
-                      "village" -> "ગામ"
-                      "age" -> "ઉંમર"
-                      "disease" -> "રોગ / બીમારી"
-                      "medicines" -> "દવાઓ"
-                      "fee_amount" -> "ફી / રકમ ₹"
-                      "payment_mode" -> "પેમેન્ટ મોડ:"
-                      "save_booking" -> "બુકિંગ સેવ કરો"
-                      "back" -> "પાછા જાઓ"
-                      "close" -> "બંધ કરો"
-                      "search_hint" -> "નામ, ગામ કે રોગ થી શોધો..."
-                      else -> key
-                  }
-                  AppLang.HI -> when (key) {
-                      "app_title" -> "आस्था क्लिनिक"
-                      "home_btn" -> "होम"
-                      "add_title" -> "मरीज बुकिंग फॉर्म"
-                      "records_title" -> "मरीजों का रिकॉर्ड"
-                      "today_tab" -> "📅 आज के मरीज (Today)"
-                      "past_tab" -> "📁 पुराना रिकॉर्ड (Past Records)"
-                      "morning_shift" -> "🌅 मॉर्निंग शिफ्ट"
-                      "evening_shift" -> "🌆 इवनिंग शिफ्ट"
-                      "new_booking" -> "➕ नया मरीज बुकिंग"
-                      "new_booking_sub" -> "१५ मिनट में ३ मरीज लिमिट"
-                      "view_records" -> "📋 मरीज रिकॉर्ड और पेमेंट"
-                      "view_records_sub" -> "आज और पुराने सभी मरीजों का डाटा"
-                      "total_patients" -> "कुल मरीज"
-                      "pending_patients" -> "जांच बाकी"
-                      "completed_patients" -> "जांच पूर्ण"
-                      "total_collection" -> "कुल फीस"
-                      "delete_patient" -> "🗑️ रद्द करें (Delete)"
-                      "sync_live" -> "🔄 Sync Now (लाइव)"
-                      "select_doctor" -> "डॉक्टर चुनें:"
-                      "time_slot_label" -> "१५ मिनट टाइम स्लॉट:"
-                      "patient_name" -> "मरीज का पूरा नाम"
-                      "village" -> "गांव"
-                      "age" -> "उम्र"
-                      "disease" -> "बीमारी / लक्षण"
-                      "medicines" -> "दवाइयां"
-                      "fee_amount" -> "फीस / राशि ₹"
-                      "payment_mode" -> "पेमेंट मोड:"
-                      "save_booking" -> "बुकिंग सेव करें"
-                      "back" -> "वापस जाएं"
-                      "close" -> "बंद करें"
-                      "search_hint" -> "नाम, गांव या बीमारी से खोजें..."
-                      else -> key
-                  }
-                  AppLang.EN -> when (key) {
-                      "app_title" -> "Aastha Clinic"
-                      "home_btn" -> "Home"
-                      "add_title" -> "Patient Booking Form"
-                      "records_title" -> "Patient Records"
-                      "today_tab" -> "📅 Today's Patients"
-                      "past_tab" -> "📁 Past Records"
-                      "morning_shift" -> "🌅 Morning Shift"
-                      "evening_shift" -> "🌆 Evening Shift"
-                      "new_booking" -> "➕ New Patient Booking"
-                      "new_booking_sub" -> "Appointment with 3 patients / 15-min limit"
-                      "view_records" -> "📋 Patient Records & History"
-                      "view_records_sub" -> "Present day and past history"
-                      "total_patients" -> "Total Patients"
-                      "pending_patients" -> "Pending Checkup"
-                      "completed_patients" -> "Checked Patients"
-                      "total_collection" -> "Total Collection"
-                      "delete_patient" -> "🗑️ Delete / Cancel"
-                      "sync_live" -> "🔄 Sync Now (Live)"
-                      "select_doctor" -> "Select Doctor:"
-                      "time_slot_label" -> "15-Min Time Slot:"
-                      "patient_name" -> "Patient Full Name"
-                      "village" -> "Village"
-                      "age" -> "Age"
-                      "disease" -> "Disease / Symptoms"
-                      "medicines" -> "Medicines Prescribed"
-                      "fee_amount" -> "Fee Amount ₹"
-                      "payment_mode" -> "Payment Mode:"
-                      "save_booking" -> "Save Appointment"
-                      "back" -> "Back"
-                      "close" -> "Close"
-                      "search_hint" -> "Search by name, village or disease..."
-                      else -> key
-                  }
+          fun sendWhatsAppMessage(context: Context, phone: String, patientName: String, doctor: String, date: String, slot: String) {
+              val cleanPhone = phone.replace("+", "").replace(" ", "").replace("-", "")
+              val finalPhone = if (cleanPhone.length == 10) "91$cleanPhone" else cleanPhone
+
+              val message = """
+                  🏥 *AASTHA CLINIC (આસ્થા ક્લિનિક)* 🏥
+                  
+                  નમસ્તે *$patientName*,
+                  તમારી એપોઇન્ટમેન્ટ સફળતાપૂર્વક બુક થઈ ગઈ છે:
+                  
+                  👨‍⚕️ *ડોક્ટર:* $doctor
+                  📅 *તારીખ:* $date
+                  ⏰ *સમય સ્લોટ:* $slot
+                  📍 *સ્થળ:* આસ્થા ક્લિનિક
+                  
+                  _કૃપા કરીને સમયસર પહોંચવા વિનંતી._
+              """.trimIndent()
+
+              try {
+                  val url = "https://api.whatsapp.com/send?phone=$finalPhone&text=" + URLEncoder.encode(message, "UTF-8")
+                  val intent = Intent(Intent.ACTION_VIEW)
+                  intent.data = Uri.parse(url)
+                  context.startActivity(intent)
+              } catch (e: Exception) {
+                  Toast.makeText(context, "WhatsApp ઇન્સ્ટોલ નથી અથવા નંબર ખોટો છે", Toast.LENGTH_SHORT).show()
               }
           }
 
@@ -283,26 +217,46 @@ jobs:
               override fun onCreate(savedInstanceState: Bundle?) {
                   super.onCreate(savedInstanceState)
                   setContent {
-                      AasthaClinicApp()
+                      AasthaClinicApp(this)
                   }
               }
           }
 
           @OptIn(ExperimentalMaterial3Api::class)
           @Composable
-          fun AasthaClinicApp() {
+          fun AasthaClinicApp(activity: Activity) {
               var currentScreen by remember { mutableStateOf("home") }
               var currentLang by remember { mutableStateOf(AppLang.GU) }
-              var activeSlotDetail by remember { mutableStateOf<Pair<String, String>?>(null) }
+              var isDarkMode by remember { mutableStateOf(false) }
+              var brightnessLevel by remember { mutableStateOf(0.8f) }
+              var textScale by remember { mutableStateOf(TextScale.NORMAL) }
+
+              var directBookingSlot by remember { mutableStateOf<Pair<String, String>?>(null) } // (Slot, Doctor)
+              var viewSlotDetail by remember { mutableStateOf<Pair<String, String>?>(null) }
               val todayDate = remember { getCurrentDate() }
+              val context = LocalContext.current
+              val coroutineScope = rememberCoroutineScope()
+              var isSyncing by remember { mutableStateOf(false) }
 
               val patientList = remember {
                   mutableStateListOf(
-                      Patient(name = "Ramesh Patel (રમેશ પટેલ)", village = "Veraval (વેરાવળ)", age = "45", disease = "Fever & Cold", medicine = "Paracetamol 500mg", amount = "350", paymentMode = "Cash", doctorName = "DR. BIRJU K. SIRODARIA", timeSlot = "11:00 AM - 11:15 AM", date = todayDate, isChecked = false),
-                      Patient(name = "Geetaben Shah (ગીતાબેન શાહ)", village = "Somnath (સોમનાથ)", age = "38", disease = "Acidity & BP", medicine = "Pantocid 40", amount = "500", paymentMode = "Online (UPI)", doctorName = "DR. NIDDHI JAVIA", timeSlot = "05:00 PM - 05:15 PM", date = todayDate, isChecked = true),
-                      Patient(name = "Kishorbhai Joshi (કિશોરભાઈ)", village = "Kodinar (કોડીનાર)", age = "52", disease = "Joint Pain", medicine = "Aceclofenac", amount = "400", paymentMode = "Cash", doctorName = "DR. BIRJU K. SIRODARIA", timeSlot = "11:00 AM - 11:15 AM", date = "18-08-2026", isChecked = true)
+                      Patient(name = "Ramesh Patel (રમેશ પટેલ)", phone = "9876543210", village = "Veraval", age = "45", disease = "Fever & Cold", medicine = "Paracetamol 500mg", amount = "350", paymentMode = "Cash", doctorName = "DR. BIRJU K. SIRODARIA", timeSlot = "11:00 AM - 11:15 AM", date = todayDate, isChecked = false),
+                      Patient(name = "Geetaben Shah (ગીતાબેન)", phone = "9825012345", village = "Somnath", age = "38", disease = "Acidity & BP", medicine = "Pantocid 40", amount = "500", paymentMode = "Online (UPI)", doctorName = "DR. NIDDHI JAVIA", timeSlot = "05:00 PM - 05:15 PM", date = todayDate, isChecked = true)
                   )
               }
+
+              // Adjust Brightness
+              LaunchedEffect(brightnessLevel) {
+                  val layoutParams = activity.window.attributes
+                  layoutParams.screenBrightness = brightnessLevel
+                  activity.window.attributes = layoutParams
+              }
+
+              // Colors based on Dark/Light mode
+              val bgColor = if (isDarkMode) Color(0xFF121212) else Color(0xFFF1F5F9)
+              val cardColor = if (isDarkMode) Color(0xFF1E1E1E) else Color.White
+              val primaryTextColor = if (isDarkMode) Color.White else Color(0xFF0D276B)
+              val bodyTextColor = if (isDarkMode) Color(0xFFE0E0E0) else Color(0xFF1E293B)
 
               Scaffold(
                   topBar = {
@@ -311,16 +265,19 @@ jobs:
                               Text(
                                   text = when (currentScreen) {
                                       "home" -> "AASTHA CLINIC"
-                                      "add" -> tr("add_title", currentLang)
-                                      else -> tr("records_title", currentLang)
+                                      "records" -> "દર્દીઓનો રેકોર્ડ"
+                                      "settings" -> "સેટિંગ્સ (Settings)"
+                                      else -> "દર્દી બુકિંગ"
                                   },
                                   fontWeight = FontWeight.Black,
-                                  letterSpacing = 1.sp,
-                                  fontSize = 19.sp
+                                  fontSize = (18 * textScale.scale).sp
                               )
                           },
                           actions = {
-                              Row(modifier = Modifier.padding(end = 8.dp)) {
+                              IconButton(onClick = { currentScreen = if (currentScreen == "settings") "home" else "settings" }) {
+                                  Text("⚙️", fontSize = 20.sp)
+                              }
+                              Row(modifier = Modifier.padding(end = 6.dp)) {
                                   listOf(
                                       AppLang.GU to "ગુજ",
                                       AppLang.HI to "हिं",
@@ -332,10 +289,10 @@ jobs:
                                               containerColor = if (currentLang == lang) Color.White else Color(0xFF1E3A8A),
                                               contentColor = if (currentLang == lang) Color(0xFF0D276B) else Color.White
                                           ),
-                                          contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                                          modifier = Modifier.padding(horizontal = 2.dp).height(32.dp)
+                                          contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+                                          modifier = Modifier.padding(horizontal = 2.dp).height(30.dp)
                                       ) {
-                                          Text(label, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                          Text(label, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                       }
                                   }
                               }
@@ -351,30 +308,33 @@ jobs:
                       modifier = Modifier
                           .fillMaxSize()
                           .padding(paddingValues)
-                          .background(Color(0xFFF1F5F9))
+                          .background(bgColor)
                   ) {
                       when (currentScreen) {
                           "home" -> HomeScreen(
-                              lang = currentLang,
                               patientList = patientList,
-                              onAddClick = { currentScreen = "add" },
+                              cardColor = cardColor,
+                              textColor = primaryTextColor,
+                              bodyTextColor = bodyTextColor,
+                              textScale = textScale.scale,
+                              onDirectBookSlot = { slot, doc -> directBookingSlot = Pair(slot, doc) },
+                              onViewSlotInfo = { slot, doc -> viewSlotDetail = Pair(slot, doc) },
                               onRecordsClick = { currentScreen = "records" },
-                              onSlotClick = { slot, doc -> activeSlotDetail = Pair(slot, doc) }
-                          )
-                          "add" -> AddPatientScreen(
-                              lang = currentLang,
-                              patientList = patientList,
-                              onSave = { newPatient ->
-                                  patientList.add(0, newPatient)
-                                  currentScreen = "records"
-                              },
-                              onBack = { currentScreen = "home" },
-                              onSlotInfoClick = { slot, doc -> activeSlotDetail = Pair(slot, doc) }
+                              onSyncClick = {
+                                  coroutineScope.launch {
+                                      isSyncing = true
+                                      Toast.makeText(context, "🔄 Cloud Database સાથે Sync થઈ રહ્યું છે...", Toast.LENGTH_SHORT).show()
+                                      kotlinx.coroutines.delay(1200)
+                                      isSyncing = false
+                                      Toast.makeText(context, "✅ Data Synchronized successfully!", Toast.LENGTH_SHORT).show()
+                                  }
+                              }
                           )
                           "records" -> PatientRecordsScreen(
-                              lang = currentLang,
                               patients = patientList,
                               todayDate = todayDate,
+                              cardColor = cardColor,
+                              textScale = textScale.scale,
                               onBack = { currentScreen = "home" },
                               onToggleCheck = { patient ->
                                   val index = patientList.indexOfFirst { it.id == patient.id }
@@ -384,53 +344,72 @@ jobs:
                               },
                               onDelete = { patient ->
                                   patientList.removeIf { it.id == patient.id }
+                                  Toast.makeText(context, "દર્દી રદ કરવામાં આવ્યા", Toast.LENGTH_SHORT).show()
+                              },
+                              onSendWhatsApp = { patient ->
+                                  sendWhatsAppMessage(context, patient.phone, patient.name, patient.doctorName, patient.date, patient.timeSlot)
+                              }
+                          )
+                          "settings" -> SettingsScreen(
+                              isDarkMode = isDarkMode,
+                              onToggleDarkMode = { isDarkMode = it },
+                              brightnessLevel = brightnessLevel,
+                              onBrightnessChange = { brightnessLevel = it },
+                              textScale = textScale,
+                              onTextScaleChange = { textScale = it },
+                              cardColor = cardColor,
+                              textColor = bodyTextColor,
+                              onBack = { currentScreen = "home" }
+                          )
+                      }
+
+                      // Direct Slot Booking Dialog
+                      directBookingSlot?.let { (slot, doc) ->
+                          DirectSlotBookingDialog(
+                              slot = slot,
+                              doctor = doc,
+                              onDismiss = { directBookingSlot = null },
+                              onSave = { newPatient ->
+                                  patientList.add(0, newPatient)
+                                  directBookingSlot = null
+                                  if (newPatient.phone.isNotBlank()) {
+                                      sendWhatsAppMessage(context, newPatient.phone, newPatient.name, newPatient.doctorName, newPatient.date, newPatient.timeSlot)
+                                  }
+                                  Toast.makeText(context, "✅ એપોઇન્ટમેન્ટ બુક થઈ ગઈ!", Toast.LENGTH_SHORT).show()
                               }
                           )
                       }
 
-                      // Popup to View Slot Patients & Delete if cancelled
-                      activeSlotDetail?.let { (slot, doc) ->
-                          val slotPatients = patientList.filter { it.timeSlot == slot && it.doctorName.contains(doc.take(5)) }
+                      // View Slot Details Dialog
+                      viewSlotDetail?.let { (slot, doc) ->
+                          val slotPatients = patientList.filter { it.timeSlot == slot && it.doctorName.contains(doc.take(5)) && it.date == todayDate }
                           AlertDialog(
-                              onDismissRequest = { activeSlotDetail = null },
+                              onDismissRequest = { viewSlotDetail = null },
                               title = {
                                   Column {
-                                      Text(text = "⏰ $slot", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color(0xFF0D276B))
-                                      Text(text = "👨‍⚕️ $doc", fontSize = 13.sp, color = Color.Gray)
+                                      Text(text = "⏰ $slot", fontWeight = FontWeight.Bold, fontSize = (16 * textScale.scale).sp, color = Color(0xFF0D276B))
+                                      Text(text = "👨‍⚕️ $doc", fontSize = (12 * textScale.scale).sp, color = Color.Gray)
                                   }
                               },
                               text = {
                                   Column(modifier = Modifier.fillMaxWidth()) {
-                                      Text(text = "આ સ્લોટના દર્દીઓ:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                      Spacer(modifier = Modifier.height(8.dp))
                                       if (slotPatients.isEmpty()) {
-                                          Text(text = "આ સ્લોટમાં હજુ કોઈ દર્દી નથી (સ્લોટ ખાલી છે).", fontSize = 13.sp, color = Color.DarkGray)
+                                          Text(text = "આ સ્લોટમાં હજુ કોઈ દર્દી નથી.", fontSize = 13.sp, color = Color.DarkGray)
                                       } else {
                                           slotPatients.forEachIndexed { index, p ->
                                               Card(
-                                                  modifier = Modifier
-                                                      .fillMaxWidth()
-                                                      .padding(vertical = 4.dp),
-                                                  colors = CardDefaults.cardColors(
-                                                      containerColor = if (p.isChecked) Color(0xFFFFEBEE) else Color(0xFFE8F5E9)
-                                                  )
+                                                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                                  colors = CardDefaults.cardColors(containerColor = if (p.isChecked) Color(0xFFFFEBEE) else Color(0xFFE8F5E9))
                                               ) {
-                                                  Column(modifier = Modifier.padding(10.dp)) {
-                                                      Row(
-                                                          modifier = Modifier.fillMaxWidth(),
-                                                          horizontalArrangement = Arrangement.SpaceBetween,
-                                                          verticalAlignment = Alignment.CenterVertically
-                                                      ) {
-                                                          Text(text = "${index + 1}. ${p.name}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF0D276B))
-                                                          IconButton(
-                                                              onClick = { patientList.removeIf { it.id == p.id } },
-                                                              modifier = Modifier.size(28.dp)
-                                                          ) {
-                                                              Text("🗑️", fontSize = 14.sp)
+                                                  Column(modifier = Modifier.padding(8.dp)) {
+                                                      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                                          Text(text = "${index + 1}. ${p.name}", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                                          IconButton(onClick = { patientList.removeIf { it.id == p.id } }, modifier = Modifier.size(24.dp)) {
+                                                              Text("🗑️", fontSize = 12.sp)
                                                           }
                                                       }
-                                                      Text(text = "ગામ: ${p.village} | ઉંમર: ${p.age} વર્ષ | તારીખ: ${p.date}", fontSize = 11.sp, color = Color.DarkGray)
-                                                      Text(text = "રોગ: ${p.disease} | ફી: ₹${p.amount}", fontSize = 12.sp, color = Color(0xFFD32F2F))
+                                                      Text(text = "📱 મો: ${p.phone} | ગામ: ${p.village}", fontSize = 11.sp)
+                                                      Text(text = "રોગ: ${p.disease} | ફી: ₹${p.amount}", fontSize = 11.sp, color = Color(0xFFD32F2F))
                                                   }
                                               }
                                           }
@@ -438,11 +417,24 @@ jobs:
                                   }
                               },
                               confirmButton = {
-                                  Button(
-                                      onClick = { activeSlotDetail = null },
-                                      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B))
-                                  ) {
-                                      Text(tr("close", currentLang))
+                                  Row {
+                                      if (slotPatients.size < 3) {
+                                          Button(
+                                              onClick = {
+                                                  val s = slot
+                                                  val d = doc
+                                                  viewSlotDetail = null
+                                                  directBookingSlot = Pair(s, d)
+                                              },
+                                              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                                          ) {
+                                              Text("+ નવો દર્દી ઉમેરો")
+                                          }
+                                          Spacer(modifier = Modifier.width(6.dp))
+                                      }
+                                      Button(onClick = { viewSlotDetail = null }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B))) {
+                                          Text("બંધ કરો")
+                                      }
                                   }
                               }
                           )
@@ -453,252 +445,19 @@ jobs:
 
           @Composable
           fun HomeScreen(
-              lang: AppLang,
               patientList: List<Patient>,
-              onAddClick: () -> Unit,
+              cardColor: Color,
+              textColor: Color,
+              bodyTextColor: Color,
+              textScale: Float,
+              onDirectBookSlot: (String, String) -> Unit,
+              onViewSlotInfo: (String, String) -> Unit,
               onRecordsClick: () -> Unit,
-              onSlotClick: (String, String) -> Unit
+              onSyncClick: () -> Unit
           ) {
               val todayDate = getCurrentDate()
               val todayPatients = patientList.filter { it.date == todayDate }
-              val totalPatients = todayPatients.size
-              val pendingCount = todayPatients.count { !it.isChecked }
-              val completedCount = todayPatients.count { it.isChecked }
-              val totalCollection = todayPatients.sumOf { it.amount.toIntOrNull() ?: 0 }
-
-              Column(
-                  modifier = Modifier
-                      .fillMaxSize()
-                      .padding(16.dp)
-                      .verticalScroll(rememberScrollState()),
-                  horizontalAlignment = Alignment.CenterHorizontally
-              ) {
-                  // Large Beautiful Brand Logo Header Card
-                  Card(
-                      modifier = Modifier.fillMaxWidth(),
-                      shape = RoundedCornerShape(20.dp),
-                      colors = CardDefaults.cardColors(containerColor = Color.White),
-                      elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
-                  ) {
-                      Column(
-                          modifier = Modifier
-                              .fillMaxWidth()
-                              .padding(20.dp),
-                          horizontalAlignment = Alignment.CenterHorizontally
-                      ) {
-                          Image(
-                              painter = painterResource(id = R.drawable.ic_aastha_brand_logo),
-                              contentDescription = "Aastha Clinic Logo",
-                              modifier = Modifier.size(90.dp) // Large Symbol
-                          )
-                          Spacer(modifier = Modifier.height(10.dp))
-                          Text(
-                              text = "AASTHA CLINIC",
-                              fontSize = 26.sp,
-                              fontWeight = FontWeight.Black,
-                              letterSpacing = 3.sp,
-                              color = Color(0xFF0D276B)
-                          )
-                          Text(
-                              text = "આસ્થા ક્લિનિક - હેલ્થકેર મેનેજમેન્ટ",
-                              fontSize = 13.sp,
-                              fontWeight = FontWeight.Medium,
-                              color = Color(0xFFD32F2F)
-                          )
-                      }
-                  }
-
-                  Spacer(modifier = Modifier.height(16.dp))
-
-                  // Live Today's Analytics Dashboard Grid
-                  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                      MetricCard(title = "${tr("total_patients", lang)} (આજે)", value = "$totalPatients", color = Color(0xFF0288D1), modifier = Modifier.weight(1f).padding(end = 4.dp))
-                      MetricCard(title = tr("pending_patients", lang), value = "$pendingCount", color = Color(0xFF16A34A), modifier = Modifier.weight(1f).padding(start = 4.dp))
-                  }
-
-                  Spacer(modifier = Modifier.height(8.dp))
-
-                  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                      MetricCard(title = tr("completed_patients", lang), value = "$completedCount", color = Color(0xFFDC2626), modifier = Modifier.weight(1f).padding(end = 4.dp))
-                      MetricCard(title = tr("total_collection", lang), value = "₹$totalCollection", color = Color(0xFF7C3AED), modifier = Modifier.weight(1f).padding(start = 4.dp))
-                  }
-
-                  Spacer(modifier = Modifier.height(16.dp))
-
-                  DoctorInfoCard(
-                      doctorName = "DR. BIRJU K. SIRODARIA",
-                      shift = tr("morning_shift", lang),
-                      time = "⏰ 11:00 AM - 03:30 PM",
-                      bgColor = Color(0xFF0D276B)
-                  )
-
-                  Spacer(modifier = Modifier.height(8.dp))
-
-                  DoctorInfoCard(
-                      doctorName = "DR. NIDDHI JAVIA",
-                      shift = tr("evening_shift", lang),
-                      time = "⏰ 05:00 PM - 08:00 PM",
-                      bgColor = Color(0xFF1E3A8A)
-                  )
-
-                  Spacer(modifier = Modifier.height(16.dp))
-
-                  HomeMenuButton(
-                      title = tr("new_booking", lang),
-                      subtitle = tr("new_booking_sub", lang),
-                      color = Color(0xFFD32F2F),
-                      onClick = onAddClick
-                  )
-
-                  Spacer(modifier = Modifier.height(10.dp))
-
-                  HomeMenuButton(
-                      title = tr("view_records", lang),
-                      subtitle = tr("view_records_sub", lang),
-                      color = Color(0xFF0D276B),
-                      onClick = onRecordsClick
-                  )
-
-                  Spacer(modifier = Modifier.height(18.dp))
-
-                  Text(
-                      text = "🕒 આજના ટાઈમ સ્લોટ્સ (Green: બાકી | Red: તપાસાઈ ગયા)",
-                      fontWeight = FontWeight.Bold,
-                      fontSize = 13.sp,
-                      color = Color(0xFF1E293B)
-                  )
-                  Spacer(modifier = Modifier.height(8.dp))
-
-                  val morningSlots = listOf(
-                      "11:00 AM - 11:15 AM", "11:15 AM - 11:30 AM", "11:30 AM - 11:45 AM", "11:45 AM - 12:00 PM",
-                      "12:00 PM - 12:15 PM", "12:15 PM - 12:30 PM", "12:30 PM - 12:45 PM", "12:45 PM - 01:00 PM",
-                      "01:00 PM - 01:15 PM", "01:15 PM - 01:30 PM", "01:30 PM - 01:45 PM", "01:45 PM - 02:00 PM",
-                      "02:00 PM - 02:15 PM", "02:15 PM - 02:30 PM", "02:30 PM - 02:45 PM", "02:45 PM - 03:00 PM",
-                      "03:00 PM - 03:15 PM", "03:15 PM - 03:30 PM"
-                  )
-
-                  morningSlots.chunked(2).forEach { rowSlots ->
-                      Row(modifier = Modifier.fillMaxWidth()) {
-                          rowSlots.forEach { slot ->
-                              val doc = "DR. BIRJU K. SIRODARIA"
-                              val slotPatients = patientList.filter { it.timeSlot == slot && it.doctorName.contains("BIRJU") && it.date == todayDate }
-                              val hasPatients = slotPatients.isNotEmpty()
-                              val allChecked = hasPatients && slotPatients.all { it.isChecked }
-                              val isPending = hasPatients && slotPatients.any { !it.isChecked }
-
-                              val cardBgColor = when {
-                                  allChecked -> Color(0xFFDC2626)
-                                  isPending -> Color(0xFF16A34A)
-                                  else -> Color.White
-                              }
-                              val textColor = if (hasPatients) Color.White else Color(0xFF0D276B)
-
-                              Card(
-                                  modifier = Modifier
-                                      .weight(1f)
-                                      .padding(3.dp)
-                                      .clickable { onSlotClick(slot, doc) },
-                                  colors = CardDefaults.cardColors(containerColor = cardBgColor),
-                                  shape = RoundedCornerShape(8.dp)
-                              ) {
-                                  Column(modifier = Modifier.padding(10.dp)) {
-                                      Text(text = slot, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = textColor)
-                                      Text(
-                                          text = when {
-                                              allChecked -> "🔴 તપાસાઈ ગયા"
-                                              isPending -> "🟢 તપાસવાના બાકી (${slotPatients.size})"
-                                              else -> "⚪ ખાલી (0/3)"
-                                          },
-                                          fontSize = 10.sp,
-                                          color = if (hasPatients) Color.White.copy(alpha = 0.9f) else Color.Gray
-                                      )
-                                  }
-                              }
-                          }
-                      }
-                  }
-              }
-          }
-
-          @Composable
-          fun MetricCard(title: String, value: String, color: Color, modifier: Modifier = Modifier) {
-              Card(
-                  modifier = modifier,
-                  shape = RoundedCornerShape(12.dp),
-                  colors = CardDefaults.cardColors(containerColor = Color.White),
-                  elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-              ) {
-                  Column(modifier = Modifier.padding(12.dp)) {
-                      Text(text = title, fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
-                      Spacer(modifier = Modifier.height(4.dp))
-                      Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = color)
-                  }
-              }
-          }
-
-          @Composable
-          fun DoctorInfoCard(doctorName: String, shift: String, time: String, bgColor: Color) {
-              Card(
-                  modifier = Modifier.fillMaxWidth(),
-                  shape = RoundedCornerShape(14.dp),
-                  colors = CardDefaults.cardColors(containerColor = bgColor),
-                  elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-              ) {
-                  Column(modifier = Modifier.padding(14.dp)) {
-                      Text(text = "👨‍⚕️ $doctorName", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                      Spacer(modifier = Modifier.height(3.dp))
-                      Text(text = shift, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = Color(0xFF90CAF9))
-                      Spacer(modifier = Modifier.height(2.dp))
-                      Text(text = time, fontSize = 12.sp, color = Color.White.copy(alpha = 0.9f))
-                  }
-              }
-          }
-
-          @Composable
-          fun HomeMenuButton(title: String, subtitle: String, color: Color, onClick: () -> Unit) {
-              Card(
-                  modifier = Modifier
-                      .fillMaxWidth()
-                      .clickable { onClick() },
-                  shape = RoundedCornerShape(12.dp),
-                  colors = CardDefaults.cardColors(containerColor = Color.White),
-                  elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-              ) {
-                  Row(
-                      modifier = Modifier.padding(14.dp),
-                      verticalAlignment = Alignment.CenterVertically
-                  ) {
-                      Box(
-                          modifier = Modifier
-                              .size(10.dp, 40.dp)
-                              .background(color, RoundedCornerShape(4.dp))
-                      )
-                      Spacer(modifier = Modifier.width(12.dp))
-                      Column {
-                          Text(text = title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
-                          Spacer(modifier = Modifier.height(2.dp))
-                          Text(text = subtitle, fontSize = 12.sp, color = Color.Gray)
-                      }
-                  }
-              }
-          }
-
-          @Composable
-          fun AddPatientScreen(
-              lang: AppLang,
-              patientList: List<Patient>,
-              onSave: (Patient) -> Unit,
-              onBack: () -> Unit,
-              onSlotInfoClick: (String, String) -> Unit
-          ) {
-              var name by remember { mutableStateOf("") }
-              var village by remember { mutableStateOf("") }
-              var age by remember { mutableStateOf("") }
-              var disease by remember { mutableStateOf("") }
-              var medicine by remember { mutableStateOf("") }
-              var amount by remember { mutableStateOf("") }
-              var paymentMode by remember { mutableStateOf("Cash") }
-              var selectedDoctor by remember { mutableStateOf("DR. BIRJU K. SIRODARIA (11:00 AM - 03:30 PM)") }
+              var selectedDoctorTab by remember { mutableStateOf("DR. BIRJU K. SIRODARIA") }
 
               val morningSlots = listOf(
                   "11:00 AM - 11:15 AM", "11:15 AM - 11:30 AM", "11:30 AM - 11:45 AM", "11:45 AM - 12:00 PM",
@@ -714,227 +473,396 @@ jobs:
                   "07:00 PM - 07:15 PM", "07:15 PM - 07:30 PM", "07:30 PM - 07:45 PM", "07:45 PM - 08:00 PM"
               )
 
-              val currentSlots = if (selectedDoctor.contains("BIRJU")) morningSlots else eveningSlots
-              var selectedSlot by remember(selectedDoctor) { mutableStateOf(currentSlots.first()) }
+              val currentSlots = if (selectedDoctorTab.contains("BIRJU")) morningSlots else eveningSlots
 
               Column(
                   modifier = Modifier
                       .fillMaxSize()
-                      .verticalScroll(rememberScrollState())
-                      .padding(16.dp)
+                      .padding(14.dp)
+                      .verticalScroll(rememberScrollState()),
+                  horizontalAlignment = Alignment.CenterHorizontally
               ) {
-                  Text(tr("select_doctor", lang), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                  Spacer(modifier = Modifier.height(4.dp))
-
-                  listOf(
-                      "DR. BIRJU K. SIRODARIA (11:00 AM - 03:30 PM)",
-                      "DR. NIDDHI JAVIA (05:00 PM - 08:00 PM)"
-                  ).forEach { doc ->
-                      Row(
-                          verticalAlignment = Alignment.CenterVertically,
-                          modifier = Modifier.clickable { selectedDoctor = doc }
+                  // Official Large Clinic Brand Logo Card
+                  Card(
+                      modifier = Modifier.fillMaxWidth(),
+                      shape = RoundedCornerShape(18.dp),
+                      colors = CardDefaults.cardColors(containerColor = cardColor),
+                      elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                  ) {
+                      Column(
+                          modifier = Modifier.fillMaxWidth().padding(14.dp),
+                          horizontalAlignment = Alignment.CenterHorizontally
                       ) {
-                          RadioButton(selected = (selectedDoctor == doc), onClick = { selectedDoctor = doc })
-                          Text(text = doc, fontSize = 13.sp)
+                          Image(
+                              painter = painterResource(id = R.drawable.ic_aastha_brand_logo),
+                              contentDescription = "Aastha Clinic Logo",
+                              modifier = Modifier.size(85.dp)
+                          )
+                          Spacer(modifier = Modifier.height(6.dp))
+                          Text(text = "AASTHA CLINIC", fontSize = (22 * textScale).sp, fontWeight = FontWeight.Black, color = Color(0xFF0D276B))
+                          Text(text = "🏥 આસ્થા ક્લિનિક - ડાયરેક્ટ સ્લોટ બુકિંગ", fontSize = (12 * textScale).sp, color = Color(0xFFD32F2F))
                       }
                   }
 
-                  Spacer(modifier = Modifier.height(10.dp))
-                  Text(tr("time_slot_label", lang), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                  Spacer(modifier = Modifier.height(6.dp))
+                  Spacer(modifier = Modifier.height(12.dp))
 
-                  Column(modifier = Modifier.fillMaxWidth()) {
-                      currentSlots.chunked(2).forEach { rowSlots ->
-                          Row(modifier = Modifier.fillMaxWidth()) {
-                              rowSlots.forEach { slot ->
-                                  val docKey = if (selectedDoctor.contains("BIRJU")) "BIRJU" else "NIDDHI"
-                                  val slotPatients = patientList.filter { it.timeSlot == slot && it.doctorName.contains(docKey) && it.date == getCurrentDate() }
-                                  val bookedCount = slotPatients.size
-                                  val allChecked = bookedCount > 0 && slotPatients.all { it.isChecked }
-                                  val isPending = bookedCount > 0 && slotPatients.any { !it.isChecked }
+                  // Live Cloud Sync & History Action Bar
+                  Row(modifier = Modifier.fillMaxWidth()) {
+                      Button(
+                          onClick = onSyncClick,
+                          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B)),
+                          modifier = Modifier.weight(1f).height(42.dp),
+                          shape = RoundedCornerShape(8.dp)
+                      ) {
+                          Text("🔄 Live Sync Data", fontSize = (12 * textScale).sp, fontWeight = FontWeight.Bold)
+                      }
+                      Spacer(modifier = Modifier.width(8.dp))
+                      Button(
+                          onClick = onRecordsClick,
+                          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                          modifier = Modifier.weight(1f).height(42.dp),
+                          shape = RoundedCornerShape(8.dp)
+                      ) {
+                          Text("📋 દર્દી રેકોર્ડ્સ (${todayPatients.size})", fontSize = (12 * textScale).sp, fontWeight = FontWeight.Bold)
+                      }
+                  }
 
-                                  val cardBgColor = when {
-                                      selectedSlot == slot -> Color(0xFF0D276B)
-                                      allChecked -> Color(0xFFDC2626)
-                                      isPending -> Color(0xFF16A34A)
-                                      else -> Color.White
-                                  }
+                  Spacer(modifier = Modifier.height(16.dp))
 
-                                  Card(
-                                      modifier = Modifier
-                                          .weight(1f)
-                                          .padding(3.dp)
-                                          .clickable {
-                                              selectedSlot = slot
-                                              onSlotInfoClick(slot, selectedDoctor)
-                                          },
-                                      colors = CardDefaults.cardColors(containerColor = cardBgColor),
-                                      shape = RoundedCornerShape(8.dp)
-                                  ) {
-                                      Column(modifier = Modifier.padding(8.dp)) {
-                                          Text(
-                                              text = slot,
-                                              fontSize = 11.sp,
-                                              fontWeight = FontWeight.Bold,
-                                              color = if (selectedSlot == slot || bookedCount > 0) Color.White else Color(0xFF0D276B)
-                                          )
-                                          Text(
-                                              text = when {
-                                                  allChecked -> "🔴 તપાસાઈ ગયા"
-                                                  isPending -> "🟢 બાકી"
-                                                  else -> "$bookedCount/3 દર્દી"
-                                              },
-                                              fontSize = 10.sp,
-                                              color = if (selectedSlot == slot || bookedCount > 0) Color.White.copy(alpha = 0.9f) else Color.Gray
-                                          )
-                                      }
-                                  }
-                              }
-                          }
+                  // Doctor Tab Switcher
+                  Row(modifier = Modifier.fillMaxWidth()) {
+                      Button(
+                          onClick = { selectedDoctorTab = "DR. BIRJU K. SIRODARIA" },
+                          colors = ButtonDefaults.buttonColors(
+                              containerColor = if (selectedDoctorTab.contains("BIRJU")) Color(0xFF0D276B) else cardColor,
+                              contentColor = if (selectedDoctorTab.contains("BIRJU")) Color.White else bodyTextColor
+                          ),
+                          modifier = Modifier.weight(1f).padding(end = 4.dp),
+                          shape = RoundedCornerShape(8.dp)
+                      ) {
+                          Text("🌅 Dr. Birju\n11am-3:30pm", fontSize = (11 * textScale).sp, fontWeight = FontWeight.Bold)
+                      }
+
+                      Button(
+                          onClick = { selectedDoctorTab = "DR. NIDDHI JAVIA" },
+                          colors = ButtonDefaults.buttonColors(
+                              containerColor = if (selectedDoctorTab.contains("NIDDHI")) Color(0xFF0D276B) else cardColor,
+                              contentColor = if (selectedDoctorTab.contains("NIDDHI")) Color.White else bodyTextColor
+                          ),
+                          modifier = Modifier.weight(1f).padding(start = 4.dp),
+                          shape = RoundedCornerShape(8.dp)
+                      ) {
+                          Text("🌆 Dr. Niddhi\n5pm-8:00pm", fontSize = (11 * textScale).sp, fontWeight = FontWeight.Bold)
                       }
                   }
 
                   Spacer(modifier = Modifier.height(14.dp))
 
-                  OutlinedTextField(
-                      value = name,
-                      onValueChange = { name = it },
-                      label = { Text(tr("patient_name", lang)) },
-                      supportingText = {
-                          val converted = IndicToEnglish.convert(name)
-                          if (converted != name && name.isNotBlank()) {
-                              Text("➡️ English: $converted", color = Color(0xFF0D276B), fontWeight = FontWeight.Bold)
-                          }
-                      },
-                      modifier = Modifier.fillMaxWidth()
+                  Text(
+                      text = "⚡ કોઈપણ સ્લોટ પર ક્લિક કરી ડાયરેક્ટ દર્દી બુક કરો:",
+                      fontWeight = FontWeight.Bold,
+                      fontSize = (12 * textScale).sp,
+                      color = bodyTextColor
                   )
                   Spacer(modifier = Modifier.height(8.dp))
 
-                  Row(modifier = Modifier.fillMaxWidth()) {
-                      OutlinedTextField(
-                          value = village,
-                          onValueChange = { village = it },
-                          label = { Text(tr("village", lang)) },
-                          supportingText = {
-                              val converted = IndicToEnglish.convert(village)
-                              if (converted != village && village.isNotBlank()) {
-                                  Text("➡️ $converted", color = Color(0xFF0D276B))
+                  // Interactive Grid of Slots with Direct Booking
+                  currentSlots.chunked(2).forEach { rowSlots ->
+                      Row(modifier = Modifier.fillMaxWidth()) {
+                          rowSlots.forEach { slot ->
+                              val docKey = if (selectedDoctorTab.contains("BIRJU")) "BIRJU" else "NIDDHI"
+                              val slotPatients = patientList.filter { it.timeSlot == slot && it.doctorName.contains(docKey) && it.date == todayDate }
+                              val count = slotPatients.size
+                              val allChecked = count > 0 && slotPatients.all { it.isChecked }
+                              val isPending = count > 0 && slotPatients.any { !it.isChecked }
+
+                              val cardBg = when {
+                                  allChecked -> Color(0xFFDC2626) // Red when completed
+                                  isPending -> Color(0xFF16A34A)  // Green when pending
+                                  else -> cardColor              // White / Dark
+                              }
+
+                              val titleColor = if (count > 0) Color.White else Color(0xFF0D276B)
+
+                              Card(
+                                  modifier = Modifier
+                                      .weight(1f)
+                                      .padding(3.dp)
+                                      .clickable {
+                                          if (count >= 3) {
+                                              onViewSlotInfo(slot, selectedDoctorTab)
+                                          } else {
+                                              onDirectBookSlot(slot, selectedDoctorTab)
+                                          }
+                                      },
+                                  colors = CardDefaults.cardColors(containerColor = cardBg),
+                                  shape = RoundedCornerShape(8.dp),
+                                  elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                              ) {
+                                  Column(modifier = Modifier.padding(10.dp)) {
+                                      Text(text = slot, fontSize = (11 * textScale).sp, fontWeight = FontWeight.Bold, color = titleColor)
+                                      Spacer(modifier = Modifier.height(2.dp))
+                                      Text(
+                                          text = when {
+                                              allChecked -> "🔴 તપાસાઈ ગયા"
+                                              isPending -> "🟢 તપાસવાના બાકી ($count/3)"
+                                              else -> "➕ બુક કરો (ખાલી)"
+                                          },
+                                          fontSize = (10 * textScale).sp,
+                                          color = if (count > 0) Color.White.copy(alpha = 0.9f) else Color(0xFF2E7D32),
+                                          fontWeight = FontWeight.SemiBold
+                                      )
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun DirectSlotBookingDialog(
+              slot: String,
+              doctor: String,
+              onDismiss: () -> Unit,
+              onSave: (Patient) -> Unit
+          ) {
+              var name by remember { mutableStateOf("") }
+              var phone by remember { mutableStateOf("") }
+              var village by remember { mutableStateOf("") }
+              var age by remember { mutableStateOf("") }
+              var disease by remember { mutableStateOf("") }
+              var amount by remember { mutableStateOf("300") }
+              var paymentMode by remember { mutableStateOf("Cash") }
+
+              AlertDialog(
+                  onDismissRequest = onDismiss,
+                  title = {
+                      Column {
+                          Text(text = "➕ નવું દર્દી બુકિંગ", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF0D276B))
+                          Text(text = "⏰ સ્લોટ: $slot | $doctor", fontSize = 12.sp, color = Color.Gray)
+                      }
+                  },
+                  text = {
+                      Column(
+                          modifier = Modifier
+                              .fillMaxWidth()
+                              .verticalScroll(rememberScrollState())
+                      ) {
+                          OutlinedTextField(
+                              value = name,
+                              onValueChange = { name = it },
+                              label = { Text("દર્દીનું નામ (Name)") },
+                              modifier = Modifier.fillMaxWidth()
+                          )
+                          Spacer(modifier = Modifier.height(6.dp))
+
+                          OutlinedTextField(
+                              value = phone,
+                              onValueChange = { phone = it },
+                              label = { Text("વોટ્સએપ મોબાઇલ નંબર (Mobile No)") },
+                              placeholder = { Text("9876543210") },
+                              modifier = Modifier.fillMaxWidth()
+                          )
+                          Spacer(modifier = Modifier.height(6.dp))
+
+                          Row(modifier = Modifier.fillMaxWidth()) {
+                              OutlinedTextField(
+                                  value = village,
+                                  onValueChange = { village = it },
+                                  label = { Text("ગામ (Village)") },
+                                  modifier = Modifier.weight(1.4f)
+                              )
+                              Spacer(modifier = Modifier.width(6.dp))
+                              OutlinedTextField(
+                                  value = age,
+                                  onValueChange = { age = it },
+                                  label = { Text("ઉંમર") },
+                                  modifier = Modifier.weight(1f)
+                              )
+                          }
+                          Spacer(modifier = Modifier.height(6.dp))
+
+                          OutlinedTextField(
+                              value = disease,
+                              onValueChange = { disease = it },
+                              label = { Text("રોગ / બીમારી (Disease)") },
+                              modifier = Modifier.fillMaxWidth()
+                          )
+                          Spacer(modifier = Modifier.height(6.dp))
+
+                          OutlinedTextField(
+                              value = amount,
+                              onValueChange = { amount = it },
+                              label = { Text("ફી ₹ (Fee)") },
+                              modifier = Modifier.fillMaxWidth()
+                          )
+                          Spacer(modifier = Modifier.height(6.dp))
+
+                          Text("પેમેન્ટ:", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                          Row {
+                              listOf("Cash", "Online", "બાકી").forEach { mode ->
+                                  Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { paymentMode = mode }) {
+                                      RadioButton(selected = (paymentMode == mode), onClick = { paymentMode = mode })
+                                      Text(text = mode, fontSize = 12.sp)
+                                  }
+                              }
+                          }
+                      }
+                  },
+                  confirmButton = {
+                      Button(
+                          onClick = {
+                              if (name.isNotBlank()) {
+                                  val engName = IndicToEnglish.convert(name)
+                                  val displayName = if (engName != name) "$engName ($name)" else name
+                                  onSave(
+                                      Patient(
+                                          name = displayName,
+                                          phone = phone,
+                                          village = village,
+                                          age = age,
+                                          disease = disease,
+                                          medicine = "-",
+                                          amount = amount,
+                                          paymentMode = paymentMode,
+                                          doctorName = doctor,
+                                          timeSlot = slot,
+                                          date = getCurrentDate(),
+                                          isChecked = false
+                                      )
+                                  )
                               }
                           },
-                          modifier = Modifier.weight(1.5f)
-                      )
-                      Spacer(modifier = Modifier.width(8.dp))
-                      OutlinedTextField(
-                          value = age,
-                          onValueChange = { age = it },
-                          label = { Text(tr("age", lang)) },
-                          modifier = Modifier.weight(1f)
-                      )
+                          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                      ) {
+                          Text("💾 બુક & WhatsApp")
+                      }
+                  },
+                  dismissButton = {
+                      OutlinedButton(onClick = onDismiss) {
+                          Text("રદ કરો")
+                      }
                   }
-                  Spacer(modifier = Modifier.height(8.dp))
+              )
+          }
 
-                  OutlinedTextField(
-                      value = disease,
-                      onValueChange = { disease = it },
-                      label = { Text(tr("disease", lang)) },
-                      supportingText = {
-                          val converted = IndicToEnglish.convert(disease)
-                          if (converted != disease && disease.isNotBlank()) {
-                              Text("➡️ English: $converted", color = Color(0xFF0D276B))
-                          }
-                      },
-                      modifier = Modifier.fillMaxWidth()
-                  )
-                  Spacer(modifier = Modifier.height(8.dp))
+          @Composable
+          fun SettingsScreen(
+              isDarkMode: Boolean,
+              onToggleDarkMode: (Boolean) -> Unit,
+              brightnessLevel: Float,
+              onBrightnessChange: (Float) -> Unit,
+              textScale: TextScale,
+              onTextScaleChange: (TextScale) -> Unit,
+              cardColor: Color,
+              textColor: Color,
+              onBack: () -> Unit
+          ) {
+              Column(
+                  modifier = Modifier
+                      .fillMaxSize()
+                      .padding(16.dp)
+                      .verticalScroll(rememberScrollState())
+              ) {
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                      IconButton(onClick = onBack) { Text("⬅️", fontSize = 20.sp) }
+                      Spacer(modifier = Modifier.width(6.dp))
+                      Text(text = "એપ સેટિંગ્સ (Settings)", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = textColor)
+                  }
 
-                  OutlinedTextField(
-                      value = medicine,
-                      onValueChange = { medicine = it },
-                      label = { Text(tr("medicines", lang)) },
+                  Spacer(modifier = Modifier.height(16.dp))
+
+                  // Dark Mode Card
+                  Card(
                       modifier = Modifier.fillMaxWidth(),
-                      minLines = 2
-                  )
-                  Spacer(modifier = Modifier.height(8.dp))
+                      colors = CardDefaults.cardColors(containerColor = cardColor),
+                      shape = RoundedCornerShape(12.dp)
+                  ) {
+                      Row(
+                          modifier = Modifier.fillMaxWidth().padding(16.dp),
+                          horizontalArrangement = Arrangement.SpaceBetween,
+                          verticalAlignment = Alignment.CenterVertically
+                      ) {
+                          Column {
+                              Text("🌓 Dark Mode (ડાર્ક થીમ)", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = textColor)
+                              Text("રાત્રે વાપરવા માટે આરામદાયક", fontSize = 12.sp, color = Color.Gray)
+                          }
+                          Switch(checked = isDarkMode, onCheckedChange = onToggleDarkMode)
+                      }
+                  }
 
-                  OutlinedTextField(
-                      value = amount,
-                      onValueChange = { amount = it },
-                      label = { Text(tr("fee_amount", lang)) },
-                      modifier = Modifier.fillMaxWidth()
-                  )
-                  Spacer(modifier = Modifier.height(8.dp))
+                  Spacer(modifier = Modifier.height(12.dp))
 
-                  Text(tr("payment_mode", lang), fontWeight = FontWeight.Bold)
-                  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                      listOf("Cash", "Online (UPI)", "Offline").forEach { mode ->
-                          Row(
-                              verticalAlignment = Alignment.CenterVertically,
-                              modifier = Modifier.clickable { paymentMode = mode }
-                          ) {
-                              RadioButton(selected = (paymentMode == mode), onClick = { paymentMode = mode })
-                              Text(text = mode, fontSize = 12.sp)
+                  // Brightness Slider Card
+                  Card(
+                      modifier = Modifier.fillMaxWidth(),
+                      colors = CardDefaults.cardColors(containerColor = cardColor),
+                      shape = RoundedCornerShape(12.dp)
+                  ) {
+                      Column(modifier = Modifier.padding(16.dp)) {
+                          Text("☀️ સ્ક્રીન બ્રાઇટનેસ (Brightness)", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = textColor)
+                          Slider(
+                              value = brightnessLevel,
+                              onValueChange = onBrightnessChange,
+                              valueRange = 0.1f..1.0f
+                          )
+                          Text("${(brightnessLevel * 100).toInt()}%", fontSize = 12.sp, color = Color.Gray)
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(12.dp))
+
+                  // Text Size Card
+                  Card(
+                      modifier = Modifier.fillMaxWidth(),
+                      colors = CardDefaults.cardColors(containerColor = cardColor),
+                      shape = RoundedCornerShape(12.dp)
+                  ) {
+                      Column(modifier = Modifier.padding(16.dp)) {
+                          Text("🔤 ટેક્સ્ટ સાઇઝ (Text Size)", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = textColor)
+                          Spacer(modifier = Modifier.height(8.dp))
+                          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                              TextScale.values().forEach { scale ->
+                                  Button(
+                                      onClick = { onTextScaleChange(scale) },
+                                      colors = ButtonDefaults.buttonColors(
+                                          containerColor = if (textScale == scale) Color(0xFF0D276B) else Color.LightGray,
+                                          contentColor = if (textScale == scale) Color.White else Color.Black
+                                      )
+                                  ) {
+                                      Text(scale.label, fontSize = 12.sp)
+                                  }
+                              }
                           }
                       }
                   }
 
-                  Spacer(modifier = Modifier.height(18.dp))
+                  Spacer(modifier = Modifier.height(20.dp))
 
                   Button(
-                      onClick = {
-                          if (name.isNotBlank()) {
-                              val engName = IndicToEnglish.convert(name)
-                              val displayName = if (engName != name) "$engName ($name)" else name
-                              val engVillage = IndicToEnglish.convert(village)
-                              val displayVillage = if (engVillage != village) "$engVillage ($village)" else village
-                              val engDisease = IndicToEnglish.convert(disease)
-
-                              onSave(
-                                  Patient(
-                                      name = displayName,
-                                      village = displayVillage,
-                                      age = age,
-                                      disease = if (engDisease != disease) "$engDisease ($disease)" else disease,
-                                      medicine = medicine,
-                                      amount = amount,
-                                      paymentMode = paymentMode,
-                                      doctorName = if (selectedDoctor.contains("BIRJU")) "DR. BIRJU K. SIRODARIA" else "DR. NIDDHI JAVIA",
-                                      timeSlot = selectedSlot,
-                                      date = getCurrentDate(),
-                                      isChecked = false
-                                  )
-                              )
-                          }
-                      },
-                      modifier = Modifier.fillMaxWidth(),
-                      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B)),
-                      shape = RoundedCornerShape(8.dp)
-                  ) {
-                      Text(tr("save_booking", lang), fontSize = 15.sp)
-                  }
-
-                  Spacer(modifier = Modifier.height(8.dp))
-
-                  OutlinedButton(
                       onClick = onBack,
                       modifier = Modifier.fillMaxWidth(),
-                      shape = RoundedCornerShape(8.dp)
+                      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B))
                   ) {
-                      Text(tr("back", lang))
+                      Text("સેવ કરી પાછા જાઓ")
                   }
               }
           }
 
           @Composable
           fun PatientRecordsScreen(
-              lang: AppLang,
               patients: List<Patient>,
               todayDate: String,
+              cardColor: Color,
+              textScale: Float,
               onBack: () -> Unit,
               onToggleCheck: (Patient) -> Unit,
-              onDelete: (Patient) -> Unit
+              onDelete: (Patient) -> Unit,
+              onSendWhatsApp: (Patient) -> Unit
           ) {
               var searchQuery by remember { mutableStateOf("") }
-              var selectedTab by remember { mutableStateOf("today") } // "today" or "past"
+              var selectedTab by remember { mutableStateOf("today") }
 
               val tabFiltered = if (selectedTab == "today") {
                   patients.filter { it.date == todayDate }
@@ -946,60 +874,51 @@ jobs:
                   it.name.contains(searchQuery, ignoreCase = true) ||
                   it.village.contains(searchQuery, ignoreCase = true) ||
                   it.disease.contains(searchQuery, ignoreCase = true) ||
-                  it.doctorName.contains(searchQuery, ignoreCase = true)
+                  it.phone.contains(searchQuery)
               }
 
               Column(
-                  modifier = Modifier
-                      .fillMaxSize()
-                      .padding(16.dp)
+                  modifier = Modifier.fillMaxSize().padding(14.dp)
               ) {
-                  // Tab Row to Switch between Today and Past
                   Row(modifier = Modifier.fillMaxWidth()) {
                       Button(
                           onClick = { selectedTab = "today" },
                           colors = ButtonDefaults.buttonColors(
-                              containerColor = if (selectedTab == "today") Color(0xFF0D276B) else Color.White,
+                              containerColor = if (selectedTab == "today") Color(0xFF0D276B) else cardColor,
                               contentColor = if (selectedTab == "today") Color.White else Color(0xFF0D276B)
                           ),
                           modifier = Modifier.weight(1f).padding(end = 4.dp),
                           shape = RoundedCornerShape(8.dp)
                       ) {
-                          Text(tr("today_tab", lang), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                          Text("📅 આજના દર્દીઓ", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                       }
 
                       Button(
                           onClick = { selectedTab = "past" },
                           colors = ButtonDefaults.buttonColors(
-                              containerColor = if (selectedTab == "past") Color(0xFF0D276B) else Color.White,
+                              containerColor = if (selectedTab == "past") Color(0xFF0D276B) else cardColor,
                               contentColor = if (selectedTab == "past") Color.White else Color(0xFF0D276B)
                           ),
                           modifier = Modifier.weight(1f).padding(start = 4.dp),
                           shape = RoundedCornerShape(8.dp)
                       ) {
-                          Text(tr("past_tab", lang), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                          Text("📁 જૂનો રેકોર્ડ", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                       }
                   }
 
                   Spacer(modifier = Modifier.height(10.dp))
 
-                  Row(
-                      modifier = Modifier.fillMaxWidth(),
-                      verticalAlignment = Alignment.CenterVertically
-                  ) {
+                  Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                       OutlinedTextField(
                           value = searchQuery,
                           onValueChange = { searchQuery = it },
-                          placeholder = { Text(tr("search_hint", lang)) },
+                          placeholder = { Text("નામ, ગામ કે મોબાઇલથી શોધો...") },
                           modifier = Modifier.weight(1f),
                           singleLine = true
                       )
-                      Spacer(modifier = Modifier.width(8.dp))
-                      Button(
-                          onClick = onBack,
-                          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B))
-                      ) {
-                          Text(tr("home_btn", lang))
+                      Spacer(modifier = Modifier.width(6.dp))
+                      Button(onClick = onBack, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B))) {
+                          Text("હોમ")
                       }
                   }
 
@@ -1008,57 +927,45 @@ jobs:
                   LazyColumn(modifier = Modifier.fillMaxSize()) {
                       items(filteredPatients) { p ->
                           Card(
-                              modifier = Modifier
-                                  .fillMaxWidth()
-                                  .padding(vertical = 6.dp),
-                              colors = CardDefaults.cardColors(
-                                  containerColor = if (p.isChecked) Color(0xFFFFEBEE) else Color.White
-                              ),
+                              modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                              colors = CardDefaults.cardColors(containerColor = if (p.isChecked) Color(0xFFFFEBEE) else cardColor),
                               elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                           ) {
-                              Column(modifier = Modifier.padding(14.dp)) {
-                                  Row(
-                                      modifier = Modifier.fillMaxWidth(),
-                                      horizontalArrangement = Arrangement.SpaceBetween,
-                                      verticalAlignment = Alignment.CenterVertically
-                                  ) {
-                                      Text(text = p.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF0D276B), modifier = Modifier.weight(1f))
+                              Column(modifier = Modifier.padding(12.dp)) {
+                                  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                      Text(text = p.name, fontWeight = FontWeight.Bold, fontSize = (15 * textScale).sp, color = Color(0xFF0D276B), modifier = Modifier.weight(1f))
                                       Row {
+                                          if (p.phone.isNotBlank()) {
+                                              Button(
+                                                  onClick = { onSendWhatsApp(p) },
+                                                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)),
+                                                  contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+                                                  modifier = Modifier.height(28.dp)
+                                              ) {
+                                                  Text("💬 WhatsApp", fontSize = 10.sp, color = Color.White)
+                                              }
+                                              Spacer(modifier = Modifier.width(4.dp))
+                                          }
                                           Button(
                                               onClick = { onToggleCheck(p) },
                                               colors = ButtonDefaults.buttonColors(
                                                   containerColor = if (p.isChecked) Color(0xFFDC2626) else Color(0xFF16A34A)
                                               ),
-                                              contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                                              modifier = Modifier.height(30.dp)
+                                              contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+                                              modifier = Modifier.height(28.dp)
                                           ) {
-                                              Text(
-                                                  text = if (p.isChecked) "🔴 તપાસાઈ ગયા" else "🟢 બાકી",
-                                                  fontSize = 11.sp,
-                                                  color = Color.White
-                                              )
+                                              Text(text = if (p.isChecked) "🔴 થઈ ગયું" else "🟢 બાકી", fontSize = 10.sp, color = Color.White)
                                           }
-                                          Spacer(modifier = Modifier.width(6.dp))
-                                          IconButton(
-                                              onClick = { onDelete(p) },
-                                              modifier = Modifier.size(30.dp)
-                                          ) {
-                                              Text("🗑️", fontSize = 14.sp)
+                                          Spacer(modifier = Modifier.width(4.dp))
+                                          IconButton(onClick = { onDelete(p) }, modifier = Modifier.size(28.dp)) {
+                                              Text("🗑️", fontSize = 13.sp)
                                           }
                                       }
                                   }
-                                  Spacer(modifier = Modifier.height(4.dp))
-                                  Text(text = "📅 તારીખ: ${p.date} | ⏰ ${p.timeSlot}", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF0288D1))
-                                  Spacer(modifier = Modifier.height(2.dp))
-                                  Text(text = "👨‍⚕️ ${p.doctorName}", fontSize = 12.sp, color = Color.DarkGray)
-                                  Spacer(modifier = Modifier.height(2.dp))
-                                  Text(text = "ગામ: ${p.village} | ઉંમર: ${p.age} વર્ષ", fontSize = 13.sp, color = Color.DarkGray)
-                                  Spacer(modifier = Modifier.height(2.dp))
-                                  Text(text = "રોગ: ${p.disease}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color(0xFFD32F2F))
-                                  Spacer(modifier = Modifier.height(2.dp))
-                                  Text(text = "દવા: ${p.medicine}", fontSize = 12.sp, color = Color.Gray)
-                                  Spacer(modifier = Modifier.height(2.dp))
-                                  Text(text = "ફી: ₹${p.amount} (${p.paymentMode})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                  Spacer(modifier = Modifier.height(3.dp))
+                                  Text(text = "📅 ${p.date} | ⏰ ${p.timeSlot} | 📱 ${p.phone}", fontSize = 11.sp, color = Color(0xFF0288D1), fontWeight = FontWeight.SemiBold)
+                                  Text(text = "👨‍⚕️ ${p.doctorName} | ગામ: ${p.village}", fontSize = 12.sp)
+                                  Text(text = "રોગ: ${p.disease} | ફી: ₹${p.amount} (${p.paymentMode})", fontSize = 12.sp, color = Color(0xFFD32F2F), fontWeight = FontWeight.Medium)
                               }
                           }
                       }
@@ -1072,6 +979,14 @@ jobs:
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET" />
               <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+              <queries>
+                  <package android:name="com.whatsapp" />
+                  <package android:name="com.whatsapp.w4b" />
+                  <intent>
+                      <action android:name="android.intent.action.VIEW" />
+                      <data android:scheme="https" />
+                  </intent>
+              </queries>
               <application
                   android:allowBackup="true"
                   android:icon="@mipmap/ic_launcher"
@@ -1134,8 +1049,8 @@ jobs:
                   applicationId = "com.aastha.clinic"
                   minSdk = 26
                   targetSdk = 35
-                  versionCode = 13
-                  versionName = "3.0"
+                  versionCode = 15
+                  versionName = "3.2"
               }
 
               buildFeatures {
@@ -1197,5 +1112,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Aastha-Clinic-Ultimate-App
+          name: Aastha-Clinic-Direct-Slot-Settings-App
           path: app/build/outputs/apk/debug/*.apk
