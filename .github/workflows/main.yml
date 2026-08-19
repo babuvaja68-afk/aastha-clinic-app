@@ -1,4 +1,4 @@
-name: Build Aastha Clinic APK
+   name: Build Aastha Clinic APK
 
 on:
   push:
@@ -21,9 +21,8 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Fix Directory Structure and Manifest
+      - name: Generate Aastha Clinic Doctors and Slot Booking App
         run: |
-          # 1. Base directories
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
@@ -31,213 +30,403 @@ jobs:
           mkdir -p app/src/main/java/com/aastha/clinic
           mkdir -p gradle/wrapper
 
-          # 2. Move Kotlin / Java files to proper package folder
-          mv *.kt *.java app/src/main/java/com/aastha/clinic/ 2>/dev/null || true
-          if [ -d "app/src/main/java" ]; then
-            find app/src/main/java -maxdepth 1 -name "*.kt" -exec mv {} app/src/main/java/com/aastha/clinic/ \; 2>/dev/null || true
-          fi
+          # Clinic Medical Logo
+          cat << 'EOF' > app/src/main/res/drawable/ic_clinic_logo.xml
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="120dp"
+              android:height="120dp"
+              android:viewportWidth="24"
+              android:viewportHeight="24">
+              <path
+                  android:fillColor="#00796B"
+                  android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM17,13h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+          </vector>
+          EOF
 
-          # 3. Create a clean MainActivity that launches properly
+          # Launcher Icon
+          cat << 'EOF' > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@drawable/ic_clinic_logo"/>
+              <foreground android:drawable="@drawable/ic_clinic_logo"/>
+          </adaptive-icon>
+          EOF
+
+          # Complete App Code with Doctor Details, Slot Booking (3 Patients per 15 min), and Records
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
           import android.os.Bundle
           import androidx.activity.ComponentActivity
           import androidx.activity.compose.setContent
-          import androidx.compose.foundation.layout.Box
-          import androidx.compose.foundation.layout.fillMaxSize
-          import androidx.compose.material3.MaterialTheme
-          import androidx.compose.material3.Surface
-          import androidx.compose.material3.Text
+          import androidx.compose.foundation.background
+          import androidx.compose.foundation.clickable
+          import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.lazy.LazyColumn
+          import androidx.compose.foundation.lazy.items
+          import androidx.compose.foundation.rememberScrollState
+          import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.foundation.verticalScroll
+          import androidx.compose.material3.*
+          import androidx.compose.runtime.*
           import androidx.compose.ui.Alignment
           import androidx.compose.ui.Modifier
+          import androidx.compose.ui.graphics.Color
+          import androidx.compose.ui.text.font.FontWeight
+          import androidx.compose.ui.unit.dp
+          import androidx.compose.ui.unit.sp
+
+          data class Patient(
+              val id: Int,
+              val name: String,
+              val village: String,
+              val age: String,
+              val disease: String,
+              val medicine: String,
+              val amount: String,
+              val paymentMode: String,
+              val doctorName: String,
+              val timeSlot: String
+          )
 
           class MainActivity : ComponentActivity() {
               override fun onCreate(savedInstanceState: Bundle?) {
                   super.onCreate(savedInstanceState)
                   setContent {
-                      Surface(
-                          modifier = Modifier.fillMaxSize(),
-                          color = MaterialTheme.colorScheme.background
-                      ) {
-                          Box(
-                              modifier = Modifier.fillMaxSize(),
-                              contentAlignment = Alignment.Center
-                          ) {
-                              Text(text = "Welcome to Aastha Clinic")
-                          }
+                      AasthaClinicApp()
+                  }
+              }
+          }
+
+          @OptIn(ExperimentalMaterial3Api::class)
+          @Composable
+          fun AasthaClinicApp() {
+              var currentScreen by remember { mutableStateOf("home") }
+              val patientList = remember {
+                  mutableStateListOf(
+                      Patient(1, "Ramesh Patel", "Veraval", "45", "Fever & Cold", "Paracetamol 500mg", "350", "Cash", "DR. BIRJU K. SIRODARIA", "11:00 AM - 11:15 AM"),
+                      Patient(2, "Geetaben Shah", "Somnath", "38", "Acidity & BP", "Pantocid 40", "500", "Online (UPI)", "DR. NIDDHI JAVIA", "05:00 PM - 05:15 PM")
+                  )
+              }
+
+              Scaffold(
+                  topBar = {
+                      TopAppBar(
+                          title = {
+                              Text(
+                                  text = when (currentScreen) {
+                                      "home" -> "આસ્થા ક્લિનિક (Aastha Clinic)"
+                                      "add" -> "દર્દી બુકિંગ / એન્ટ્રી ફોર્મ"
+                                      else -> "દર્દીઓનો જૂનો રેકોર્ડ"
+                                  },
+                                  fontWeight = FontWeight.Bold,
+                                  fontSize = 18.sp
+                              )
+                          },
+                          colors = TopAppBarDefaults.topAppBarColors(
+                              containerColor = Color(0xFF00695C),
+                              titleContentColor = Color.White
+                          )
+                      )
+                  }
+              ) { paddingValues ->
+                  Box(
+                      modifier = Modifier
+                          .fillMaxSize()
+                          .padding(paddingValues)
+                          .background(Color(0xFFF8FAFC))
+                  ) {
+                      when (currentScreen) {
+                          "home" -> HomeScreen(
+                              onAddClick = { currentScreen = "add" },
+                              onRecordsClick = { currentScreen = "records" }
+                          )
+                          "add" -> AddPatientScreen(
+                              patientList = patientList,
+                              onSave = { newPatient ->
+                                  patientList.add(0, newPatient)
+                                  currentScreen = "records"
+                              },
+                              onBack = { currentScreen = "home" }
+                          )
+                          "records" -> PatientRecordsScreen(
+                              patients = patientList,
+                              onBack = { currentScreen = "home" }
+                          )
                       }
                   }
               }
           }
-          EOF
 
-          # 4. AndroidManifest with correct package & activity
-          cat << 'EOF' > app/src/main/AndroidManifest.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <application
-                  android:allowBackup="true"
-                  android:dataExtractionRules="@xml/data_extraction_rules"
-                  android:fullBackupContent="@xml/backup_rules"
-                  android:icon="@mipmap/ic_launcher"
-                  android:label="@string/app_name"
-                  android:roundIcon="@mipmap/ic_launcher"
-                  android:supportsRtl="true"
-                  android:theme="@android:style/Theme.Material.Light.NoActionBar">
-                  <activity
-                      android:name="com.aastha.clinic.MainActivity"
-                      android:exported="true">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
-                      </intent-filter>
-                  </activity>
-              </application>
-          </manifest>
-          EOF
+          @Composable
+          fun HomeScreen(onAddClick: () -> Unit, onRecordsClick: () -> Unit) {
+              Column(
+                  modifier = Modifier
+                      .fillMaxSize()
+                      .padding(16.dp)
+                      .verticalScroll(rememberScrollState()),
+                  horizontalAlignment = Alignment.CenterHorizontally
+              ) {
+                  // Doctors Cards
+                  DoctorInfoCard(
+                      doctorName = "DR. BIRJU K. SIRODARIA",
+                      shift = "🌅 મોર્નિંગ શિફ્ટ (Morning)",
+                      time = "⏰ 11:00 AM થી 03:30 PM",
+                      bgColor = Color(0xFF004D40)
+                  )
 
-          # 5. XML Rules
-          cat << 'EOF' > app/src/main/res/xml/data_extraction_rules.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <data-extraction-rules>
-              <cloud-backup>
-                  <include domain="root" path="."/>
-              </cloud-backup>
-              <device-transfer>
-                  <include domain="root" path="."/>
-              </device-transfer>
-          </data-extraction-rules>
-          EOF
+                  Spacer(modifier = Modifier.height(12.dp))
 
-          cat << 'EOF' > app/src/main/res/xml/backup_rules.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <full-backup-content>
-              <include domain="root" path="."/>
-          </full-backup-content>
-          EOF
+                  DoctorInfoCard(
+                      doctorName = "DR. NIDDHI JAVIA",
+                      shift = "🌆 ઇવનિંગ શિફ્ટ (Evening)",
+                      time = "⏰ 05:00 PM થી 08:00 PM",
+                      bgColor = Color(0xFF1E3A8A)
+                  )
 
-          # 6. Strings & Launcher Icons
-          cat << 'EOF' > app/src/main/res/values/strings.xml
-          <resources>
-              <string name="app_name">Aastha Clinic</string>
-          </resources>
-          EOF
+                  Spacer(modifier = Modifier.height(20.dp))
 
-          cat << 'EOF' > app/src/main/res/drawable/ic_launcher_foreground.xml
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="108dp"
-              android:height="108dp"
-              android:viewportWidth="108"
-              android:viewportHeight="108">
-              <path
-                  android:fillColor="#00796B"
-                  android:pathData="M30,30h48v48h-48z"/>
-          </vector>
-          EOF
+                  // Navigation Action Cards
+                  HomeMenuButton(
+                      title = "➕ નવું દર્દી બુકિંગ (15 મિનિટ સ્લોટ)",
+                      subtitle = "૧૫ મિનિટમાં ૩ દર્દી લિમિટ મુજબ એપોઇન્ટમેન્ટ",
+                      color = Color(0xFF00796B),
+                      onClick = onAddClick
+                  )
 
-          cat << 'EOF' > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-              <background android:drawable="@drawable/ic_launcher_foreground"/>
-              <foreground android:drawable="@drawable/ic_launcher_foreground"/>
-          </adaptive-icon>
-          EOF
+                  Spacer(modifier = Modifier.height(14.dp))
 
-          # 7. gradle.properties
-          cat << 'EOF' > gradle.properties
-          android.useAndroidX=true
-          android.nonTransitiveRClass=true
-          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-          EOF
-
-          # 8. Dummy env files
-          touch .env .env.example
-          touch app/.env app/.env.example
-
-          # 9. Clean app/build.gradle.kts
-          cat << 'EOF' > app/build.gradle.kts
-          plugins {
-              id("com.android.application")
-              id("org.jetbrains.kotlin.android")
-              id("org.jetbrains.kotlin.plugin.compose")
-          }
-
-          android {
-              namespace = "com.aastha.clinic"
-              compileSdk = 35
-
-              defaultConfig {
-                  applicationId = "com.aastha.clinic"
-                  minSdk = 26
-                  targetSdk = 35
-                  versionCode = 2
-                  versionName = "1.1"
-              }
-
-              buildFeatures {
-                  compose = true
-              }
-
-              compileOptions {
-                  sourceCompatibility = JavaVersion.VERSION_17
-                  targetCompatibility = JavaVersion.VERSION_17
-              }
-              kotlinOptions {
-                  jvmTarget = "17"
+                  HomeMenuButton(
+                      title = "📋 દર્દીઓનો રેકોર્ડ અને હિસાબ",
+                      subtitle = "દર્દીની જૂની દવાઓ, ગામ અને કેશ/ઓનલાઇન હિસાબ",
+                      color = Color(0xFF388E3C),
+                      onClick = onRecordsClick
+                  )
               }
           }
 
-          dependencies {
-              implementation(platform("androidx.compose:compose-bom:2024.12.01"))
-              implementation("androidx.compose.ui:ui")
-              implementation("androidx.compose.material3:material3")
-              implementation("androidx.activity:activity-compose:1.9.3")
-              implementation("androidx.core:core-ktx:1.15.0")
-          }
-          EOF
-
-          # 10. Root settings.gradle.kts
-          cat << 'EOF' > settings.gradle.kts
-          pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
+          @Composable
+          fun DoctorInfoCard(doctorName: String, shift: String, time: String, bgColor: Color) {
+              Card(
+                  modifier = Modifier.fillMaxWidth(),
+                  shape = RoundedCornerShape(14.dp),
+                  colors = CardDefaults.cardColors(containerColor = bgColor),
+                  elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+              ) {
+                  Column(modifier = Modifier.padding(16.dp)) {
+                      Text(text = "👨‍⚕️ $doctorName", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                      Spacer(modifier = Modifier.height(4.dp))
+                      Text(text = shift, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color(0xFF80CBC4))
+                      Spacer(modifier = Modifier.height(2.dp))
+                      Text(text = time, fontSize = 13.sp, color = Color.White.copy(alpha = 0.9f))
+                  }
               }
           }
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
+
+          @Composable
+          fun HomeMenuButton(title: String, subtitle: String, color: Color, onClick: () -> Unit) {
+              Card(
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .clickable { onClick() },
+                  shape = RoundedCornerShape(12.dp),
+                  colors = CardDefaults.cardColors(containerColor = Color.White),
+                  elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+              ) {
+                  Row(
+                      modifier = Modifier.padding(16.dp),
+                      verticalAlignment = Alignment.CenterVertically
+                  ) {
+                      Box(
+                          modifier = Modifier
+                              .size(10.dp, 44.dp)
+                              .background(color, RoundedCornerShape(4.dp))
+                      )
+                      Spacer(modifier = Modifier.width(12.dp))
+                      Column {
+                          Text(text = title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
+                          Spacer(modifier = Modifier.height(3.dp))
+                          Text(text = subtitle, fontSize = 12.sp, color = Color.Gray)
+                      }
+                  }
               }
           }
-          rootProject.name = "aastha-clinic"
-          include(":app")
-          EOF
 
-          # 11. Root build.gradle.kts
-          cat << 'EOF' > build.gradle.kts
-          plugins {
-              id("com.android.application") version "8.7.3" apply false
-              id("org.jetbrains.kotlin.android") version "2.0.21" apply false
-              id("org.jetbrains.kotlin.plugin.compose") version "2.0.21" apply false
-          }
-          EOF
+          @Composable
+          fun AddPatientScreen(patientList: List<Patient>, onSave: (Patient) -> Unit, onBack: () -> Unit) {
+              var name by remember { mutableStateOf("") }
+              var village by remember { mutableStateOf("") }
+              var age by remember { mutableStateOf("") }
+              var disease by remember { mutableStateOf("") }
+              var medicine by remember { mutableStateOf("") }
+              var amount by remember { mutableStateOf("") }
+              var paymentMode by remember { mutableStateOf("Cash") }
+              var selectedDoctor by remember { mutableStateOf("DR. BIRJU K. SIRODARIA (11:00 AM - 03:30 PM)") }
 
-          # 12. Gradle Wrapper
-          gradle wrapper --gradle-version 8.10.2
+              val morningSlots = listOf(
+                  "11:00 AM - 11:15 AM", "11:15 AM - 11:30 AM", "11:30 AM - 11:45 AM", "11:45 AM - 12:00 PM",
+                  "12:00 PM - 12:15 PM", "12:15 PM - 12:30 PM", "12:30 PM - 12:45 PM", "12:45 PM - 01:00 PM",
+                  "01:00 PM - 01:15 PM", "01:15 PM - 01:30 PM", "01:30 PM - 01:45 PM", "01:45 PM - 02:00 PM",
+                  "02:00 PM - 02:15 PM", "02:15 PM - 02:30 PM", "02:30 PM - 02:45 PM", "02:45 PM - 03:00 PM",
+                  "03:00 PM - 03:15 PM", "03:15 PM - 03:30 PM"
+              )
 
-      - name: Build Debug APK
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace --no-daemon
+              val eveningSlots = listOf(
+                  "05:00 PM - 05:15 PM", "05:15 PM - 05:30 PM", "05:30 PM - 05:45 PM", "05:45 PM - 06:00 PM",
+                  "06:00 PM - 06:15 PM", "06:15 PM - 06:30 PM", "06:30 PM - 06:45 PM", "06:45 PM - 07:00 PM",
+                  "07:00 PM - 07:15 PM", "07:15 PM - 07:30 PM", "07:30 PM - 07:45 PM", "07:45 PM - 08:00 PM"
+              )
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Aastha-Clinic-App-v2
-          path: app/build/outputs/apk/debug/*.apk
+              val currentSlots = if (selectedDoctor.contains("BIRJU")) morningSlots else eveningSlots
+              var selectedSlot by remember(selectedDoctor) { mutableStateOf(currentSlots.first()) }
 
-          
+              Column(
+                  modifier = Modifier
+                      .fillMaxSize()
+                      .verticalScroll(rememberScrollState())
+                      .padding(16.dp)
+              ) {
+                  Text("ડોક્ટર પસંદ કરો:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                  Spacer(modifier = Modifier.height(4.dp))
+                  
+                  listOf(
+                      "DR. BIRJU K. SIRODARIA (11:00 AM - 03:30 PM)",
+                      "DR. NIDDHI JAVIA (05:00 PM - 08:00 PM)"
+                  ).forEach { doc ->
+                      Row(
+                          verticalAlignment = Alignment.CenterVertically,
+                          modifier = Modifier.clickable { selectedDoctor = doc }
+                      ) {
+                          RadioButton(selected = (selectedDoctor == doc), onClick = { selectedDoctor = doc })
+                          Text(text = doc, fontSize = 13.sp)
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(10.dp))
+                  Text("૧૫ મિનિટ ટાઈમ સ્લોટ (મહત્તમ ૩ દર્દી):", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                  Spacer(modifier = Modifier.height(6.dp))
+
+                  // Slots Selection Box
+                  Column(modifier = Modifier.fillMaxWidth()) {
+                      currentSlots.chunked(2).forEach { rowSlots ->
+                          Row(modifier = Modifier.fillMaxWidth()) {
+                              rowSlots.forEach { slot ->
+                                  val bookedCount = patientList.count { it.timeSlot == slot }
+                                  val isFull = bookedCount >= 3
+                                  Card(
+                                      modifier = Modifier
+                                          .weight(1f)
+                                          .padding(3.dp)
+                                          .clickable(enabled = !isFull) { selectedSlot = slot },
+                                      colors = CardDefaults.cardColors(
+                                          containerColor = if (selectedSlot == slot) Color(0xFF00796B) 
+                                                          else if (isFull) Color(0xFFFFCDD2) 
+                                                          else Color.White
+                                      ),
+                                      shape = RoundedCornerShape(8.dp)
+                                  ) {
+                                      Column(modifier = Modifier.padding(8.dp)) {
+                                          Text(
+                                              text = slot,
+                                              fontSize = 11.sp,
+                                              fontWeight = FontWeight.Bold,
+                                              color = if (selectedSlot == slot) Color.White else if (isFull) Color.Red else Color.Black
+                                          )
+                                          Text(
+                                              text = if (isFull) "Full (3/3)" else "$bookedCount/3 દર્દી",
+                                              fontSize = 10.sp,
+                                              color = if (selectedSlot == slot) Color(0xFFE0F2F1) else Color.Gray
+                                          )
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(14.dp))
+
+                  OutlinedTextField(
+                      value = name,
+                      onValueChange = { name = it },
+                      label = { Text("દર્દીનું પૂરું નામ (Patient Name)") },
+                      modifier = Modifier.fillMaxWidth()
+                  )
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  Row(modifier = Modifier.fillMaxWidth()) {
+                      OutlinedTextField(
+                          value = village,
+                          onValueChange = { village = it },
+                          label = { Text("ગામ (Village)") },
+                          modifier = Modifier.weight(1.5f)
+                      )
+                      Spacer(modifier = Modifier.width(8.dp))
+                      OutlinedTextField(
+                          value = age,
+                          onValueChange = { age = it },
+                          label = { Text("ઉંમર (Age)") },
+                          modifier = Modifier.weight(1f)
+                      )
+                  }
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  OutlinedTextField(
+                      value = disease,
+                      onValueChange = { disease = it },
+                      label = { Text("રોગ / બીમારી (Disease / Symptoms)") },
+                      modifier = Modifier.fillMaxWidth()
+                  )
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  OutlinedTextField(
+                      value = medicine,
+                      onValueChange = { medicine = it },
+                      label = { Text("દવાઓ (Medicines)") },
+                      modifier = Modifier.fillMaxWidth(),
+                      minLines = 2
+                  )
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  OutlinedTextField(
+                      value = amount,
+                      onValueChange = { amount = it },
+                      label = { Text("ફી / રકમ ₹ (Fee Amount)") },
+                      modifier = Modifier.fillMaxWidth()
+                  )
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  Text("પેમેન્ટ મોડ:", fontWeight = FontWeight.Bold)
+                  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                      listOf("Cash", "Online (UPI)", "Offline / બાકી").forEach { mode ->
+                          Row(
+                              verticalAlignment = Alignment.CenterVertically,
+                              modifier = Modifier.clickable { paymentMode = mode }
+                          ) {
+                              RadioButton(selected = (paymentMode == mode), onClick = { paymentMode = mode })
+                              Text(text = mode, fontSize = 12.sp)
+                          }
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(20.dp))
+
+                  Button(
+                      onClick = {
+                          if (name.isNotBlank()) {
+                              onSave(
+                                  Patient(
+                                      id = (100..999).random(),
+                                      name = name,
+                                      village = village,
+                                      age = age,
+                                      disease = disease,
+                                      medicine = medicine,
+                                      amount = amount,
+                                      paymentMode = paymentMode,
+                                      doctorName = if (selectedDoctor.contains("BIRJU")) "DR. BIRJU K. SIRODARIA" else "DR. NIDDHI JAVIA",
+                                      timeSlot = selectedSlot
+                                  )
+                              )
+                          }
+                  
