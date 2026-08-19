@@ -21,10 +21,21 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Create Version Catalog and Project Config
+      - name: Fix Project Files and Build Configurations
         run: |
           mkdir -p gradle app/src/main/res/values
 
+          # Create dummy .env files required by Secrets Gradle Plugin
+          touch .env .env.example
+          touch app/.env app/.env.example
+
+          # Fix compileSdk version syntax in app/build.gradle.kts
+          if [ -f "app/build.gradle.kts" ]; then
+            sed -i 's/compileSdk { version = release(36) { minorApiLevel = 1 } }/compileSdk = 35/g' app/build.gradle.kts
+            sed -i 's/targetSdk = 36/targetSdk = 35/g' app/build.gradle.kts
+          fi
+
+          # Create Version Catalog
           cat << 'EOF' > gradle/libs.versions.toml
           [versions]
           agp = "8.7.3"
@@ -82,6 +93,7 @@ jobs:
           roborazzi = { id = "io.github.takahirom.roborazzi", version = "1.38.0" }
           EOF
 
+          # Create Root settings.gradle.kts
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
@@ -101,6 +113,7 @@ jobs:
           include(":app")
           EOF
 
+          # Create Root build.gradle.kts
           cat << 'EOF' > build.gradle.kts
           plugins {
               alias(libs.plugins.android.application) apply false
@@ -126,5 +139,7 @@ jobs:
         with:
           name: Aastha-Clinic-App
           path: app/build/outputs/apk/debug/*.apk
+          
+          
           
 
