@@ -21,7 +21,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Multi-Language Clinic App
+      - name: Setup Professional Dashboard & Checked Slot Colors
         run: |
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
@@ -30,45 +30,73 @@ jobs:
           mkdir -p app/src/main/java/com/aastha/clinic
           mkdir -p gradle/wrapper
 
-          cat << 'EOF' > app/src/main/res/drawable/ic_clinic_logo.xml
+          # 1. Exact Vector Reproduction of Aastha Clinic Logo Symbol
+          cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="120dp"
-              android:height="120dp"
-              android:viewportWidth="24"
-              android:viewportHeight="24">
+              android:width="150dp"
+              android:height="150dp"
+              android:viewportWidth="100"
+              android:viewportHeight="100">
               <path
-                  android:fillColor="#00796B"
-                  android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM17,13h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                  android:fillColor="#D32F2F"
+                  android:pathData="M44,40 h12 v24 h-12 z"/>
+              <path
+                  android:fillColor="#D32F2F"
+                  android:pathData="M38,46 h24 v12 h-24 z"/>
+              <path
+                  android:fillColor="#0D276B"
+                  android:pathData="M50,15 a4,4 0 1,0 0.1,0 z M42,22 c-3,0 -6,2 -7,5 l4,2 c1,-2 2,-3 3,-3 c2,0 3,1 4,3 l4,-2 c-1,-3 -4,-5 -8,-5 z M58,22 c-4,0 -7,2 -8,5 l4,2 c1,-2 2,-3 4,-3 c1,0 2,1 3,3 l4,-2 c-1,-3 -4,-5 -7,-5 z"/>
+              <path
+                  android:fillColor="#0D276B"
+                  android:pathData="M28,38 C28,52 38,62 50,66 C36,60 32,48 32,38 Z M72,38 C72,52 62,62 50,66 C64,60 68,48 68,38 Z"/>
+          </vector>
+          EOF
+
+          # 2. App Launcher Adaptive Icon
+          cat << 'EOF' > app/src/main/res/drawable/ic_launcher_bg.xml
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp"
+              android:height="108dp"
+              android:viewportWidth="108"
+              android:viewportHeight="108">
+              <path
+                  android:fillColor="#0D276B"
+                  android:pathData="M0,0h108v108h-108z"/>
           </vector>
           EOF
 
           cat << 'EOF' > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           <?xml version="1.0" encoding="utf-8"?>
           <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-              <background android:drawable="@drawable/ic_clinic_logo"/>
-              <foreground android:drawable="@drawable/ic_clinic_logo"/>
+              <background android:drawable="@drawable/ic_launcher_bg"/>
+              <foreground android:drawable="@drawable/ic_aastha_brand_logo"/>
           </adaptive-icon>
           EOF
 
+          # 3. Professional Main Activity with Dynamic Slot Status Colors & Analytics Dashboard
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
           import android.os.Bundle
           import androidx.activity.ComponentActivity
           import androidx.activity.compose.setContent
+          import androidx.compose.foundation.Image
           import androidx.compose.foundation.background
           import androidx.compose.foundation.clickable
           import androidx.compose.foundation.layout.*
           import androidx.compose.foundation.lazy.LazyColumn
           import androidx.compose.foundation.lazy.items
           import androidx.compose.foundation.rememberScrollState
+          import androidx.compose.foundation.shape.CircleShape
           import androidx.compose.foundation.shape.RoundedCornerShape
           import androidx.compose.foundation.verticalScroll
           import androidx.compose.material3.*
           import androidx.compose.runtime.*
           import androidx.compose.ui.Alignment
           import androidx.compose.ui.Modifier
+          import androidx.compose.ui.draw.clip
           import androidx.compose.ui.graphics.Color
+          import androidx.compose.ui.res.painterResource
           import androidx.compose.ui.text.font.FontWeight
           import androidx.compose.ui.unit.dp
           import androidx.compose.ui.unit.sp
@@ -83,7 +111,8 @@ jobs:
               val amount: String,
               val paymentMode: String,
               val doctorName: String,
-              val timeSlot: String
+              val timeSlot: String,
+              var isChecked: Boolean = false
           )
 
           enum class AppLang { GU, EN, HI }
@@ -95,14 +124,149 @@ jobs:
                       "home_btn" -> "હોમ"
                       "add_title" -> "દર્દી બુકિંગ ફોર્મ"
                       "records_title" -> "દર્દીઓનો રેકોર્ડ"
+                      "slots_overview" -> "🕒 લાઈવ સ્લોટ્સ સ્ટેટસ"
+                      "morning_shift" -> "🌅 મોર્નિંગ શિફ્ટ"
+                      "evening_shift" -> "```yaml
+name: Build Aastha Clinic APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Professional Dashboard & Checked Slot Colors
+        run: |
+          mkdir -p app/src/main/res/xml
+          mkdir -p app/src/main/res/values
+          mkdir -p app/src/main/res/drawable
+          mkdir -p app/src/main/res/mipmap-anydpi-v26
+          mkdir -p app/src/main/java/com/aastha/clinic
+          mkdir -p gradle/wrapper
+
+          # 1. Exact Vector Reproduction of Aastha Clinic Logo Symbol
+          cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
+          <vector xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+              android:width="150dp"
+              android:height="150dp"
+              android:viewportWidth="100"
+              android:viewportHeight="100">
+              <path
+                  android:fillColor="#D32F2F"
+                  android:pathData="M44,40 h12 v24 h-12 z"/>
+              <path
+                  android:fillColor="#D32F2F"
+                  android:pathData="M38,46 h24 v12 h-24 z"/>
+              <path
+                  android:fillColor="#0D276B"
+                  android:pathData="M50,15 a4,4 0 1,0 0.1,0 z M42,22 c-3,0 -6,2 -7,5 l4,2 c1,-2 2,-3 3,-3 c2,0 3,1 4,3 l4,-2 c-1,-3 -4,-5 -8,-5 z M58,22 c-4,0 -7,2 -8,5 l4,2 c1,-2 2,-3 4,-3 c1,0 2,1 3,3 l4,-2 c-1,-3 -4,-5 -7,-5 z"/>
+              <path
+                  android:fillColor="#0D276B"
+                  android:pathData="M28,38 C28,52 38,62 50,66 C36,60 32,48 32,38 Z M72,38 C72,52 62,62 50,66 C64,60 68,48 68,38 Z"/>
+          </vector>
+          EOF
+
+          # 2. App Launcher Adaptive Icon
+          cat << 'EOF' > app/src/main/res/drawable/ic_launcher_bg.xml
+          <vector xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+              android:width="108dp"
+              android:height="108dp"
+              android:viewportWidth="108"
+              android:viewportHeight="108">
+              <path
+                  android:fillColor="#0D276B"
+                  android:pathData="M0,0h108v108h-108z"/>
+          </vector>
+          EOF
+
+          cat << 'EOF' > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)">
+              <background android:drawable="@drawable/ic_launcher_bg"/>
+              <foreground android:drawable="@drawable/ic_aastha_brand_logo"/>
+          </adaptive-icon>
+          EOF
+
+          # 3. Professional Main Activity with Dynamic Slot Status Colors & Analytics Dashboard
+          cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
+          package com.aastha.clinic
+
+          import android.os.Bundle
+          import androidx.activity.ComponentActivity
+          import androidx.activity.compose.setContent
+          import androidx.compose.foundation.Image
+          import androidx.compose.foundation.background
+          import androidx.compose.foundation.clickable
+          import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.lazy.LazyColumn
+          import androidx.compose.foundation.lazy.items
+          import androidx.compose.foundation.rememberScrollState
+          import androidx.compose.foundation.shape.CircleShape
+          import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.foundation.verticalScroll
+          import androidx.compose.material3.*
+          import androidx.compose.runtime.*
+          import androidx.compose.ui.Alignment
+          import androidx.compose.ui.Modifier
+          import androidx.compose.ui.draw.clip
+          import androidx.compose.ui.graphics.Color
+          import androidx.compose.ui.res.painterResource
+          import androidx.compose.ui.text.font.FontWeight
+          import androidx.compose.ui.unit.dp
+          import androidx.compose.ui.unit.sp
+
+          data class Patient(
+              val id: Int,
+              val name: String,
+              val village: String,
+              val age: String,
+              val disease: String,
+              val medicine: String,
+              val amount: String,
+              val paymentMode: String,
+              val doctorName: String,
+              val timeSlot: String,
+              var isChecked: Boolean = false
+          )
+
+          enum class AppLang { GU, EN, HI }
+
+          fun tr(key: String, lang: AppLang): String {
+              return when (lang) {
+                  AppLang.GU -> when (key) {
+                      "app_title" -> "આસ્થા ક્લિનિક"
+                      "home_btn" -> "હોમ"
+                      "add_title" -> "દર્દી બુકિંગ ફોર્મ"
+                      "records_title" -> "દર્દીઓનો રેકોર્ડ"
+                      "slots_overview" -> "🕒 ટાઈમ સ્લોટ સ્ટેટસ (Green: બાકી | Red: પૂરું)"
                       "morning_shift" -> "🌅 મોર્નિંગ શિફ્ટ (સવાર)"
+                      "evening_shift" -> "```yaml
                       "evening_shift" -> "🌆 ઇવનિંગ શિફ્ટ (સાંજ)"
                       "new_booking" -> "➕ નવું દર્દી બુકિંગ"
                       "new_booking_sub" -> "૧૫ મિનિટમાં ૩ દર્દી લિમિટ મુજબ એપોઇન્ટમેન્ટ"
                       "view_records" -> "📋 દર્દીઓનો જૂનો રેકોર્ડ"
                       "view_records_sub" -> "દર્દીની જૂની દવાઓ, ગામ અને હિસાબ"
+                      "total_patients" -> "કુલ દર્દીઓ"
+                      "pending_patients" -> "તપાસવાના બાકી"
+                      "completed_patients" -> "તપાસાઈ ગયા"
+                      "total_collection" -> "કુલ ફી કલેક્શન"
                       "select_doctor" -> "ડોક્ટર પસંદ કરો:"
-                      "time_slot_label" -> "૧૫ મિનિટ ટાઈમ સ્લોટ (મહત્તમ ૩ દર્દી):"
+                      "time_slot_label" -> "૧૫ મિનિટ ટાઈમ સ્લોટ (વિગત માટે ટચ કરો):"
                       "patient_name" -> "દર્દીનું પૂરું નામ"
                       "village" -> "ગામ"
                       "age" -> "ઉંમર"
@@ -112,8 +276,11 @@ jobs:
                       "payment_mode" -> "પેમેન્ટ મોડ:"
                       "save_booking" -> "બુકિંગ સેવ કરો"
                       "back" -> "પાછા જાઓ"
+                      "close" -> "બંધ કરો"
                       "search_hint" -> "નામ, ગામ કે રોગ થી શોધો..."
                       "full" -> "Full (3/3)"
+                      "no_patients_in_slot" -> "આ સ્લોટમાં હજુ કોઈ દર્દી બુક થયેલ નથી."
+                      "patients_in_slot" -> "આ સ્લોટના દર્દીઓ (તપાસ માર્ક કરો):"
                       "patients_count" -> "દર્દી"
                       else -> key
                   }
@@ -122,14 +289,19 @@ jobs:
                       "home_btn" -> "होम"
                       "add_title" -> "मरीज बुकिंग फॉर्म"
                       "records_title" -> "मरीजों का रिकॉर्ड"
-                      "morning_shift" -> "🌅 मॉर्निंग शिफ्ट (सुबह)"
-                      "evening_shift" -> "🌆 इवनिंग शिफ्ट (शाम)"
+                      "slots_overview" -> "🕒 टाइम स्लॉट स्थिति (🟢 बाकी | 🔴 पूर्ण)"
+                      "morning_shift" -> "🌅 मॉर्निंग शिफ्ट"
+                      "evening_shift" -> "🌆 इवनिंग शिफ्ट"
                       "new_booking" -> "➕ नया मरीज बुकिंग"
-                      "new_booking_sub" -> "१५ मिनट में ३ मरीज लिमिट के अनुसार अपॉइंटमेंट"
+                      "new_booking_sub" -> "१५ मिनट में ३ मरीज लिमिट"
                       "view_records" -> "📋 पुराना मरीज रिकॉर्ड"
-                      "view_records_sub" -> "पुरानी दवाइयां, गांव और पेमेंट रिकॉर्ड"
+                      "view_records_sub" -> "पुरानी दवाइयां और पेमेंट रिकॉर्ड"
+                      "total_patients" -> "कुल मरीज"
+                      "pending_patients" -> "जांच बाकी"
+                      "completed_patients" -> "जांच पूर्ण"
+                      "total_collection" -> "कुल फीस संग्रह"
                       "select_doctor" -> "डॉक्टर चुनें:"
-                      "time_slot_label" -> "१५ मिनट टाइम स्लॉट (अधिकतम ३ मरीज):"
+                      "time_slot_label" -> "१५ मिनट टाइम स्लॉट (विवरण हेतु टच करें):"
                       "patient_name" -> "मरीज का पूरा नाम"
                       "village" -> "गांव"
                       "age" -> "उम्र"
@@ -139,8 +311,11 @@ jobs:
                       "payment_mode" -> "पेमेंट मोड:"
                       "save_booking" -> "बुकिंग सेव करें"
                       "back" -> "वापस जाएं"
+                      "close" -> "बंद करें"
                       "search_hint" -> "नाम, गांव या बीमारी से खोजें..."
                       "full" -> "फुल (3/3)"
+                      "no_patients_in_slot" -> "इस स्लॉट में कोई मरीज बुक नहीं है।"
+                      "patients_in_slot" -> "इस स्लॉट के मरीज:"
                       "patients_count" -> "मरीज"
                       else -> key
                   }
@@ -149,14 +324,19 @@ jobs:
                       "home_btn" -> "Home"
                       "add_title" -> "Patient Booking Form"
                       "records_title" -> "Patient Records"
+                      "slots_overview" -> "🕒 Time Slots Status (🟢 Pending | 🔴 Checked)"
                       "morning_shift" -> "🌅 Morning Shift"
                       "evening_shift" -> "🌆 Evening Shift"
                       "new_booking" -> "➕ New Patient Booking"
                       "new_booking_sub" -> "Appointment with 3 patients / 15-min limit"
                       "view_records" -> "📋 Patient Records & History"
-                      "view_records_sub" -> "Medical history, village and billing"
+                      "view_records_sub" -> "Medical history & billing"
+                      "total_patients" -> "Total Patients"
+                      "pending_patients" -> "Pending Checkup"
+                      "completed_patients" -> "Checked Patients"
+                      "total_collection" -> "Total Collection"
                       "select_doctor" -> "Select Doctor:"
-                      "time_slot_label" -> "15-Min Time Slot (Max 3 Patients):"
+                      "time_slot_label" -> "15-Min Time Slot (Tap for details):"
                       "patient_name" -> "Patient Full Name"
                       "village" -> "Village"
                       "age" -> "Age"
@@ -166,8 +346,11 @@ jobs:
                       "payment_mode" -> "Payment Mode:"
                       "save_booking" -> "Save Appointment"
                       "back" -> "Back"
+                      "close" -> "Close"
                       "search_hint" -> "Search by name, village or disease..."
                       "full" -> "Full (3/3)"
+                      "no_patients_in_slot" -> "No patients in this slot yet."
+                      "patients_in_slot" -> "Patients in this Slot:"
                       "patients_count" -> "pts"
                       else -> key
                   }
@@ -188,11 +371,13 @@ jobs:
           fun AasthaClinicApp() {
               var currentScreen by remember { mutableStateOf("home") }
               var currentLang by remember { mutableStateOf(AppLang.GU) }
+              var activeSlotDetail by remember { mutableStateOf<Pair<String, String>?>(null) }
 
               val patientList = remember {
                   mutableStateListOf(
-                      Patient(1, "Ramesh Patel", "Veraval", "45", "Fever & Cold", "Paracetamol 500mg", "350", "Cash", "DR. BIRJU K. SIRODARIA", "11:00 AM - 11:15 AM"),
-                      Patient(2, "Geetaben Shah", "Somnath", "38", "Acidity & BP", "Pantocid 40", "500", "Online (UPI)", "DR. NIDDHI JAVIA", "05:00 PM - 05:15 PM")
+                      Patient(1, "Ramesh Patel", "Veraval", "45", "Fever & Cold", "Paracetamol 500mg", "350", "Cash", "DR. BIRJU K. SIRODARIA", "11:00 AM - 11:15 AM", isChecked = false),
+                      Patient(2, "Geetaben Shah", "Somnath", "38", "Acidity & BP", "Pantocid 40", "500", "Online (UPI)", "DR. NIDDHI JAVIA", "05:00 PM - 05:15 PM", isChecked = true),
+                      Patient(3, "Kishorbhai Joshi", "Kodinar", "52", "Joint Pain", "Aceclofenac + Paracetamol", "400", "Cash", "DR. BIRJU K. SIRODARIA", "11:00 AM - 11:15 AM", isChecked = false)
                   )
               }
 
@@ -202,12 +387,13 @@ jobs:
                           title = {
                               Text(
                                   text = when (currentScreen) {
-                                      "home" -> tr("app_title", currentLang)
+                                      "home" -> "AASTHA CLINIC"
                                       "add" -> tr("add_title", currentLang)
                                       else -> tr("records_title", currentLang)
                                   },
-                                  fontWeight = FontWeight.Bold,
-                                  fontSize = 18.sp
+                                  fontWeight = FontWeight.Black,
+                                  letterSpacing = 1.sp,
+                                  fontSize = 19.sp
                               )
                           },
                           actions = {
@@ -220,8 +406,8 @@ jobs:
                                       FilledTonalButton(
                                           onClick = { currentLang = lang },
                                           colors = ButtonDefaults.filledTonalButtonColors(
-                                              containerColor = if (currentLang == lang) Color.White else Color(0xFF004D40),
-                                              contentColor = if (currentLang == lang) Color(0xFF00695C) else Color.White
+                                              containerColor = if (currentLang == lang) Color.White else Color(0xFF1E3A8A),
+                                              contentColor = if (currentLang == lang) Color(0xFF0D276B) else Color.White
                                           ),
                                           contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                                           modifier = Modifier.padding(horizontal = 2.dp).height(32.dp)
@@ -232,7 +418,7 @@ jobs:
                               }
                           },
                           colors = TopAppBarDefaults.topAppBarColors(
-                              containerColor = Color(0xFF00695C),
+                              containerColor = Color(0xFF0D276B),
                               titleContentColor = Color.White
                           )
                       )
@@ -242,13 +428,15 @@ jobs:
                       modifier = Modifier
                           .fillMaxSize()
                           .padding(paddingValues)
-                          .background(Color(0xFFF8FAFC))
+                          .background(Color(0xFFF1F5F9))
                   ) {
                       when (currentScreen) {
                           "home" -> HomeScreen(
                               lang = currentLang,
+                              patientList = patientList,
                               onAddClick = { currentScreen = "add" },
-                              onRecordsClick = { currentScreen = "records" }
+                              onRecordsClick = { currentScreen = "records" },
+                              onSlotClick = { slot, doc -> activeSlotDetail = Pair(slot, doc) }
                           )
                           "add" -> AddPatientScreen(
                               lang = currentLang,
@@ -257,12 +445,94 @@ jobs:
                                   patientList.add(0, newPatient)
                                   currentScreen = "records"
                               },
-                              onBack = { currentScreen = "home" }
+                              onBack = { currentScreen = "home" },
+                              onSlotInfoClick = { slot, doc -> activeSlotDetail = Pair(slot, doc) }
                           )
                           "records" -> PatientRecordsScreen(
                               lang = currentLang,
                               patients = patientList,
-                              onBack = { currentScreen = "home" }
+                              onBack = { currentScreen = "home" },
+                              onToggleCheck = { patient ->
+                                  val index = patientList.indexOfFirst { it.id == patient.id }
+                                  if (index != -1) {
+                                      patientList[index] = patientList[index].copy(isChecked = !patientList[index].isChecked)
+                                  }
+                              }
+                          )
+                      }
+
+                      // Popup Details for Time Slots
+                      activeSlotDetail?.let { (slot, doc) ->
+                          val slotPatients = patientList.filter { it.timeSlot == slot && it.doctorName.contains(doc.take(5)) }
+                          AlertDialog(
+                              onDismissRequest = { activeSlotDetail = null },
+                              title = {
+                                  Column {
+                                      Text(text = "⏰ $slot", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color(0xFF0D276B))
+                                      Text(text = "👨‍⚕️ $doc", fontSize = 13.sp, color = Color.Gray)
+                                  }
+                              },
+                              text = {
+                                  Column(modifier = Modifier.fillMaxWidth()) {
+                                      Text(text = tr("patients_in_slot", currentLang), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                      Spacer(modifier = Modifier.height(8.dp))
+                                      if (slotPatients.isEmpty()) {
+                                          Text(text = tr("no_patients_in_slot", currentLang), fontSize = 13.sp, color = Color.DarkGray)
+                                      } else {
+                                          slotPatients.forEachIndexed { index, p ->
+                                              Card(
+                                                  modifier = Modifier
+                                                      .fillMaxWidth()
+                                                      .padding(vertical = 4.dp),
+                                                  colors = CardDefaults.cardColors(
+                                                      containerColor = if (p.isChecked) Color(0xFFFFEBEE) else Color(0xFFE8F5E9)
+                                                  )
+                                              ) {
+                                                  Column(modifier = Modifier.padding(10.dp)) {
+                                                      Row(
+                                                          modifier = Modifier.fillMaxWidth(),
+                                                          horizontalArrangement = Arrangement.SpaceBetween,
+                                                          verticalAlignment = Alignment.CenterVertically
+                                                      ) {
+                                                          Text(text = "${index + 1}. ${p.name}", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF0D276B))
+                                                          Button(
+                                                              onClick = {
+                                                                  val pIdx = patientList.indexOfFirst { it.id == p.id }
+                                                                  if (pIdx != -1) {
+                                                                      patientList[pIdx] = patientList[pIdx].copy(isChecked = !patientList[pIdx].isChecked)
+                                                                  }
+                                                              },
+                                                              colors = ButtonDefaults.buttonColors(
+                                                                  containerColor = if (p.isChecked) Color(0xFFDC2626) else Color(0xFF16A34A)
+                                                              ),
+                                                              contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                                                              modifier = Modifier.height(30.dp)
+                                                          ) {
+                                                              Text(
+                                                                  text = if (p.isChecked) "🔴 તપાસાઈ ગયા (Checked)" else "🟢 તપાસવા બાકી (Pending)",
+                                                                  fontSize = 11.sp,
+                                                                  color = Color.White
+                                                              )
+                                                          }
+                                                      }
+                                                      Spacer(modifier = Modifier.height(4.dp))
+                                                      Text(text = "ગામ: ${p.village} | ઉંમર: ${p.age} વર્ષ", fontSize = 12.sp, color = Color.DarkGray)
+                                                      Text(text = "રોગ: ${p.disease}", fontSize = 12.sp, color = Color(0xFFD32F2F))
+                                                      Text(text = "ફી: ₹${p.amount} (${p.paymentMode})", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF2E7D32))
+                                                  }
+                                              }
+                                          }
+                                      }
+                                  }
+                              },
+                              confirmButton = {
+                                  Button(
+                                      onClick = { activeSlotDetail = null },
+                                      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B))
+                                  ) {
+                                      Text(tr("close", currentLang))
+                                  }
+                              }
                           )
                       }
                   }
@@ -270,7 +540,18 @@ jobs:
           }
 
           @Composable
-          fun HomeScreen(lang: AppLang, onAddClick: () -> Unit, onRecordsClick: () -> Unit) {
+          fun HomeScreen(
+              lang: AppLang,
+              patientList: List<Patient>,
+              onAddClick: () -> Unit,
+              onRecordsClick: () -> Unit,
+              onSlotClick: (String, String) -> Unit
+          ) {
+              val totalPatients = patientList.size
+              val pendingCount = patientList.count { !it.isChecked }
+              val completedCount = patientList.count { it.isChecked }
+              val totalCollection = patientList.sumOf { it.amount.toIntOrNull() ?: 0 }
+
               Column(
                   modifier = Modifier
                       .fillMaxSize()
@@ -278,14 +559,95 @@ jobs:
                       .verticalScroll(rememberScrollState()),
                   horizontalAlignment = Alignment.CenterHorizontally
               ) {
+                  // Official Brand Header Card
+                  Card(
+                      modifier = Modifier.fillMaxWidth(),
+                      shape = RoundedCornerShape(16.dp),
+                      colors = CardDefaults.cardColors(containerColor = Color.White),
+                      elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                  ) {
+                      Column(
+                          modifier = Modifier
+                              .fillMaxWidth()
+                              .padding(16.dp),
+                          horizontalAlignment = Alignment.CenterHorizontally
+                      ) {
+                          Row(
+                              verticalAlignment = Alignment.CenterVertically,
+                              horizontalArrangement = Arrangement.Center
+                          ) {
+                              Image(
+                                  painter = painterResource(id = R.drawable.ic_aastha_brand_logo),
+                                  contentDescription = "Aastha Logo",
+                                  modifier = Modifier.size(52.dp)
+                              )
+                              Spacer(modifier = Modifier.width(12.dp))
+                              Column {
+                                  Text(
+                                      text = "AASTHA",
+                                      fontSize = 24.sp,
+                                      fontWeight = FontWeight.Black,
+                                      letterSpacing = 3.sp,
+                                      color = Color(0xFF0D276B)
+                                  )
+                                  Text(
+                                      text = "CLINIC",
+                                      fontSize = 18.sp,
+                                      fontWeight = FontWeight.Bold,
+                                      letterSpacing = 2.sp,
+                                      color = Color(0xFFD32F2F)
+                                  )
+                              }
+                          }
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(14.dp))
+
+                  // Live Analytics Dashboard Cards (4 Professional Grid Metric Boxes)
+                  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                      MetricCard(
+                          title = tr("total_patients", lang),
+                          value = "$totalPatients",
+                          color = Color(0xFF0288D1),
+                          modifier = Modifier.weight(1f).padding(end = 4.dp)
+                      )
+                      MetricCard(
+                          title = tr("pending_patients", lang),
+                          value = "$pendingCount",
+                          color = Color(0xFF16A34A),
+                          modifier = Modifier.weight(1f).padding(start = 4.dp)
+                      )
+                  }
+
+                  Spacer(modifier = Modifier.height(8.dp))
+
+                  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                      MetricCard(
+                          title = tr("completed_patients", lang),
+                          value = "$completedCount",
+                          color = Color(0xFFDC2626),
+                          modifier = Modifier.weight(1f).padding(end = 4.dp)
+                      )
+                      MetricCard(
+                          title = tr("total_collection", lang),
+                          value = "₹$totalCollection",
+                          color = Color(0xFF7C3AED),
+                          modifier = Modifier.weight(1f).padding(start = 4.dp)
+                      )
+                  }
+
+                  Spacer(modifier = Modifier.height(16.dp))
+
+                  // Doctors Cards
                   DoctorInfoCard(
                       doctorName = "DR. BIRJU K. SIRODARIA",
                       shift = tr("morning_shift", lang),
                       time = "⏰ 11:00 AM - 03:30 PM",
-                      bgColor = Color(0xFF004D40)
+                      bgColor = Color(0xFF0D276B)
                   )
 
-                  Spacer(modifier = Modifier.height(12.dp))
+                  Spacer(modifier = Modifier.height(8.dp))
 
                   DoctorInfoCard(
                       doctorName = "DR. NIDDHI JAVIA",
@@ -294,23 +656,101 @@ jobs:
                       bgColor = Color(0xFF1E3A8A)
                   )
 
-                  Spacer(modifier = Modifier.height(20.dp))
+                  Spacer(modifier = Modifier.height(16.dp))
 
+                  // Navigation Action Cards
                   HomeMenuButton(
                       title = tr("new_booking", lang),
                       subtitle = tr("new_booking_sub", lang),
-                      color = Color(0xFF00796B),
+                      color = Color(0xFFD32F2F),
                       onClick = onAddClick
                   )
 
-                  Spacer(modifier = Modifier.height(14.dp))
+                  Spacer(modifier = Modifier.height(10.dp))
 
                   HomeMenuButton(
                       title = tr("view_records", lang),
                       subtitle = tr("view_records_sub", lang),
-                      color = Color(0xFF388E3C),
+                      color = Color(0xFF0D276B),
                       onClick = onRecordsClick
                   )
+
+                  Spacer(modifier = Modifier.height(18.dp))
+
+                  // Live Slot Status with Green (Pending) and Red (Checked)
+                  Text(
+                      text = tr("slots_overview", lang),
+                      fontWeight = FontWeight.Bold,
+                      fontSize = 13.sp,
+                      color = Color(0xFF1E293B)
+                  )
+                  Spacer(modifier = Modifier.height(8.dp))
+
+                  val morningSlots = listOf(
+                      "11:00 AM - 11:15 AM", "11:15 AM - 11:30 AM", "11:30 AM - 11:45 AM", "11:45 AM - 12:00 PM",
+                      "12:00 PM - 12:15 PM", "12:15 PM - 12:30 PM", "12:30 PM - 12:45 PM", "12:45 PM - 01:00 PM",
+                      "01:00 PM - 01:15 PM", "01:15 PM - 01:30 PM", "01:30 PM - 01:45 PM", "01:45 PM - 02:00 PM",
+                      "02:00 PM - 02:15 PM", "02:15 PM - 02:30 PM", "02:30 PM - 02:45 PM", "02:45 PM - 03:00 PM",
+                      "03:00 PM - 03:15 PM", "03:15 PM - 03:30 PM"
+                  )
+
+                  morningSlots.chunked(2).forEach { rowSlots ->
+                      Row(modifier = Modifier.fillMaxWidth()) {
+                          rowSlots.forEach { slot ->
+                              val doc = "DR. BIRJU K. SIRODARIA"
+                              val slotPatients = patientList.filter { it.timeSlot == slot && it.doctorName.contains("BIRJU") }
+                              val hasPatients = slotPatients.isNotEmpty()
+                              val allChecked = hasPatients && slotPatients.all { it.isChecked }
+                              val isPending = hasPatients && slotPatients.any { !it.isChecked }
+
+                              val cardBgColor = when {
+                                  allChecked -> Color(0xFFDC2626) // RED when all checked
+                                  isPending -> Color(0xFF16A34A)  // GREEN when pending checkup
+                                  else -> Color.White            // Neutral when empty
+                              }
+
+                              val textColor = if (hasPatients) Color.White else Color(0xFF0D276B)
+
+                              Card(
+                                  modifier = Modifier
+                                      .weight(1f)
+                                      .padding(3.dp)
+                                      .clickable { onSlotClick(slot, doc) },
+                                  colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                  shape = RoundedCornerShape(8.dp)
+                              ) {
+                                  Column(modifier = Modifier.padding(10.dp)) {
+                                      Text(text = slot, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = textColor)
+                                      Text(
+                                          text = when {
+                                              allChecked -> "🔴 તપાસાઈ ગયા (Red)"
+                                              isPending -> "🟢 તપાસવાના બાકી (${slotPatients.size})"
+                                              else -> "⚪ ખાલી (0/3)"
+                                          },
+                                          fontSize = 10.sp,
+                                          color = if (hasPatients) Color.White.copy(alpha = 0.9f) else Color.Gray
+                                      )
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun MetricCard(title: String, value: String, color: Color, modifier: Modifier = Modifier) {
+              Card(
+                  modifier = modifier,
+                  shape = RoundedCornerShape(12.dp),
+                  colors = CardDefaults.cardColors(containerColor = Color.White),
+                  elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+              ) {
+                  Column(modifier = Modifier.padding(12.dp)) {
+                      Text(text = title, fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
+                      Spacer(modifier = Modifier.height(4.dp))
+                      Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = color)
+                  }
               }
           }
 
@@ -322,12 +762,12 @@ jobs:
                   colors = CardDefaults.cardColors(containerColor = bgColor),
                   elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
               ) {
-                  Column(modifier = Modifier.padding(16.dp)) {
-                      Text(text = "👨‍⚕️ $doctorName", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                      Spacer(modifier = Modifier.height(4.dp))
-                      Text(text = shift, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color(0xFF80CBC4))
+                  Column(modifier = Modifier.padding(14.dp)) {
+                      Text(text = "👨‍⚕️ $doctorName", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                      Spacer(modifier = Modifier.height(3.dp))
+                      Text(text = shift, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = Color(0xFF90CAF9))
                       Spacer(modifier = Modifier.height(2.dp))
-                      Text(text = time, fontSize = 13.sp, color = Color.White.copy(alpha = 0.9f))
+                      Text(text = time, fontSize = 12.sp, color = Color.White.copy(alpha = 0.9f))
                   }
               }
           }
@@ -343,18 +783,18 @@ jobs:
                   elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
               ) {
                   Row(
-                      modifier = Modifier.padding(16.dp),
+                      modifier = Modifier.padding(14.dp),
                       verticalAlignment = Alignment.CenterVertically
                   ) {
                       Box(
                           modifier = Modifier
-                              .size(10.dp, 44.dp)
+                              .size(10.dp, 40.dp)
                               .background(color, RoundedCornerShape(4.dp))
                       )
                       Spacer(modifier = Modifier.width(12.dp))
                       Column {
                           Text(text = title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
-                          Spacer(modifier = Modifier.height(3.dp))
+                          Spacer(modifier = Modifier.height(2.dp))
                           Text(text = subtitle, fontSize = 12.sp, color = Color.Gray)
                       }
                   }
@@ -362,7 +802,13 @@ jobs:
           }
 
           @Composable
-          fun AddPatientScreen(lang: AppLang, patientList: List<Patient>, onSave: (Patient) -> Unit, onBack: () -> Unit) {
+          fun AddPatientScreen(
+              lang: AppLang,
+              patientList: List<Patient>,
+              onSave: (Patient) -> Unit,
+              onBack: () -> Unit,
+              onSlotInfoClick: (String, String) -> Unit
+          ) {
               var name by remember { mutableStateOf("") }
               var village by remember { mutableStateOf("") }
               var age by remember { mutableStateOf("") }
@@ -419,18 +865,28 @@ jobs:
                       currentSlots.chunked(2).forEach { rowSlots ->
                           Row(modifier = Modifier.fillMaxWidth()) {
                               rowSlots.forEach { slot ->
-                                  val bookedCount = patientList.count { it.timeSlot == slot }
-                                  val isFull = bookedCount >= 3
+                                  val docKey = if (selectedDoctor.contains("BIRJU")) "BIRJU" else "NIDDHI"
+                                  val slotPatients = patientList.filter { it.timeSlot == slot && it.doctorName.contains(docKey) }
+                                  val bookedCount = slotPatients.size
+                                  val allChecked = bookedCount > 0 && slotPatients.all { it.isChecked }
+                                  val isPending = bookedCount > 0 && slotPatients.any { !it.isChecked }
+
+                                  val cardBgColor = when {
+                                      selectedSlot == slot -> Color(0xFF0D276B)
+                                      allChecked -> Color(0xFFDC2626) // RED when checked
+                                      isPending -> Color(0xFF16A34A)  // GREEN when pending
+                                      else -> Color.White
+                                  }
+
                                   Card(
                                       modifier = Modifier
                                           .weight(1f)
                                           .padding(3.dp)
-                                          .clickable(enabled = !isFull) { selectedSlot = slot },
-                                      colors = CardDefaults.cardColors(
-                                          containerColor = if (selectedSlot == slot) Color(0xFF00796B)
-                                                          else if (isFull) Color(0xFFFFCDD2)
-                                                          else Color.White
-                                      ),
+                                          .clickable {
+                                              selectedSlot = slot
+                                              onSlotInfoClick(slot, selectedDoctor)
+                                          },
+                                      colors = CardDefaults.cardColors(containerColor = cardBgColor),
                                       shape = RoundedCornerShape(8.dp)
                                   ) {
                                       Column(modifier = Modifier.padding(8.dp)) {
@@ -438,12 +894,16 @@ jobs:
                                               text = slot,
                                               fontSize = 11.sp,
                                               fontWeight = FontWeight.Bold,
-                                              color = if (selectedSlot == slot) Color.White else if (isFull) Color.Red else Color.Black
+                                              color = if (selectedSlot == slot || bookedCount > 0) Color.White else Color(0xFF0D276B)
                                           )
                                           Text(
-                                              text = if (isFull) tr("full", lang) else "$bookedCount/3 " + tr("patients_count", lang),
+                                              text = when {
+                                                  allChecked -> "🔴 તપાસાઈ ગયા (Red)"
+                                                  isPending -> "🟢 તપાસવાના બાકી"
+                                                  else -> "$bookedCount/3 દર્દી"
+                                              },
                                               fontSize = 10.sp,
-                                              color = if (selectedSlot == slot) Color(0xFFE0F2F1) else Color.Gray
+                                              color = if (selectedSlot == slot || bookedCount > 0) Color.White.copy(alpha = 0.9f) else Color.Gray
                                           )
                                       }
                                   }
@@ -533,13 +993,14 @@ jobs:
                                       amount = amount,
                                       paymentMode = paymentMode,
                                       doctorName = if (selectedDoctor.contains("BIRJU")) "DR. BIRJU K. SIRODARIA" else "DR. NIDDHI JAVIA",
-                                      timeSlot = selectedSlot
+                                      timeSlot = selectedSlot,
+                                      isChecked = false
                                   )
                               )
                           }
                       },
                       modifier = Modifier.fillMaxWidth(),
-                      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00796B)),
+                      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B)),
                       shape = RoundedCornerShape(8.dp)
                   ) {
                       Text(tr("save_booking", lang), fontSize = 15.sp)
@@ -558,7 +1019,12 @@ jobs:
           }
 
           @Composable
-          fun PatientRecordsScreen(lang: AppLang, patients: List<Patient>, onBack: () -> Unit) {
+          fun PatientRecordsScreen(
+              lang: AppLang,
+              patients: List<Patient>,
+              onBack: () -> Unit,
+              onToggleCheck: (Patient) -> Unit
+          ) {
               var searchQuery by remember { mutableStateOf("") }
               val filteredPatients = patients.filter {
                   it.name.contains(searchQuery, ignoreCase = true) ||
@@ -586,7 +1052,7 @@ jobs:
                       Spacer(modifier = Modifier.width(8.dp))
                       Button(
                           onClick = onBack,
-                          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00796B))
+                          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B))
                       ) {
                           Text(tr("home_btn", lang))
                       }
@@ -600,25 +1066,43 @@ jobs:
                               modifier = Modifier
                                   .fillMaxWidth()
                                   .padding(vertical = 6.dp),
-                              colors = CardDefaults.cardColors(containerColor = Color.White),
+                              colors = CardDefaults.cardColors(
+                                  containerColor = if (p.isChecked) Color(0xFFFFEBEE) else Color.White
+                              ),
                               elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                           ) {
                               Column(modifier = Modifier.padding(14.dp)) {
                                   Row(
                                       modifier = Modifier.fillMaxWidth(),
-                                      horizontalArrangement = Arrangement.SpaceBetween
+                                      horizontalArrangement = Arrangement.SpaceBetween,
+                                      verticalAlignment = Alignment.CenterVertically
                                   ) {
-                                      Text(text = p.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF00796B))
-                                      Text(text = "₹ ${p.amount} (${p.paymentMode})", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                      Text(text = p.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF0D276B))
+                                      Button(
+                                          onClick = { onToggleCheck(p) },
+                                          colors = ButtonDefaults.buttonColors(
+                                              containerColor = if (p.isChecked) Color(0xFFDC2626) else Color(0xFF16A34A)
+                                          ),
+                                          contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                                          modifier = Modifier.height(30.dp)
+                                      ) {
+                                          Text(
+                                              text = if (p.isChecked) "🔴 તપાસાઈ ગયા (Red)" else "🟢 બાકી (Green)",
+                                              fontSize = 11.sp,
+                                              color = Color.White
+                                          )
+                                      }
                                   }
                                   Spacer(modifier = Modifier.height(4.dp))
                                   Text(text = "⏰ ${p.timeSlot} | 👨‍⚕️ ${p.doctorName}", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF0288D1))
                                   Spacer(modifier = Modifier.height(2.dp))
                                   Text(text = "${tr("village", lang)}: ${p.village} | ${tr("age", lang)}: ${p.age}", fontSize = 13.sp, color = Color.DarkGray)
                                   Spacer(modifier = Modifier.height(2.dp))
-                                  Text(text = "${tr("disease", lang)}: ${p.disease}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color(0xFFC2185B))
+                                  Text(text = "${tr("disease", lang)}: ${p.disease}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color(0xFFD32F2F))
                                   Spacer(modifier = Modifier.height(2.dp))
                                   Text(text = "${tr("medicines", lang)}: ${p.medicine}", fontSize = 12.sp, color = Color.Gray)
+                                  Spacer(modifier = Modifier.height(2.dp))
+                                  Text(text = "ફી: ₹${p.amount} (${p.paymentMode})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
                               }
                           }
                       }
@@ -630,6 +1114,7 @@ jobs:
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET" />
               <application
                   android:allowBackup="true"
                   android:icon="@mipmap/ic_launcher"
@@ -692,8 +1177,8 @@ jobs:
                   applicationId = "com.aastha.clinic"
                   minSdk = 26
                   targetSdk = 35
-                  versionCode = 7
-                  versionName = "2.2"
+                  versionCode = 10
+                  versionName = "2.5"
               }
 
               buildFeatures {
@@ -755,5 +1240,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Aastha-Clinic-Multilingual-App
+          name: Aastha-Clinic-Pro-Dashboard-App
           path: app/build/outputs/apk/debug/*.apk
