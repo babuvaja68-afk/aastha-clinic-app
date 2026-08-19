@@ -18,17 +18,24 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Create Gradle Root Setup
         run: |
-          if [ -f "./gradlew" ]; then
-            chmod +x gradlew
-            ./gradlew assembleDebug
-          else
-            echo "No gradle wrapper found"
+          if [ ! -f "settings.gradle.kts" ]; then
+            echo 'include(":app")' > settings.gradle.kts
           fi
+          if [ ! -f "build.gradle.kts" ]; then
+            echo 'plugins { alias(libs.plugins.android.application) apply false; alias(libs.plugins.kotlin.compose) apply false }' > build.gradle.kts
+          fi
+          gradle wrapper
+
+      - name: Build APK with Gradle
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: "**/*.apk"
+          name: Aastha-Clinic-App
+          path: app/build/outputs/apk/debug/*.apk
