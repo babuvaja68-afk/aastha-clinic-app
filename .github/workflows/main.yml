@@ -30,7 +30,6 @@ jobs:
           mkdir -p app/src/main/java/com/aastha/clinic
           mkdir -p gradle/wrapper
 
-          # 1. Exact Vector Reproduction of Aastha Clinic Logo Symbol
           cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="150dp"
@@ -52,7 +51,6 @@ jobs:
           </vector>
           EOF
 
-          # 2. App Launcher Adaptive Icon
           cat << 'EOF' > app/src/main/res/drawable/ic_launcher_bg.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="108dp"
@@ -73,7 +71,6 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 3. Professional Main Activity with Dynamic Slot Status Colors & Analytics Dashboard
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
@@ -87,143 +84,12 @@ jobs:
           import androidx.compose.foundation.lazy.LazyColumn
           import androidx.compose.foundation.lazy.items
           import androidx.compose.foundation.rememberScrollState
-          import androidx.compose.foundation.shape.CircleShape
           import androidx.compose.foundation.shape.RoundedCornerShape
           import androidx.compose.foundation.verticalScroll
           import androidx.compose.material3.*
           import androidx.compose.runtime.*
           import androidx.compose.ui.Alignment
           import androidx.compose.ui.Modifier
-          import androidx.compose.ui.draw.clip
-          import androidx.compose.ui.graphics.Color
-          import androidx.compose.ui.res.painterResource
-          import androidx.compose.ui.text.font.FontWeight
-          import androidx.compose.ui.unit.dp
-          import androidx.compose.ui.unit.sp
-
-          data class Patient(
-              val id: Int,
-              val name: String,
-              val village: String,
-              val age: String,
-              val disease: String,
-              val medicine: String,
-              val amount: String,
-              val paymentMode: String,
-              val doctorName: String,
-              val timeSlot: String,
-              var isChecked: Boolean = false
-          )
-
-          enum class AppLang { GU, EN, HI }
-
-          fun tr(key: String, lang: AppLang): String {
-              return when (lang) {
-                  AppLang.GU -> when (key) {
-                      "app_title" -> "આસ્થા ક્લિનિક"
-                      "home_btn" -> "હોમ"
-                      "add_title" -> "દર્દી બુકિંગ ફોર્મ"
-                      "records_title" -> "દર્દીઓનો રેકોર્ડ"
-                      "slots_overview" -> "🕒 લાઈવ સ્લોટ્સ સ્ટેટસ"
-                      "morning_shift" -> "🌅 મોર્નિંગ શિફ્ટ"
-                      "evening_shift" -> "```yaml
-name: Build Aastha Clinic APK
-
-on:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Java JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Setup Professional Dashboard & Checked Slot Colors
-        run: |
-          mkdir -p app/src/main/res/xml
-          mkdir -p app/src/main/res/values
-          mkdir -p app/src/main/res/drawable
-          mkdir -p app/src/main/res/mipmap-anydpi-v26
-          mkdir -p app/src/main/java/com/aastha/clinic
-          mkdir -p gradle/wrapper
-
-          # 1. Exact Vector Reproduction of Aastha Clinic Logo Symbol
-          cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
-          <vector xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
-              android:width="150dp"
-              android:height="150dp"
-              android:viewportWidth="100"
-              android:viewportHeight="100">
-              <path
-                  android:fillColor="#D32F2F"
-                  android:pathData="M44,40 h12 v24 h-12 z"/>
-              <path
-                  android:fillColor="#D32F2F"
-                  android:pathData="M38,46 h24 v12 h-24 z"/>
-              <path
-                  android:fillColor="#0D276B"
-                  android:pathData="M50,15 a4,4 0 1,0 0.1,0 z M42,22 c-3,0 -6,2 -7,5 l4,2 c1,-2 2,-3 3,-3 c2,0 3,1 4,3 l4,-2 c-1,-3 -4,-5 -8,-5 z M58,22 c-4,0 -7,2 -8,5 l4,2 c1,-2 2,-3 4,-3 c1,0 2,1 3,3 l4,-2 c-1,-3 -4,-5 -7,-5 z"/>
-              <path
-                  android:fillColor="#0D276B"
-                  android:pathData="M28,38 C28,52 38,62 50,66 C36,60 32,48 32,38 Z M72,38 C72,52 62,62 50,66 C64,60 68,48 68,38 Z"/>
-          </vector>
-          EOF
-
-          # 2. App Launcher Adaptive Icon
-          cat << 'EOF' > app/src/main/res/drawable/ic_launcher_bg.xml
-          <vector xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
-              android:width="108dp"
-              android:height="108dp"
-              android:viewportWidth="108"
-              android:viewportHeight="108">
-              <path
-                  android:fillColor="#0D276B"
-                  android:pathData="M0,0h108v108h-108z"/>
-          </vector>
-          EOF
-
-          cat << 'EOF' > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <adaptive-icon xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)">
-              <background android:drawable="@drawable/ic_launcher_bg"/>
-              <foreground android:drawable="@drawable/ic_aastha_brand_logo"/>
-          </adaptive-icon>
-          EOF
-
-          # 3. Professional Main Activity with Dynamic Slot Status Colors & Analytics Dashboard
-          cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
-          package com.aastha.clinic
-
-          import android.os.Bundle
-          import androidx.activity.ComponentActivity
-          import androidx.activity.compose.setContent
-          import androidx.compose.foundation.Image
-          import androidx.compose.foundation.background
-          import androidx.compose.foundation.clickable
-          import androidx.compose.foundation.layout.*
-          import androidx.compose.foundation.lazy.LazyColumn
-          import androidx.compose.foundation.lazy.items
-          import androidx.compose.foundation.rememberScrollState
-          import androidx.compose.foundation.shape.CircleShape
-          import androidx.compose.foundation.shape.RoundedCornerShape
-          import androidx.compose.foundation.verticalScroll
-          import androidx.compose.material3.*
-          import androidx.compose.runtime.*
-          import androidx.compose.ui.Alignment
-          import androidx.compose.ui.Modifier
-          import androidx.compose.ui.draw.clip
           import androidx.compose.ui.graphics.Color
           import androidx.compose.ui.res.painterResource
           import androidx.compose.ui.text.font.FontWeight
@@ -255,7 +121,6 @@ jobs:
                       "records_title" -> "દર્દીઓનો રેકોર્ડ"
                       "slots_overview" -> "🕒 ટાઈમ સ્લોટ સ્ટેટસ (Green: બાકી | Red: પૂરું)"
                       "morning_shift" -> "🌅 મોર્નિંગ શિફ્ટ (સવાર)"
-                      "evening_shift" -> "```yaml
                       "evening_shift" -> "🌆 ઇવનિંગ શિફ્ટ (સાંજ)"
                       "new_booking" -> "➕ નવું દર્દી બુકિંગ"
                       "new_booking_sub" -> "૧૫ મિનિટમાં ૩ દર્દી લિમિટ મુજબ એપોઇન્ટમેન્ટ"
@@ -280,7 +145,7 @@ jobs:
                       "search_hint" -> "નામ, ગામ કે રોગ થી શોધો..."
                       "full" -> "Full (3/3)"
                       "no_patients_in_slot" -> "આ સ્લોટમાં હજુ કોઈ દર્દી બુક થયેલ નથી."
-                      "patients_in_slot" -> "આ સ્લોટના દર્દીઓ (તપાસ માર્ક કરો):"
+                      "patients_in_slot" -> "આ સ્લોટના દર્દીઓ:"
                       "patients_count" -> "દર્દી"
                       else -> key
                   }
@@ -461,7 +326,6 @@ jobs:
                           )
                       }
 
-                      // Popup Details for Time Slots
                       activeSlotDetail?.let { (slot, doc) ->
                           val slotPatients = patientList.filter { it.timeSlot == slot && it.doctorName.contains(doc.take(5)) }
                           AlertDialog(
@@ -509,7 +373,7 @@ jobs:
                                                               modifier = Modifier.height(30.dp)
                                                           ) {
                                                               Text(
-                                                                  text = if (p.isChecked) "🔴 તપાસાઈ ગયા (Checked)" else "🟢 તપાસવા બાકી (Pending)",
+                                                                  text = if (p.isChecked) "🔴 તપાસાઈ ગયા" else "🟢 બાકી",
                                                                   fontSize = 11.sp,
                                                                   color = Color.White
                                                               )
@@ -559,7 +423,6 @@ jobs:
                       .verticalScroll(rememberScrollState()),
                   horizontalAlignment = Alignment.CenterHorizontally
               ) {
-                  // Official Brand Header Card
                   Card(
                       modifier = Modifier.fillMaxWidth(),
                       shape = RoundedCornerShape(16.dp),
@@ -604,7 +467,6 @@ jobs:
 
                   Spacer(modifier = Modifier.height(14.dp))
 
-                  // Live Analytics Dashboard Cards (4 Professional Grid Metric Boxes)
                   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                       MetricCard(
                           title = tr("total_patients", lang),
@@ -639,7 +501,6 @@ jobs:
 
                   Spacer(modifier = Modifier.height(16.dp))
 
-                  // Doctors Cards
                   DoctorInfoCard(
                       doctorName = "DR. BIRJU K. SIRODARIA",
                       shift = tr("morning_shift", lang),
@@ -658,7 +519,6 @@ jobs:
 
                   Spacer(modifier = Modifier.height(16.dp))
 
-                  // Navigation Action Cards
                   HomeMenuButton(
                       title = tr("new_booking", lang),
                       subtitle = tr("new_booking_sub", lang),
@@ -677,7 +537,6 @@ jobs:
 
                   Spacer(modifier = Modifier.height(18.dp))
 
-                  // Live Slot Status with Green (Pending) and Red (Checked)
                   Text(
                       text = tr("slots_overview", lang),
                       fontWeight = FontWeight.Bold,
@@ -704,9 +563,9 @@ jobs:
                               val isPending = hasPatients && slotPatients.any { !it.isChecked }
 
                               val cardBgColor = when {
-                                  allChecked -> Color(0xFFDC2626) // RED when all checked
-                                  isPending -> Color(0xFF16A34A)  // GREEN when pending checkup
-                                  else -> Color.White            // Neutral when empty
+                                  allChecked -> Color(0xFFDC2626)
+                                  isPending -> Color(0xFF16A34A)
+                                  else -> Color.White
                               }
 
                               val textColor = if (hasPatients) Color.White else Color(0xFF0D276B)
@@ -873,8 +732,8 @@ jobs:
 
                                   val cardBgColor = when {
                                       selectedSlot == slot -> Color(0xFF0D276B)
-                                      allChecked -> Color(0xFFDC2626) // RED when checked
-                                      isPending -> Color(0xFF16A34A)  // GREEN when pending
+                                      allChecked -> Color(0xFFDC2626)
+                                      isPending -> Color(0xFF16A34A)
                                       else -> Color.White
                                   }
 
@@ -1087,7 +946,7 @@ jobs:
                                           modifier = Modifier.height(30.dp)
                                       ) {
                                           Text(
-                                              text = if (p.isChecked) "🔴 તપાસાઈ ગયા (Red)" else "🟢 બાકી (Green)",
+                                              text = if (p.isChecked) "🔴 તપાસાઈ ગયા" else "🟢 બાકી",
                                               fontSize = 11.sp,
                                               color = Color.White
                                           )
@@ -1177,8 +1036,8 @@ jobs:
                   applicationId = "com.aastha.clinic"
                   minSdk = 26
                   targetSdk = 35
-                  versionCode = 10
-                  versionName = "2.5"
+                  versionCode = 11
+                  versionName = "2.6"
               }
 
               buildFeatures {
