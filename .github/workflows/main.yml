@@ -21,7 +21,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Encrypted Secure Clinic App with Master PIN Lock
+      - name: Generate Complete Clean Android Project
         run: |
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
@@ -72,7 +72,7 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 2. Main Application Source
+          # 2. Main Application Source (No PIN/Login, Live Cloud Sync & History)
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
@@ -392,6 +392,9 @@ jobs:
 
       - name: Build Android APK
         run: |
+          if [ ! -f "gradlew" ]; then
+            gradle wrapper
+          fi
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon || ./gradlew assembleDebug --no-daemon
 
