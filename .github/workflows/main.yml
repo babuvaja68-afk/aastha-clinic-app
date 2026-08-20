@@ -21,160 +21,16 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Wrapper and Android Files
+      - name: Generate Clean Project Files
         run: |
-          rm -rf app gradle settings.gradle build.gradle gradlew gradlew.bat
-          mkdir -p gradle/wrapper
-          mkdir -p app/src/main/res/layout
+          mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
           mkdir -p app/src/main/java/com/aastha/clinic
+          mkdir -p gradle/wrapper
 
-          # Download official gradle-wrapper.jar to avoid Gradle 9.x conflicts
-          curl -sLo gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradle/wrapper/gradle-wrapper.jar
-          
-          # Gradle Wrapper Properties
-          cat << 'EOF' > gradle/wrapper/gradle-wrapper.properties
-          distributionBase=GRADLE_USER_HOME
-          distributionPath=wrapper/dists
-          distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip
-          networkTimeout=10000
-          zipStoreBase=GRADLE_USER_HOME
-          zipStorePath=wrapper/dists
-          EOF
-
-          # Official Gradle Wrapper Script
-          cat << 'EOF' > gradlew
-          #!/bin/sh
-          JAVA_EXE="java"
-          if [ -n "$JAVA_HOME" ] ; then
-              JAVA_EXE="$JAVA_HOME/bin/java"
-          fi
-          exec "$JAVA_EXE" -jar gradle/wrapper/gradle-wrapper.jar "$@"
-          EOF
-          chmod +x gradlew
-
-          # 1. settings.gradle
-          cat << 'EOF' > settings.gradle
-          pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
-          }
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-          rootProject.name = "AasthaClinic"
-          include ':app'
-          EOF
-
-          # 2. Root build.gradle
-          cat << 'EOF' > build.gradle
-          plugins {
-              id 'com.android.application' version '8.2.2' apply false
-          }
-          EOF
-
-          # 3. app/build.gradle
-          cat << 'EOF' > app/build.gradle
-          plugins {
-              id 'com.android.application'
-          }
-
-          android {
-              namespace 'com.aastha.clinic'
-              compileSdk 34
-
-              defaultConfig {
-                  applicationId "com.aastha.clinic"
-                  minSdk 24
-                  targetSdk 34
-                  versionCode 8
-                  versionName "8.0"
-              }
-
-              buildTypes {
-                  release {
-                      minifyEnabled false
-                  }
-                  debug {
-                      minifyEnabled false
-                  }
-              }
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_17
-                  targetCompatibility JavaVersion.VERSION_17
-              }
-              lint {
-                  abortOnError false
-                  checkReleaseBuilds false
-              }
-          }
-
-          dependencies {
-              implementation 'androidx.appcompat:appcompat:1.6.1'
-              implementation 'com.google.android.material:material:1.11.0'
-              implementation 'androidx.cardview:cardview:1.0.0'
-          }
-          EOF
-
-          # 4. AndroidManifest.xml
-          cat << 'EOF' > app/src/main/AndroidManifest.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <uses-permission android:name="android.permission.INTERNET" />
-              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-              <application
-                  android:allowBackup="true"
-                  android:icon="@mipmap/ic_launcher"
-                  android:label="Aastha Clinic"
-                  android:roundIcon="@mipmap/ic_launcher"
-                  android:supportsRtl="true"
-                  android:theme="@style/Theme.AasthaClinic">
-                  <activity
-                      android:name=".MainActivity"
-                      android:exported="true"
-                      android:windowSoftInputMode="adjustResize">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
-                      </intent-filter>
-                  </activity>
-              </application>
-          </manifest>
-          EOF
-
-          # 5. Resources & Styles
-          cat << 'EOF' > app/src/main/res/values/colors.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <resources>
-              <color name="primary">#0D276B</color>
-              <color name="primary_dark">#081842</color>
-              <color name="accent">#D32F2F</color>
-              <color name="bg_gray">#F4F6F9</color>
-              <color name="white">#FFFFFF</color>
-          </resources>
-          EOF
-
-          cat << 'EOF' > app/src/main/res/values/themes.xml
-          <resources>
-              <style name="Theme.AasthaClinic" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-                  <item name="colorPrimary">@color/primary</item>
-                  <item name="colorPrimaryDark">@color/primary_dark</item>
-                  <item name="colorAccent">@color/accent</item>
-                  <item name="android:windowBackground">@color/bg_gray</item>
-              </style>
-          </resources>
-          EOF
-
-          # 6. Clinic Brand Logo Vector
+          # 1. Clean Vector Brand Logo
           cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="200dp"
@@ -216,437 +72,307 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 7. Layout XML
-          cat << 'EOF' > app/src/main/res/layout/activity_main.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="#F4F6F9">
+          # 2. Main Application without Login (Direct Auto-Fill & Cloud Sync)
+          cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
+          package com.aastha.clinic
 
-              <LinearLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="vertical"
-                  android:padding="16dp">
+          import android.content.Context
+          import android.os.Bundle
+          import android.widget.Toast
+          import androidx.activity.ComponentActivity
+          import androidx.activity.compose.setContent
+          import androidx.compose.foundation.background
+          import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.lazy.LazyColumn
+          import androidx.compose.foundation.lazy.items
+          import androidx.compose.foundation.rememberScrollState
+          import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.foundation.verticalScroll
+          import androidx.compose.material3.*
+          import androidx.compose.runtime.*
+          import androidx.compose.ui.Modifier
+          import androidx.compose.ui.graphics.Color
+          import androidx.compose.ui.platform.LocalContext
+          import androidx.compose.ui.text.font.FontWeight
+          import androidx.compose.ui.unit.dp
+          import androidx.compose.ui.unit.sp
+          import kotlinx.coroutines.Dispatchers
+          import kotlinx.coroutines.launch
+          import kotlinx.coroutines.withContext
+          import org.json.JSONArray
+          import org.json.JSONObject
+          import java.io.BufferedReader
+          import java.io.InputStreamReader
+          import java.io.OutputStreamWriter
+          import java.net.HttpURLConnection
+          import java.net.URL
+          import java.text.SimpleDateFormat
+          import java.util.*
 
-                  <LinearLayout
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:orientation="horizontal"
-                      android:gravity="center_vertical"
-                      android:padding="8dp">
-                      <ImageView
-                          android:layout_width="45dp"
-                          android:layout_height="45dp"
-                          android:src="@drawable/ic_aastha_brand_logo"/>
-                      <LinearLayout
-                          android:layout_width="0dp"
-                          android:layout_weight="1"
-                          android:layout_height="wrap_content"
-                          android:orientation="vertical"
-                          android:layout_marginStart="12dp">
-                          <TextView
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:text="Aastha Clinic"
-                              android:textSize="20sp"
-                              android:textStyle="bold"
-                              android:textColor="#0D276B"/>
-                          <TextView
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:text="દર્દી રજીસ્ટ્રેશન &amp; રેકોર્ડ"
-                              android:textSize="12sp"
-                              android:textColor="#546E7A"/>
-                      </LinearLayout>
-                      <Button
-                          android:id="@+id/btnSync"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:text="Sync"
-                          android:textSize="12sp"
-                          android:backgroundTint="#0D276B"/>
-                  </LinearLayout>
+          data class Patient(
+              val id: String = UUID.randomUUID().toString(),
+              val name: String,
+              val phone: String,
+              val village: String,
+              val disease: String,
+              val medicine: String,
+              val date: String
+          )
 
-                  <androidx.cardview.widget.CardView
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      app:cardCornerRadius="10dp"
-                      app:cardElevation="2dp"
-                      app:cardBackgroundColor="#E3F2FD"
-                      android:layout_marginTop="12dp">
-                      <LinearLayout
-                          android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:orientation="vertical"
-                          android:padding="12dp">
-                          <TextView
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:text="🔍 જૂના દર્દી શોધો (નામ અથવા નંબર):"
-                              android:textStyle="bold"
-                              android:textColor="#0D276B"/>
-                          <EditText
-                              android:id="@+id/etSearch"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:hint="દા.ત. Raju Pandit અથવા 9898..."
-                              android:background="@android:drawable/editbox_background_normal"
-                              android:padding="10dp"
-                              android:layout_marginTop="6dp"/>
-                      </LinearLayout>
-                  </androidx.cardview.widget.CardView>
+          object CloudSyncManager {
+              private const val CLOUD_URL = "https://jsonblob.com/api/jsonBlob/1341050011854495744"
 
-                  <androidx.cardview.widget.CardView
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      app:cardCornerRadius="10dp"
-                      app:cardElevation="3dp"
-                      app:cardBackgroundColor="#FFFFFF"
-                      android:layout_marginTop="16dp">
-                      <LinearLayout
-                          android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:orientation="vertical"
-                          android:padding="16dp">
-
-                          <TextView
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:text="દર્દીની વિગત ઉમેરો"
-                              android:textStyle="bold"
-                              android:textSize="16sp"
-                              android:textColor="#0D276B"/>
-
-                          <EditText
-                              android:id="@+id/etName"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:hint="દર્દીનું પૂરું નામ"
-                              android:layout_marginTop="10dp"/>
-
-                          <EditText
-                              android:id="@+id/etVillage"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:hint="ગામ / શહેર"
-                              android:layout_marginTop="8dp"/>
-
-                          <EditText
-                              android:id="@+id/etMobile"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:hint="મોબાઈલ નંબર"
-                              android:inputType="phone"
-                              android:layout_marginTop="8dp"/>
-
-                          <EditText
-                              android:id="@+id/etDisease"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:hint="શેના માટે દવા લીધી (તકલીફ / રોગ)"
-                              android:layout_marginTop="8dp"/>
-
-                          <EditText
-                              android:id="@+id/etMedicine"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:hint="આપેલી દવાઓની વિગત"
-                              android:layout_marginTop="8dp"/>
-
-                          <Button
-                              android:id="@+id/btnSave"
-                              android:layout_width="match_parent"
-                              android:layout_height="50dp"
-                              android:text="ડેટા સેવ કરો (Save Visit)"
-                              android:backgroundTint="#0D276B"
-                              android:textColor="#FFFFFF"
-                              android:textStyle="bold"
-                              android:layout_marginTop="16dp"/>
-                      </LinearLayout>
-                  </androidx.cardview.widget.CardView>
-
-                  <TextView
-                      android:id="@+id/tvHistoryHeader"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:text="📋 અગાઉની હિસ્ટ્રી:"
-                      android:textStyle="bold"
-                      android:textColor="#0D276B"
-                      android:layout_marginTop="20dp"
-                      android:visibility="gone"/>
-
-                  <LinearLayout
-                      android:id="@+id/historyContainer"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:orientation="vertical"
-                      android:layout_marginTop="8dp"/>
-
-              </LinearLayout>
-          </ScrollView>
-          EOF
-
-          # 8. Java Code
-          cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.java
-          package com.aastha.clinic;
-
-          import android.os.Bundle;
-          import android.os.Handler;
-          import android.os.Looper;
-          import android.text.Editable;
-          import android.text.TextWatcher;
-          import android.view.View;
-          import android.widget.Button;
-          import android.widget.EditText;
-          import android.widget.LinearLayout;
-          import android.widget.TextView;
-          import android.widget.Toast;
-          import androidx.appcompat.app.AppCompatActivity;
-          import androidx.cardview.widget.CardView;
-          import org.json.JSONArray;
-          import org.json.JSONObject;
-          import java.io.BufferedReader;
-          import java.io.InputStreamReader;
-          import java.io.OutputStreamWriter;
-          import java.net.HttpURLConnection;
-          import java.net.URL;
-          import java.text.SimpleDateFormat;
-          import java.util.ArrayList;
-          import java.util.Date;
-          import java.util.List;
-          import java.util.Locale;
-          import java.util.concurrent.ExecutorService;
-          import java.util.concurrent.Executors;
-
-          public class MainActivity extends AppCompatActivity {
-
-              public static class PatientRecord {
-                  public String name;
-                  public String phone;
-                  public String village;
-                  public String disease;
-                  public String medicine;
-                  public String date;
-
-                  public PatientRecord(String name, String phone, String village, String disease, String medicine, String date) {
-                      this.name = name;
-                      this.phone = phone;
-                      this.village = village;
-                      this.disease = disease;
-                      this.medicine = medicine;
-                      this.date = date;
-                  }
-              }
-
-              private final String cloudUrl = "https://jsonblob.com/api/jsonBlob/1341050011854495744";
-              private final List<PatientRecord> patientList = new ArrayList<>();
-              private final ExecutorService executor = Executors.newSingleThreadExecutor();
-              private final Handler mainHandler = new Handler(Looper.getMainLooper());
-
-              private EditText etSearch, etName, etVillage, etMobile, etDisease, etMedicine;
-              private Button btnSave, btnSync;
-              private TextView tvHistoryHeader;
-              private LinearLayout historyContainer;
-
-              @Override
-              protected void onCreate(Bundle savedInstanceState) {
-                  super.onCreate(savedInstanceState);
-                  setContentView(R.layout.activity_main);
-
-                  etSearch = findViewById(R.id.etSearch);
-                  etName = findViewById(R.id.etName);
-                  etVillage = findViewById(R.id.etVillage);
-                  etMobile = findViewById(R.id.etMobile);
-                  etDisease = findViewById(R.id.etDisease);
-                  etMedicine = findViewById(R.id.etMedicine);
-                  btnSave = findViewById(R.id.btnSave);
-                  btnSync = findViewById(R.id.btnSync);
-                  tvHistoryHeader = findViewById(R.id.tvHistoryHeader);
-                  historyContainer = findViewById(R.id.historyContainer);
-
-                  fetchCloudData();
-
-                  btnSync.setOnClickListener(v -> {
-                      fetchCloudData();
-                      Toast.makeText(MainActivity.this, "સિંક થઈ રહ્યું છે...", Toast.LENGTH_SHORT).show();
-                  });
-
-                  etSearch.addTextChangedListener(new TextWatcher() {
-                      @Override
-                      public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                      @Override
-                      public void onTextChanged(CharSequence s, int start, int before, int count) {
-                          filterAndAutofill(s.toString().trim());
-                      }
-                      @Override
-                      public void afterTextChanged(Editable s) {}
-                  });
-
-                  btnSave.setOnClickListener(v -> savePatientData());
-              }
-
-              private void fetchCloudData() {
-                  executor.execute(() -> {
+              suspend fun pushToCloud(patients: List<Patient>) {
+                  withContext(Dispatchers.IO) {
                       try {
-                          URL url = new URL(cloudUrl);
-                          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                          conn.setRequestMethod("GET");
-                          if (conn.getResponseCode() == 200) {
-                              BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                              StringBuilder response = new StringBuilder();
-                              String line;
-                              while ((line = reader.readLine()) != null) {
-                                  response.append(line);
-                              }
-                              reader.close();
+                          val url = URL(CLOUD_URL)
+                          val conn = url.openConnection() as HttpURLConnection
+                          conn.requestMethod = "PUT"
+                          conn.setRequestProperty("Content-Type", "application/json")
+                          conn.doOutput = true
 
-                              JSONArray jsonArray = new JSONArray(response.toString());
-                              final List<PatientRecord> fetchedList = new ArrayList<>();
-                              for (int i = 0; i < jsonArray.length(); i++) {
-                                  JSONObject obj = jsonArray.getJSONObject(i);
-                                  fetchedList.add(new PatientRecord(
-                                          obj.optString("name"),
-                                          obj.optString("phone"),
-                                          obj.optString("village"),
-                                          obj.optString("disease"),
-                                          obj.optString("medicine"),
-                                          obj.optString("date")
-                                  ));
-                              }
-
-                              mainHandler.post(() -> {
-                                  patientList.clear();
-                                  patientList.addAll(fetchedList);
-                              });
+                          val jsonArray = JSONArray()
+                          patients.forEach { p ->
+                              val obj = JSONObject()
+                              obj.put("id", p.id)
+                              obj.put("name", p.name)
+                              obj.put("phone", p.phone)
+                              obj.put("village", p.village)
+                              obj.put("disease", p.disease)
+                              obj.put("medicine", p.medicine)
+                              obj.put("date", p.date)
+                              jsonArray.put(obj)
                           }
-                      } catch (Exception e) {
-                          e.printStackTrace();
+
+                          val wr = OutputStreamWriter(conn.outputStream)
+                          wr.write(jsonArray.toString())
+                          wr.flush()
+                          conn.responseCode
+                      } catch (e: Exception) {
+                          e.printStackTrace()
                       }
-                  });
+                  }
               }
 
-              private void filterAndAutofill(String query) {
-                  historyContainer.removeAllViews();
-                  if (query.length() < 2) {
-                      tvHistoryHeader.setVisibility(View.GONE);
-                      return;
-                  }
+              suspend fun fetchFromCloud(): List<Patient>? {
+                  return withContext(Dispatchers.IO) {
+                      try {
+                          val url = URL(CLOUD_URL)
+                          val conn = url.openConnection() as HttpURLConnection
+                          conn.requestMethod = "GET"
+                          conn.setRequestProperty("Accept", "application/json")
 
-                  List<PatientRecord> matches = new ArrayList<>();
-                  for (PatientRecord p : patientList) {
-                      if (p.name.toLowerCase().contains(query.toLowerCase()) || p.phone.contains(query)) {
-                          matches.add(p);
+                          if (conn.responseCode == 200) {
+                              val reader = BufferedReader(InputStreamReader(conn.inputStream))
+                              val response = reader.readText()
+                              val jsonArray = JSONArray(response)
+                              val list = mutableListOf<Patient>()
+                              for (i in 0 until jsonArray.length()) {
+                                  val obj = jsonArray.getJSONObject(i)
+                                  list.add(
+                                      Patient(
+                                          id = obj.optString("id"),
+                                          name = obj.optString("name"),
+                                          phone = obj.optString("phone"),
+                                          village = obj.optString("village"),
+                                          disease = obj.optString("disease"),
+                                          medicine = obj.optString("medicine"),
+                                          date = obj.optString("date")
+                                      )
+                                  )
+                              }
+                              list
+                          } else {
+                              null
+                          }
+                      } catch (e: Exception) {
+                          null
                       }
                   }
+              }
+          }
 
-                  if (!matches.isEmpty()) {
-                      PatientRecord latest = matches.get(matches.size() - 1);
-                      etName.setText(latest.name);
-                      etVillage.setText(latest.village);
-                      etMobile.setText(latest.phone);
+          class MainActivity : ComponentActivity() {
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+                  setContent {
+                      AasthaClinicApp()
+                  }
+              }
+          }
 
-                      tvHistoryHeader.setVisibility(View.VISIBLE);
-                      for (int i = matches.size() - 1; i >= 0; i--) {
-                          PatientRecord item = matches.get(i);
-                          CardView card = new CardView(this);
-                          card.setRadius(16f);
-                          card.setCardBackgroundColor(0xFFF8FAFC);
-                          card.setContentPadding(24, 24, 24, 24);
+          @OptIn(ExperimentalMaterial3Api::class)
+          @Composable
+          fun AasthaClinicApp() {
+              val context = LocalContext.current
+              val coroutineScope = rememberCoroutineScope()
+              val patientList = remember { mutableStateListOf<Patient>() }
 
-                          LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                  LinearLayout.LayoutParams.MATCH_PARENT,
-                                  LinearLayout.LayoutParams.WRAP_CONTENT
-                          );
-                          params.setMargins(0, 0, 0, 16);
-                          card.setLayoutParams(params);
+              var searchQuery by remember { mutableStateOf("") }
+              var patientName by remember { mutableStateOf("") }
+              var villageName by remember { mutableStateOf("") }
+              var mobileNumber by remember { mutableStateOf("") }
+              var diseaseText by remember { mutableStateOf("") }
+              var medicineText by remember { mutableStateOf("") }
+              var historyList by remember { mutableStateOf<List<Patient>>(emptyList()) }
+              var isSaving by remember { mutableStateOf(false) }
 
-                          TextView text = new TextView(this);
-                          text.setText("📅 " + item.date + "\n🩺 રોગ: " + item.disease + "\n💊 દવા: " + item.medicine);
-                          text.setTextColor(0xFF1E293B);
-                          text.setTextSize(14f);
+              LaunchedEffect(Unit) {
+                  coroutineScope.launch {
+                      val cloudData = CloudSyncManager.fetchFromCloud()
+                      if (!cloudData.isNullOrEmpty()) {
+                          patientList.clear()
+                          patientList.addAll(cloudData)
+                      }
+                  }
+              }
 
-                          card.addView(text);
-                          historyContainer.addView(card);
+              fun onSearchChange(text: String) {
+                  searchQuery = text
+                  if (text.trim().length >= 2) {
+                      val matches = patientList.filter {
+                          it.name.contains(text, ignoreCase = true) || it.phone.contains(text)
+                      }
+                      historyList = matches
+                      if (matches.isNotEmpty()) {
+                          val last = matches.last()
+                          patientName = last.name
+                          villageName = last.village
+                          mobileNumber = last.phone
                       }
                   } else {
-                      tvHistoryHeader.setVisibility(View.GONE);
+                      historyList = emptyList()
                   }
               }
 
-              private void savePatientData() {
-                  String name = etName.getText().toString().trim();
-                  String village = etVillage.getText().toString().trim();
-                  String mobile = etMobile.getText().toString().trim();
-                  String disease = etDisease.getText().toString().trim();
-                  String medicine = etMedicine.getText().toString().trim();
-
-                  if (name.isEmpty() || mobile.isEmpty()) {
-                      Toast.makeText(this, "નામ અને મોબાઈલ નંબર જરૂરી છે", Toast.LENGTH_SHORT).show();
-                      return;
+              Scaffold(
+                  topBar = {
+                      TopAppBar(
+                          title = { Text("Aastha Clinic - દર્દી રેકોર્ડ", fontWeight = FontWeight.Bold, color = Color.White) },
+                          colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0D276B))
+                      )
                   }
-
-                  btnSave.setEnabled(false);
-                  SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault());
-                  PatientRecord record = new PatientRecord(name, mobile, village, disease, medicine, sdf.format(Date()));
-                  patientList.add(record);
-
-                  executor.execute(() -> {
-                      try {
-                          URL url = new URL(cloudUrl);
-                          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                          conn.setRequestMethod("PUT");
-                          conn.setRequestProperty("Content-Type", "application/json");
-                          conn.setDoOutput(true);
-
-                          JSONArray array = new JSONArray();
-                          for (PatientRecord p : patientList) {
-                              JSONObject obj = new JSONObject();
-                              obj.put("name", p.name);
-                              obj.put("phone", p.phone);
-                              obj.put("village", p.village);
-                              obj.put("disease", p.disease);
-                              obj.put("medicine", p.medicine);
-                              obj.put("date", p.date);
-                              array.put(obj);
+              ) { padding ->
+                  Column(
+                      modifier = Modifier
+                          .fillMaxSize()
+                          .padding(padding)
+                          .background(Color(0xFFF4F6F9))
+                          .verticalScroll(rememberScrollState())
+                          .padding(16.dp)
+                  ) {
+                      Card(
+                          modifier = Modifier.fillMaxWidth(),
+                          colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                          shape = RoundedCornerShape(12.dp)
+                      ) {
+                          Column(modifier = Modifier.padding(14.dp)) {
+                              Text("🔍 જૂના દર્દી શોધો (નામ અથવા મોબાઈલ):", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF0D276B))
+                              Spacer(modifier = Modifier.height(6.dp))
+                              OutlinedTextField(
+                                  value = searchQuery,
+                                  onValueChange = { onSearchChange(it) },
+                                  placeholder = { Text("દા.ત. Raju Pandit અથવા 9898...") },
+                                  modifier = Modifier.fillMaxWidth(),
+                                  singleLine = true,
+                                  colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
+                              )
                           }
-
-                          OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-                          wr.write(array.toString());
-                          wr.flush();
-                          wr.close();
-                          conn.getResponseCode();
-
-                          mainHandler.post(() -> {
-                              Toast.makeText(MainActivity.this, "ડેટા સેવ થઈ ગયો!", Toast.LENGTH_SHORT).show();
-                              etDisease.setText("");
-                              etMedicine.setText("");
-                              btnSave.setEnabled(true);
-                          });
-                      } catch (Exception e) {
-                          mainHandler.post(() -> {
-                              Toast.makeText(MainActivity.this, "સેવ કરવામાં ભૂલ આવી", Toast.LENGTH_SHORT).show();
-                              btnSave.setEnabled(true);
-                          });
                       }
-                  });
-              }
 
-              @Override
-              protected void onDestroy() {
-                  super.onDestroy();
-                  executor.shutdown();
+                      Spacer(modifier = Modifier.height(16.dp))
+
+                      Card(
+                          modifier = Modifier.fillMaxWidth(),
+                          colors = CardDefaults.cardColors(containerColor = Color.White),
+                          shape = RoundedCornerShape(12.dp),
+                          elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                      ) {
+                          Column(modifier = Modifier.padding(16.dp)) {
+                              Text("દર્દીની નવી એન્ટ્રી", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF0D276B))
+                              Spacer(modifier = Modifier.height(12.dp))
+
+                              OutlinedTextField(value = patientName, onValueChange = { patientName = it }, label = { Text("દર્દીનું પૂરું નામ") }, modifier = Modifier.fillMaxWidth())
+                              Spacer(modifier = Modifier.height(8.dp))
+
+                              OutlinedTextField(value = villageName, onValueChange = { villageName = it }, label = { Text("ગામ / શહેર") }, modifier = Modifier.fillMaxWidth())
+                              Spacer(modifier = Modifier.height(8.dp))
+
+                              OutlinedTextField(value = mobileNumber, onValueChange = { mobileNumber = it }, label = { Text("મોબાઈલ નંબર") }, modifier = Modifier.fillMaxWidth())
+                              Spacer(modifier = Modifier.height(8.dp))
+
+                              OutlinedTextField(value = diseaseText, onValueChange = { diseaseText = it }, label = { Text("શેના માટે દવા લીધી (તકલીફ / રોગ)") }, modifier = Modifier.fillMaxWidth())
+                              Spacer(modifier = Modifier.height(8.dp))
+
+                              OutlinedTextField(value = medicineText, onValueChange = { medicineText = it }, label = { Text("આપેલી દવાઓની વિગત") }, modifier = Modifier.fillMaxWidth())
+                              Spacer(modifier = Modifier.height(16.dp))
+
+                              Button(
+                                  onClick = {
+                                      if (patientName.isBlank() || mobileNumber.isBlank()) {
+                                          Toast.makeText(context, "નામ અને મોબાઈલ નંબર જરૂરી છે", Toast.LENGTH_SHORT).show()
+                                          return@Button
+                                      }
+                                      isSaving = true
+                                      val sdf = SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault())
+                                      val newRecord = Patient(
+                                          name = patientName.trim(),
+                                          phone = mobileNumber.trim(),
+                                          village = villageName.trim(),
+                                          disease = diseaseText.trim(),
+                                          medicine = medicineText.trim(),
+                                          date = sdf.format(Date())
+                                      )
+                                      patientList.add(newRecord)
+                                      coroutineScope.launch {
+                                          CloudSyncManager.pushToCloud(patientList)
+                                          isSaving = false
+                                          Toast.makeText(context, "ડેટા સેવ અને સિંક થઈ ગયો!", Toast.LENGTH_SHORT).show()
+                                          diseaseText = ""
+                                          medicineText = ""
+                                      }
+                                  },
+                                  modifier = Modifier.fillMaxWidth().height(48.dp),
+                                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B)),
+                                  enabled = !isSaving
+                              ) {
+                                  Text(if (isSaving) "સેવ થઈ રહ્યું છે..." else "ડેટા સેવ કરો (Save Visit)", fontWeight = FontWeight.Bold)
+                              }
+                          }
+                      }
+
+                      if (historyList.isNotEmpty()) {
+                          Spacer(modifier = Modifier.height(18.dp))
+                          Text("📋 અગાઉની હિસ્ટ્રી (${historyList.size}):", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF0D276B))
+                          Spacer(modifier = Modifier.height(8.dp))
+
+                          historyList.reversed().forEach { item ->
+                              Card(
+                                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                  colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
+                                  shape = RoundedCornerShape(8.dp)
+                              ) {
+                                  Column(modifier = Modifier.padding(12.dp)) {
+                                      Text("📅 તારીખ: ${item.date}", fontSize = 12.sp, color = Color(0xFF0284C7), fontWeight = FontWeight.Bold)
+                                      Spacer(modifier = Modifier.height(4.dp))
+                                      Text("🩺 રોગ/તકલીફ: ${item.disease}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color(0xFF1E293B))
+                                      Text("💊 દવા: ${item.medicine}", fontSize = 13.sp, color = Color(0xFF475569))
+                                  }
+                              }
+                          }
+                      }
+                  }
               }
           }
           EOF
 
       - name: Build Android APK
-        run: ./gradlew assembleDebug --no-daemon
+        run: |
+          chmod +x gradlew || gradle wrapper
+          ./gradlew assembleDebug --no-daemon || ./gradlew assembleRelease --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Aastha-Clinic-App
-          path: app/build/outputs/apk/debug/*.apk
+          name: Aastha-Clinic-Pro-Executive-App
+          path: app/build/outputs/apk/**/*.apk
