@@ -21,14 +21,39 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Generate Complete Clean Android Project
+      - name: Setup Wrapper and Android Files
         run: |
           rm -rf app gradle settings.gradle build.gradle gradlew gradlew.bat
+          mkdir -p gradle/wrapper
           mkdir -p app/src/main/res/layout
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
           mkdir -p app/src/main/java/com/aastha/clinic
+
+          # Download official gradle-wrapper.jar to avoid Gradle 9.x conflicts
+          curl -sLo gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradle/wrapper/gradle-wrapper.jar
+          
+          # Gradle Wrapper Properties
+          cat << 'EOF' > gradle/wrapper/gradle-wrapper.properties
+          distributionBase=GRADLE_USER_HOME
+          distributionPath=wrapper/dists
+          distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip
+          networkTimeout=10000
+          zipStoreBase=GRADLE_USER_HOME
+          zipStorePath=wrapper/dists
+          EOF
+
+          # Official Gradle Wrapper Script
+          cat << 'EOF' > gradlew
+          #!/bin/sh
+          JAVA_EXE="java"
+          if [ -n "$JAVA_HOME" ] ; then
+              JAVA_EXE="$JAVA_HOME/bin/java"
+          fi
+          exec "$JAVA_EXE" -jar gradle/wrapper/gradle-wrapper.jar "$@"
+          EOF
+          chmod +x gradlew
 
           # 1. settings.gradle
           cat << 'EOF' > settings.gradle
@@ -50,7 +75,7 @@ jobs:
           include ':app'
           EOF
 
-          # 2. build.gradle (Root)
+          # 2. Root build.gradle
           cat << 'EOF' > build.gradle
           plugins {
               id 'com.android.application' version '8.2.2' apply false
@@ -71,8 +96,8 @@ jobs:
                   applicationId "com.aastha.clinic"
                   minSdk 24
                   targetSdk 34
-                  versionCode 7
-                  versionName "7.0"
+                  versionCode 8
+                  versionName "8.0"
               }
 
               buildTypes {
@@ -364,7 +389,7 @@ jobs:
           </ScrollView>
           EOF
 
-          # 8. Pure Java Main Activity
+          # 8. Java Code
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.java
           package com.aastha.clinic;
 
@@ -461,10 +486,6 @@ jobs:
                   });
 
                   btnSave.setOnClickListener(v -> savePatientData());
-              }
-
-              private funFetchCloud() {
-                  fetchCloudData();
               }
 
               private void fetchCloudData() {
@@ -569,7 +590,7 @@ jobs:
 
                   btnSave.setEnabled(false);
                   SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault());
-                  PatientRecord record = new PatientRecord(name, mobile, village, disease, medicine, sdf.format(new Date()));
+                  PatientRecord record = new PatientRecord(name, mobile, village, disease, medicine, sdf.format(Date()));
                   patientList.add(record);
 
                   executor.execute(() -> {
@@ -599,7 +620,7 @@ jobs:
                           conn.getResponseCode();
 
                           mainHandler.post(() -> {
-                              Toast.makeText(MainActivity.this, "ડેટા સેવ થઈ ગયો!", Toast.LENGTH_SHORT).show() ;
+                              Toast.makeText(MainActivity.this, "ડેટા સેવ થઈ ગયો!", Toast.LENGTH_SHORT).show();
                               etDisease.setText("");
                               etMedicine.setText("");
                               btnSave.setEnabled(true);
@@ -615,17 +636,14 @@ jobs:
 
               @Override
               protected void onDestroy() {
-                  super.onDestroy() ;
+                  super.onDestroy();
                   executor.shutdown();
               }
           }
           EOF
 
-      - name: Build Android APK with Gradle
-        run: |
-          gradle wrapper --gradle-version 8.4 --distribution-type bin
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Build Android APK
+        run: ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
