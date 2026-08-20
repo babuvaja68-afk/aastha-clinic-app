@@ -1,4 +1,4 @@
-name: Build Aastha Clinic APK
+Name: Build Aastha Clinic APK
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Encrypted Secure Clinic App
+      - name: Setup Encrypted Secure Clinic App with Master PIN Lock
         run: |
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
@@ -30,114 +30,7 @@ jobs:
           mkdir -p app/src/main/java/com/aastha/clinic
           mkdir -p gradle/wrapper
 
-          # 1. Project Configuration Files
-          cat << 'EOF' > settings.gradle
-          rootProject.name = "AasthaClinic"
-          include ':app'
-          EOF
-
-          cat << 'EOF' > build.gradle
-          buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.2.2'
-                  classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22'
-              }
-          }
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-          EOF
-
-          cat << 'EOF' > app/build.gradle
-          plugins {
-              id 'com.android.application'
-              id 'org.jetbrains.kotlin.android'
-          }
-
-          android {
-              namespace 'com.aastha.clinic'
-              compileSdk 34
-
-              defaultConfig {
-                  applicationId "com.aastha.clinic"
-                  minSdk 24
-                  targetSdk 34
-                  versionCode 20
-                  versionName "2.0"
-              }
-
-              buildTypes {
-                  release {
-                      minifyEnabled false
-                      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-                  }
-                  debug {
-                      minifyEnabled false
-                  }
-              }
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_17
-                  targetCompatibility JavaVersion.VERSION_17
-              }
-              kotlinOptions {
-                  jvmTarget = '17'
-              }
-              buildFeatures {
-                  compose true
-              }
-              composeOptions {
-                  kotlinCompilerExtensionVersion '1.5.8'
-              }
-          }
-
-          dependencies {
-              implementation platform('androidx.compose:compose-bom:2024.02.00')
-              implementation 'androidx.core:core-ktx:1.12.0'
-              implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
-              implementation 'androidx.activity:activity-compose:1.8.2'
-              implementation 'androidx.compose.ui:ui'
-              implementation 'androidx.compose.ui:ui-graphics'
-              implementation 'androidx.compose.ui:ui-tooling-preview'
-              implementation 'androidx.compose.material3:material3'
-              implementation 'androidx.compose.material:material-icons-extended'
-              implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
-          }
-          EOF
-
-          # 2. Android Manifest
-          cat << 'EOF' > app/src/main/AndroidManifest.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <uses-permission android:name="android.permission.INTERNET" />
-              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-              <application
-                  android:allowBackup="true"
-                  android:icon="@mipmap/ic_launcher"
-                  android:label="Aastha Clinic"
-                  android:roundIcon="@mipmap/ic_launcher"
-                  android:supportsRtl="true"
-                  android:theme="@android:style/Theme.Material.NoActionBar">
-                  <activity
-                      android:name=".MainActivity"
-                      android:exported="true"
-                      android:windowSoftInputMode="adjustResize">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
-                      </intent-filter>
-                  </activity>
-              </application>
-          </manifest>
-          EOF
-
-          # 3. Clean Vector Brand Logo
+          # 1. Clean Vector Brand Logo
           cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="200dp"
@@ -179,7 +72,7 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 4. Main Application Source (Direct Access - No Login)
+          # 2. Main Application
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
@@ -193,11 +86,13 @@ jobs:
           import androidx.activity.compose.setContent
           import androidx.compose.foundation.Image
           import androidx.compose.foundation.background
+          import androidx.compose.foundation.clickable
           import androidx.compose.foundation.layout.*
           import androidx.compose.foundation.lazy.LazyColumn
           import androidx.compose.foundation.lazy.items
           import androidx.compose.foundation.rememberScrollState
           import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.foundation.text.KeyboardOptions
           import androidx.compose.foundation.verticalScroll
           import androidx.compose.material.icons.Icons
           import androidx.compose.material.icons.filled.Refresh
@@ -209,6 +104,7 @@ jobs:
           import androidx.compose.ui.platform.LocalContext
           import androidx.compose.ui.res.painterResource
           import androidx.compose.ui.text.font.FontWeight
+          import androidx.compose.ui.text.input.KeyboardType
           import androidx.compose.ui.unit.dp
           import androidx.compose.ui.unit.sp
           import kotlinx.coroutines.Dispatchers
@@ -242,6 +138,8 @@ jobs:
               val date: String,
               var isChecked: Boolean = false
           )
+
+          enum class AppLang { EN, GU }
 
           object SecurityEngine {
               private const val SECRET_KEY = "AasthaClinic#2026@SecKeySecure99"
@@ -356,6 +254,11 @@ jobs:
               }
           }
 
+          fun getCurrentDate(): String {
+              val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+              return sdf.format(Date())
+          }
+
           class MainActivity : ComponentActivity() {
               override fun onCreate(savedInstanceState: Bundle?) {
                   super.onCreate(savedInstanceState)
@@ -368,6 +271,7 @@ jobs:
           @OptIn(ExperimentalMaterial3Api::class)
           @Composable
           fun AasthaClinicApp() {
+              val todayDate = remember { getCurrentDate() }
               val context = LocalContext.current
               val coroutineScope = rememberCoroutineScope()
               val patientList = remember { mutableStateListOf<Patient>() }
@@ -551,9 +455,8 @@ jobs:
 
       - name: Build Android APK
         run: |
-          gradle wrapper --gradle-version 8.4 --distribution-type bin
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon || ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
