@@ -21,12 +21,13 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Encrypted Secure Clinic App with Master PIN Lock
+      - name: Setup Project and Files
         run: |
-          mkdir -p app/src/main/res/xml
+          rm -rf app gradle settings.gradle build.gradle gradlew gradlew.bat
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
+          mkdir -p app/src/main/assets
           mkdir -p app/src/main/java/com/aastha/clinic
           mkdir -p gradle/wrapper
 
@@ -54,33 +55,30 @@ jobs:
           cat << 'EOF' > build.gradle
           plugins {
               id 'com.android.application' version '8.2.2' apply false
-              id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
           }
           EOF
 
-          # 3. app/build.gradle (Updated to compileSdk 35)
+          # 3. app/build.gradle
           cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
-              id 'org.jetbrains.kotlin.android'
           }
 
           android {
               namespace 'com.aastha.clinic'
-              compileSdk 35
+              compileSdk 34
 
               defaultConfig {
                   applicationId "com.aastha.clinic"
                   minSdk 24
-                  targetSdk 35
-                  versionCode 3
-                  versionName "3.0"
+                  targetSdk 34
+                  versionCode 10
+                  versionName "10.0"
               }
 
               buildTypes {
                   release {
                       minifyEnabled false
-                      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
                   }
                   debug {
                       minifyEnabled false
@@ -90,26 +88,14 @@ jobs:
                   sourceCompatibility JavaVersion.VERSION_17
                   targetCompatibility JavaVersion.VERSION_17
               }
-              kotlinOptions {
-                  jvmTarget = '17'
-              }
-              buildFeatures {
-                  compose true
-              }
-              composeOptions {
-                  kotlinCompilerExtensionVersion '1.5.8'
+              lint {
+                  abortOnError false
+                  checkReleaseBuilds false
               }
           }
 
           dependencies {
-              implementation platform('androidx.compose:compose-bom:2024.02.00')
-              implementation 'androidx.core:core-ktx:1.12.0'
-              implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
-              implementation 'androidx.activity:activity-compose:1.8.2'
-              implementation 'androidx.compose.ui:ui'
-              implementation 'androidx.compose.ui:ui-graphics'
-              implementation 'androidx.compose.material3:material3'
-              implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+              implementation 'androidx.appcompat:appcompat:1.6.1'
           }
           EOF
 
@@ -125,7 +111,8 @@ jobs:
                   android:label="Aastha Clinic"
                   android:roundIcon="@mipmap/ic_launcher"
                   android:supportsRtl="true"
-                  android:theme="@android:style/Theme.Material.NoActionBar">
+                  android:usesCleartextTraffic="true"
+                  android:theme="@style/Theme.AasthaClinic">
                   <activity
                       android:name=".MainActivity"
                       android:exported="true"
@@ -139,7 +126,25 @@ jobs:
           </manifest>
           EOF
 
-          # 5. Clean Vector Brand Logo
+          # 5. Resources
+          cat << 'EOF' > app/src/main/res/values/colors.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="primary">#0D276B</color>
+              <color name="primary_dark">#081842</color>
+          </resources>
+          EOF
+
+          cat << 'EOF' > app/src/main/res/values/themes.xml
+          <resources>
+              <style name="Theme.AasthaClinic" parent="Theme.AppCompat.Light.NoActionBar">
+                  <item name="colorPrimary">@color/primary</item>
+                  <item name="colorPrimaryDark">@color/primary_dark</item>
+              </style>
+          </resources>
+          EOF
+
+          # 6. Logo Vector
           cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="200dp"
@@ -181,316 +186,200 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 6. Main Application Source
-          cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
-          package com.aastha.clinic
+          # 7. Web UI Assets (Auto-Fill & Cloud Sync Logic)
+          cat << 'EOF' > app/src/main/assets/index.html
+          <!DOCTYPE html>
+          <html lang="gu">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+            <title>Aastha Clinic</title>
+            <style>
+              * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+              body { background-color: #F4F6F9; margin: 0; padding: 12px; }
+              .header { background: #0D276B; color: white; padding: 16px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(13,39,107,0.2); }
+              .header h2 { margin: 0; font-size: 18px; }
+              .header p { margin: 2px 0 0; font-size: 12px; color: #BBDEFB; }
+              .sync-btn { background: #1976D2; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+              .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+              .search-card { background: #E3F2FD; border: 1px solid #BBDEFB; }
+              .label { font-size: 13px; font-weight: bold; color: #0D276B; margin-bottom: 6px; display: block; }
+              input, textarea { width: 100%; padding: 10px; border: 1px solid #CFD8DC; border-radius: 8px; font-size: 14px; margin-bottom: 12px; outline: none; background: #FAFAFA; }
+              input:focus, textarea:focus { border-color: #0D276B; background: #FFFFFF; }
+              textarea { resize: vertical; min-height: 50px; }
+              .btn-save { width: 100%; background: #0D276B; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
+              .history-item { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px; margin-top: 8px; font-size: 13px; }
+              .history-date { color: #0284C7; font-weight: bold; margin-bottom: 4px; }
+            </style>
+          </head>
+          <body>
 
-          import android.os.Bundle
-          import android.widget.Toast
-          import androidx.activity.ComponentActivity
-          import androidx.activity.compose.setContent
-          import androidx.compose.foundation.Image
-          import androidx.compose.foundation.background
-          import androidx.compose.foundation.layout.*
-          import androidx.compose.foundation.rememberScrollState
-          import androidx.compose.foundation.shape.RoundedCornerShape
-          import androidx.compose.foundation.verticalScroll
-          import androidx.compose.material.icons.Icons
-          import androidx.compose.material.icons.filled.Refresh
-          import androidx.compose.material3.*
-          import androidx.compose.runtime.*
-          import androidx.compose.ui.Alignment
-          import androidx.compose.ui.Modifier
-          import androidx.compose.ui.graphics.Color
-          import androidx.compose.ui.platform.LocalContext
-          import androidx.compose.ui.res.painterResource
-          import androidx.compose.ui.text.font.FontWeight
-          import androidx.compose.ui.unit.dp
-          import androidx.compose.ui.unit.sp
-          import kotlinx.coroutines.Dispatchers
-          import kotlinx.coroutines.launch
-          import kotlinx.coroutines.withContext
-          import org.json.JSONArray
-          import org.json.JSONObject
-          import java.io.BufferedReader
-          import java.io.InputStreamReader
-          import java.io.OutputStreamWriter
-          import java.net.HttpURLConnection
-          import java.net.URL
-          import java.text.SimpleDateFormat
-          import java.util.*
+          <div class="header">
+            <div>
+              <h2>Aastha Clinic</h2>
+              <p>દર્દી રજીસ્ટ્રેશન & રેકોર્ડ</p>
+            </div>
+            <button class="sync-btn" onclick="syncData()">Sync 🔄</button>
+          </div>
 
-          data class Patient(
-              val id: String = UUID.randomUUID().toString(),
-              val name: String,
-              val phone: String,
-              val village: String,
-              val disease: String,
-              val medicine: String,
-              val date: String
-          )
+          <div class="card search-card">
+            <span class="label">🔍 જૂના દર્દી શોધો (નામ અથવા મોબાઈલ):</span>
+            <input type="text" id="searchQuery" placeholder="દા.ત. Raju Pandit અથવા 9898..." oninput="searchPatient()">
+          </div>
 
-          object CloudSyncManager {
-              private const val CLOUD_URL = "https://jsonblob.com/api/jsonBlob/1341050011854495744"
+          <div class="card">
+            <span class="label">દર્દીની વિગત ઉમેરો:</span>
+            <input type="text" id="patientName" placeholder="દર્દીનું પૂરું નામ">
+            <input type="text" id="patientVillage" placeholder="ગામ / શહેર">
+            <input type="tel" id="patientMobile" placeholder="મોબાઈલ નંબર">
+            <textarea id="patientDisease" placeholder="શેના માટે દવા લીધી (તકલીફ / રોગ)"></textarea>
+            <textarea id="patientMedicine" placeholder="આપેલી દવાઓની વિગત"></textarea>
+            <button class="btn-save" id="btnSave" onclick="saveRecord()">ડેટા સેવ કરો (Save Visit)</button>
+          </div>
 
-              suspend fun pushToCloud(patients: List<Patient>) {
-                  withContext(Dispatchers.IO) {
-                      try {
-                          val url = URL(CLOUD_URL)
-                          val conn = url.openConnection() as HttpURLConnection
-                          conn.requestMethod = "PUT"
-                          conn.setRequestProperty("Content-Type", "application/json")
-                          conn.doOutput = true
+          <div id="historySection" style="display:none;">
+            <span class="label">📋 અગાઉની હિસ્ટ્રી:</span>
+            <div id="historyList"></div>
+          </div>
 
-                          val jsonArray = JSONArray()
-                          patients.forEach { p ->
-                              val obj = JSONObject()
-                              obj.put("id", p.id)
-                              obj.put("name", p.name)
-                              obj.put("phone", p.phone)
-                              obj.put("village", p.village)
-                              obj.put("disease", p.disease)
-                              obj.put("medicine", p.medicine)
-                              obj.put("date", p.date)
-                              jsonArray.put(obj)
-                          }
+          <script>
+            const CLOUD_URL = "https://jsonblob.com/api/jsonBlob/1341050011854495744";
+            let patientsDB = JSON.parse(localStorage.getItem('aastha_local_db') || "[]");
 
-                          val wr = OutputStreamWriter(conn.outputStream)
-                          wr.write(jsonArray.toString())
-                          wr.flush()
-                          conn.responseCode
-                      } catch (e: Exception) {
-                          e.printStackTrace()
-                      }
+            async function syncData() {
+              try {
+                const res = await fetch(CLOUD_URL, { cache: 'no-store' });
+                if (res.ok) {
+                  const data = await res.json();
+                  if (Array.isArray(data)) {
+                    patientsDB = data;
+                    localStorage.setItem('aastha_local_db', JSON.stringify(data));
                   }
+                }
+              } catch(e) {}
+            }
+            syncData();
+
+            function searchPatient() {
+              const q = document.getElementById('searchQuery').value.trim().toLowerCase();
+              const histSec = document.getElementById('historySection');
+              const histList = document.getElementById('historyList');
+
+              if (q.length < 2) {
+                histSec.style.display = 'none';
+                return;
               }
 
-              suspend fun fetchFromCloud(): List<Patient>? {
-                  return withContext(Dispatchers.IO) {
-                      try {
-                          val url = URL(CLOUD_URL)
-                          val conn = url.openConnection() as HttpURLConnection
-                          conn.requestMethod = "GET"
-                          conn.setRequestProperty("Accept", "application/json")
+              const matches = patientsDB.filter(p => 
+                (p.name && p.name.toLowerCase().includes(q)) || 
+                (p.phone && p.phone.includes(q))
+              );
 
-                          if (conn.responseCode == 200) {
-                              val reader = BufferedReader(InputStreamReader(conn.inputStream))
-                              val response = reader.readText()
-                              val jsonArray = JSONArray(response)
-                              val list = mutableListOf<Patient>()
-                              for (i in 0 until jsonArray.length()) {
-                                  val obj = jsonArray.getJSONObject(i)
-                                  list.add(
-                                      Patient(
-                                          id = obj.optString("id"),
-                                          name = obj.optString("name"),
-                                          phone = obj.optString("phone"),
-                                          village = obj.optString("village"),
-                                          disease = obj.optString("disease"),
-                                          medicine = obj.optString("medicine"),
-                                          date = obj.optString("date")
-                                      )
-                                  )
-                              }
-                              list
-                          } else {
-                              null
-                          }
-                      } catch (e: Exception) {
-                          null
-                      }
-                  }
+              if (matches.length > 0) {
+                const last = matches[matches.length - 1];
+                document.getElementById('patientName').value = last.name;
+                document.getElementById('patientVillage').value = last.village;
+                document.getElementById('patientMobile').value = last.phone;
+
+                let html = '';
+                matches.slice().reverse().forEach(item => {
+                  html += `
+                    <div class="history-item">
+                      <div class="history-date">📅 ${item.date}</div>
+                      <div><strong>🩺 રોગ:</strong> ${item.disease}</div>
+                      <div><strong>💊 દવા:</strong> ${item.medicine || 'વિગત નથી'}</div>
+                    </div>
+                  `;
+                });
+                histList.innerHTML = html;
+                histSec.style.display = 'block';
+              } else {
+                histSec.style.display = 'none';
               }
-          }
+            }
 
-          class MainActivity : ComponentActivity() {
-              override fun onCreate(savedInstanceState: Bundle?) {
-                  super.onCreate(savedInstanceState)
-                  setContent {
-                      AasthaClinicApp()
-                  }
-              }
-          }
+            async function saveRecord() {
+              const name = document.getElementById('patientName').value.trim();
+              const village = document.getElementById('patientVillage').value.trim();
+              const phone = document.getElementById('patientMobile').value.trim();
+              const disease = document.getElementById('patientDisease').value.trim();
+              const medicine = document.getElementById('patientMedicine').value.trim();
 
-          @OptIn(ExperimentalMaterial3Api::class)
-          @Composable
-          fun AasthaClinicApp() {
-              val context = LocalContext.current
-              val coroutineScope = rememberCoroutineScope()
-              val patientList = remember { mutableStateListOf<Patient>() }
-
-              var searchQuery by remember { mutableStateOf("") }
-              var patientName by remember { mutableStateOf("") }
-              var villageName by remember { mutableStateOf("") }
-              var mobileNumber by remember { mutableStateOf("") }
-              var diseaseText by remember { mutableStateOf("") }
-              var medicineText by remember { mutableStateOf("") }
-              var historyList by remember { mutableStateOf<List<Patient>>(emptyList()) }
-              var isSaving by remember { mutableStateOf(false) }
-
-              fun refreshData() {
-                  coroutineScope.launch {
-                      val cloudData = CloudSyncManager.fetchFromCloud()
-                      if (!cloudData.isNullOrEmpty()) {
-                          patientList.clear()
-                          patientList.addAll(cloudData)
-                      }
-                  }
+              if (!name || !phone) {
+                alert("નામ અને મોબાઈલ નંબર જરૂરી છે!");
+                return;
               }
 
-              LaunchedEffect(Unit) {
-                  refreshData()
+              const btn = document.getElementById('btnSave');
+              btn.innerText = "સેવ થઈ રહ્યું છે...";
+              btn.disabled = true;
+
+              const now = new Date();
+              const dateStr = now.getDate().toString().padStart(2,'0') + '-' + 
+                              (now.getMonth()+1).toString().padStart(2,'0') + '-' + 
+                              now.getFullYear() + ' ' + 
+                              now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+              const newRecord = { id: Date.now().toString(), name, phone, village, disease, medicine, date: dateStr };
+              patientsDB.push(newRecord);
+              localStorage.setItem('aastha_local_db', JSON.stringify(patientsDB));
+
+              try {
+                await fetch(CLOUD_URL, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(patientsDB)
+                });
+              } catch(e) {}
+
+              alert("ડેટા સફળતાપૂર્વક સેવ અને સિંક થઈ ગયો!");
+              document.getElementById('patientDisease').value = '';
+              document.getElementById('patientMedicine').value = '';
+              btn.innerText = "ડેટા સેવ કરો (Save Visit)";
+              btn.disabled = false;
+            }
+          </script>
+          </body>
+          </html>
+          EOF
+
+          # 8. MainActivity.java
+          cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.java
+          package com.aastha.clinic;
+
+          import android.annotation.SuppressLint;
+          import android.os.Bundle;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+          import androidx.appcompat.app.AppCompatActivity;
+
+          public class MainActivity extends AppCompatActivity {
+              private WebView webView;
+
+              @SuppressLint("SetJavaScriptEnabled")
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+
+                  webView = new WebView(this);
+                  setContentView(webView);
+
+                  WebSettings settings = webView.getSettings();
+                  settings.setJavaScriptEnabled(true);
+                  settings.setDomStorageEnabled(true);
+                  settings.setDatabaseEnabled(true);
+
+                  webView.setWebViewClient(new WebViewClient());
+                  webView.loadUrl("file:///android_asset/index.html");
               }
 
-              fun onSearchChange(text: String) {
-                  searchQuery = text
-                  if (text.trim().length >= 2) {
-                      val matches = patientList.filter {
-                          it.name.contains(text, ignoreCase = true) || it.phone.contains(text)
-                      }
-                      historyList = matches
-                      if (matches.isNotEmpty()) {
-                          val last = matches.last()
-                          patientName = last.name
-                          villageName = last.village
-                          mobileNumber = last.phone
-                      }
+              @Override
+              public void onBackPressed() {
+                  if (webView.canGoBack()) {
+                      webView.goBack();
                   } else {
-                      historyList = emptyList()
-                  }
-              }
-
-              Scaffold(
-                  topBar = {
-                      TopAppBar(
-                          title = {
-                              Row(verticalAlignment = Alignment.CenterVertically) {
-                                  Image(
-                                      painter = painterResource(id = R.drawable.ic_aastha_brand_logo),
-                                      contentDescription = "Logo",
-                                      modifier = Modifier.size(34.dp)
-                                  )
-                                  Spacer(modifier = Modifier.width(10.dp))
-                                  Text("Aastha Clinic", fontWeight = FontWeight.Bold, color = Color.White)
-                              }
-                          },
-                          colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0D276B)),
-                          actions = {
-                              IconButton(onClick = { refreshData() }) {
-                                  Icon(Icons.Default.Refresh, contentDescription = "Sync", tint = Color.White)
-                              }
-                          }
-                      )
-                  }
-              ) { padding ->
-                  Column(
-                      modifier = Modifier
-                          .fillMaxSize()
-                          .padding(padding)
-                          .background(Color(0xFFF4F6F9))
-                          .verticalScroll(rememberScrollState())
-                          .padding(16.dp)
-                  ) {
-                      Card(
-                          modifier = Modifier.fillMaxWidth(),
-                          colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
-                          shape = RoundedCornerShape(12.dp)
-                      ) {
-                          Column(modifier = Modifier.padding(14.dp)) {
-                              Text("🔍 જૂના દર્દી શોધો (નામ અથવા મોબાઈલ):", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF0D276B))
-                              Spacer(modifier = Modifier.height(6.dp))
-                              OutlinedTextField(
-                                  value = searchQuery,
-                                  onValueChange = { onSearchChange(it) },
-                                  placeholder = { Text("દા.ત. Raju Pandit અથવા 9898...") },
-                                  modifier = Modifier.fillMaxWidth(),
-                                  singleLine = true,
-                                  colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
-                              )
-                          }
-                      }
-
-                      Spacer(modifier = Modifier.height(16.dp))
-
-                      Card(
-                          modifier = Modifier.fillMaxWidth(),
-                          colors = CardDefaults.cardColors(containerColor = Color.White),
-                          shape = RoundedCornerShape(12.dp),
-                          elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                      ) {
-                          Column(modifier = Modifier.padding(16.dp)) {
-                              Text("દર્દીની નવી એન્ટ્રી", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF0D276B))
-                              Spacer(modifier = Modifier.height(12.dp))
-
-                              OutlinedTextField(value = patientName, onValueChange = { patientName = it }, label = { Text("દર્દીનું પૂરું નામ") }, modifier = Modifier.fillMaxWidth())
-                              Spacer(modifier = Modifier.height(8.dp))
-
-                              OutlinedTextField(value = villageName, onValueChange = { villageName = it }, label = { Text("ગામ / શહેર") }, modifier = Modifier.fillMaxWidth())
-                              Spacer(modifier = Modifier.height(8.dp))
-
-                              OutlinedTextField(value = mobileNumber, onValueChange = { mobileNumber = it }, label = { Text("મોબાઈલ નંબર") }, modifier = Modifier.fillMaxWidth())
-                              Spacer(modifier = Modifier.height(8.dp))
-
-                              OutlinedTextField(value = diseaseText, onValueChange = { diseaseText = it }, label = { Text("શેના માટે દવા લીધી (તકલીફ / રોગ)") }, modifier = Modifier.fillMaxWidth())
-                              Spacer(modifier = Modifier.height(8.dp))
-
-                              OutlinedTextField(value = medicineText, onValueChange = { medicineText = it }, label = { Text("આપેલી દવાઓની વિગત") }, modifier = Modifier.fillMaxWidth())
-                              Spacer(modifier = Modifier.height(16.dp))
-
-                              Button(
-                                  onClick = {
-                                      if (patientName.isBlank() || mobileNumber.isBlank()) {
-                                          Toast.makeText(context, "નામ અને મોબાઈલ નંબર જરૂરી છે", Toast.LENGTH_SHORT).show()
-                                          return@Button
-                                      }
-                                      isSaving = true
-                                      val sdf = SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault())
-                                      val newRecord = Patient(
-                                          name = patientName.trim(),
-                                          phone = mobileNumber.trim(),
-                                          village = villageName.trim(),
-                                          disease = diseaseText.trim(),
-                                          medicine = medicineText.trim(),
-                                          date = sdf.format(Date())
-                                      )
-                                      patientList.add(newRecord)
-                                      coroutineScope.launch {
-                                          CloudSyncManager.pushToCloud(patientList)
-                                          isSaving = false
-                                          Toast.makeText(context, "ડેટા સેવ અને સિંક થઈ ગયો!", Toast.LENGTH_SHORT).show()
-                                          diseaseText = ""
-                                          medicineText = ""
-                                      }
-                                  },
-                                  modifier = Modifier.fillMaxWidth().height(48.dp),
-                                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B)),
-                                  enabled = !isSaving
-                              ) {
-                                  Text(if (isSaving) "સેવ થઈ રહ્યું છે..." else "ડેટા સેવ કરો (Save Visit)", fontWeight = FontWeight.Bold)
-                              }
-                          }
-                      }
-
-                      if (historyList.isNotEmpty()) {
-                          Spacer(modifier = Modifier.height(18.dp))
-                          Text("📋 અગાઉની હિસ્ટ્રી (${historyList.size}):", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF0D276B))
-                          Spacer(modifier = Modifier.height(8.dp))
-
-                          historyList.reversed().forEach { item ->
-                              Card(
-                                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                  colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
-                                  shape = RoundedCornerShape(8.dp)
-                              ) {
-                                  Column(modifier = Modifier.padding(12.dp)) {
-                                      Text("📅 તારીખ: ${item.date}", fontSize = 12.sp, color = Color(0xFF0284C7), fontWeight = FontWeight.Bold)
-                                      Spacer(modifier = Modifier.height(4.dp))
-                                      Text("🩺 રોગ/તકલીફ: ${item.disease}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color(0xFF1E293B))
-                                      Text("💊 દવા: ${item.medicine}", fontSize = 13.sp, color = Color(0xFF475569))
-                                  }
-                              }
-                          }
-                      }
+                      super.onBackPressed();
                   }
               }
           }
@@ -498,12 +387,12 @@ jobs:
 
       - name: Build Android APK
         run: |
-          gradle wrapper --gradle-version 8.4
+          gradle wrapper
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Aastha-Clinic-Pro-Executive-App
-          path: app/build/outputs/apk/**/*.apk
+          name: Aastha-Clinic-Pro-App
+          path: app/build/outputs/apk/debug/*.apk
