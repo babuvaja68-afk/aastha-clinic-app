@@ -21,8 +21,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Generate Complete Clean Android Project
+      - name: Build Aastha Clinic APK Directly
         run: |
+          # પ્રોજેક્ટ માળખું તૈયાર કરવું
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
@@ -30,7 +31,116 @@ jobs:
           mkdir -p app/src/main/java/com/aastha/clinic
           mkdir -p gradle/wrapper
 
-          # 1. Clean Vector Brand Logo
+          # 1. settings.gradle
+          cat << 'EOF' > settings.gradle
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = "AasthaClinic"
+          include ':app'
+          EOF
+
+          # 2. build.gradle (Root)
+          cat << 'EOF' > build.gradle
+          plugins {
+              id 'com.android.application' version '8.2.2' apply false
+              id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
+          }
+          EOF
+
+          # 3. app/build.gradle
+          cat << 'EOF' > app/build.gradle
+          plugins {
+              id 'com.android.application'
+              id 'org.jetbrains.kotlin.android'
+          }
+
+          android {
+              namespace 'com.aastha.clinic'
+              compileSdk 34
+
+              defaultConfig {
+                  applicationId "com.aastha.clinic"
+                  minSdk 24
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+
+              buildTypes {
+                  release {
+                      minifyEnabled false
+                      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+                  }
+                  debug {
+                      minifyEnabled false
+                  }
+              }
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = '17'
+              }
+              buildFeatures {
+                  compose true
+              }
+              composeOptions {
+                  kotlinCompilerExtensionVersion '1.5.8'
+              }
+          }
+
+          dependencies {
+              implementation platform('androidx.compose:compose-bom:2024.02.00')
+              implementation 'androidx.core:core-ktx:1.12.0'
+              implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+              implementation 'androidx.activity:activity-compose:1.8.2'
+              implementation 'androidx.compose.ui:ui'
+              implementation 'androidx.compose.ui:ui-graphics'
+              implementation 'androidx.compose.material3:material3'
+              implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+          }
+          EOF
+
+          # 4. AndroidManifest.xml
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+              <application
+                  android:allowBackup="true"
+                  android:icon="@mipmap/ic_launcher"
+                  android:label="Aastha Clinic"
+                  android:roundIcon="@mipmap/ic_launcher"
+                  android:supportsRtl="true"
+                  android:theme="@android:style/Theme.Material.NoActionBar">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:windowSoftInputMode="adjustResize">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+
+          # 5. Brand Logo
           cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="200dp"
@@ -72,11 +182,10 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 2. Main Application without Login
+          # 6. Main Activity Kotlin Source (No Login, Live Auto-Fill & History)
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
-          import android.content.Context
           import android.os.Bundle
           import android.widget.Toast
           import androidx.activity.ComponentActivity
@@ -219,7 +328,7 @@ jobs:
               var historyList by remember { mutableStateOf<List<Patient>>(emptyList()) }
               var isSaving by remember { mutableStateOf(false) }
 
-              fun refreshData() {
+              fun syncData() {
                   coroutineScope.launch {
                       val cloudData = CloudSyncManager.fetchFromCloud()
                       if (!cloudData.isNullOrEmpty()) {
@@ -230,7 +339,7 @@ jobs:
               }
 
               LaunchedEffect(Unit) {
-                  refreshData()
+                  syncData()
               }
 
               fun onSearchChange(text: String) {
@@ -257,7 +366,7 @@ jobs:
                           title = { Text("Aastha Clinic - દર્દી રેકોર્ડ", fontWeight = FontWeight.Bold, color = Color.White) },
                           colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0D276B)),
                           actions = {
-                              IconButton(onClick = { refreshData() }) {
+                              IconButton(onClick = { syncData() }) {
                                   Icon(Icons.Default.Refresh, contentDescription = "Sync", tint = Color.White)
                               }
                           }
@@ -377,14 +486,10 @@ jobs:
           }
           EOF
 
-      - name: Build Android APK
-        run: |
-          if [ -f "./gradlew" ]; then
-            chmod +x gradlew
-            ./gradlew assembleRelease --no-daemon || ./gradlew assembleDebug --no-daemon
-          else
-            gradle assembleRelease --no-daemon || gradle assembleDebug --no-daemon
-          fi
+          # 7. Wrapper તૈયાર કરી સીધું કમ્પાઈલ કરવું
+          gradle wrapper --gradle-version 8.2 --distribution-type bin
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
