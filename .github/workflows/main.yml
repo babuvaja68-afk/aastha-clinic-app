@@ -21,7 +21,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Professional Clinic App with Exact Custom App Icon
+      - name: Setup Clinic App with Offline Storage and Live Online Cloud Sync
         run: |
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
@@ -78,8 +78,8 @@ jobs:
                   applicationId "com.aastha.clinic"
                   minSdk 24
                   targetSdk 34
-                  versionCode 3
-                  versionName "3.0"
+                  versionCode 7
+                  versionName "7.0"
               }
 
               buildTypes {
@@ -121,6 +121,7 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
               <application
                   android:allowBackup="true"
                   android:icon="@mipmap/ic_launcher"
@@ -140,63 +141,32 @@ jobs:
           </manifest>
           EOF
 
-          # EXACT MATCH AASTHA CLINIC BRAND ICON (Blue caring figures + Medical Cross + AA emblem)
+          # EXACT MATCH AASTHA CLINIC BRAND ICON
           cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="108dp"
               android:height="108dp"
               android:viewportWidth="108"
               android:viewportHeight="108">
-              
-              <!-- Clean White Circular Plate Backdrop -->
               <path
                   android:fillColor="#FFFFFF"
                   android:pathData="M54,12 C77.2,12 96,30.8 96,54 C96,77.2 77.2,96 54,96 C30.8,96 12,77.2 12,54 C12,30.8 30.8,12 54,12 Z"/>
-              
-              <!-- Subtle Border Ring -->
               <path
                   android:strokeColor="#E2E8F0"
                   android:strokeWidth="1.5"
                   android:pathData="M54,12 C77.2,12 96,30.8 96,54 C96,77.2 77.2,96 54,96 C30.8,96 12,77.2 12,54 C12,30.8 30.8,12 54,12 Z"/>
-
-              <!-- Outer Medical Cross in Rich Crimson -->
               <path
                   android:fillColor="#B71C1C"
                   android:pathData="M46,28 h16 v18 h18 v16 h-18 v18 h-16 v-18 h-18 v-16 h18 z"/>
-
-              <!-- 4 Surrounding Blue Caring Angelic Figures / Hands -->
-              <!-- Top Figure Head -->
               <path
                   android:fillColor="#1565C0"
-                  android:pathData="M54,20 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0"/>
-              <!-- Bottom Figure Head -->
-              <path
-                  android:fillColor="#1565C0"
-                  android:pathData="M54,88 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0"/>
-              <!-- Left Figure Head -->
-              <path
-                  android:fillColor="#1565C0"
-                  android:pathData="M20,54 m0,-4 a4,4 0 1,0 0,8 a4,4 0 1,0 0,-8"/>
-              <!-- Right Figure Head -->
-              <path
-                  android:fillColor="#1565C0"
-                  android:pathData="M88,54 m0,-4 a4,4 0 1,0 0,8 a4,4 0 1,0 0,-8"/>
-
-              <!-- Blue Protective Flow Curves -->
+                  android:pathData="M54,20 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 M54,88 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 M20,54 m0,-4 a4,4 0 1,0 0,8 a4,4 0 1,0 0,-8 M88,54 m0,-4 a4,4 0 1,0 0,8 a4,4 0 1,0 0,-8"/>
               <path
                   android:fillColor="#1976D2"
-                  android:pathData="M54,25 C45,28 35,38 35,46 C39,42 45,40 54,43 C63,40 69,42 73,46 C73,38 63,28 54,25 Z"/>
-              <path
-                  android:fillColor="#1976D2"
-                  android:pathData="M54,83 C45,80 35,70 35,62 C39,66 45,68 54,65 C63,68 69,66 73,62 C73,70 63,80 54,83 Z"/>
+                  android:pathData="M54,25 C45,28 35,38 35,46 C39,42 45,40 54,43 C63,40 69,42 73,46 C73,38 63,28 54,25 Z M54,83 C45,80 35,70 35,62 C39,66 45,68 54,65 C63,68 69,66 73,62 C73,70 63,80 54,83 Z"/>
               <path
                   android:fillColor="#0D47A1"
-                  android:pathData="M25,54 C28,45 38,35 46,35 C42,39 40,45 43,54 C40,63 42,69 46,73 C38,73 28,63 25,54 Z"/>
-              <path
-                  android:fillColor="#0D47A1"
-                  android:pathData="M83,54 C80,45 70,35 62,35 C66,39 68,45 65,54 C68,63 66,69 62,73 C70,73 80,63 83,54 Z"/>
-
-              <!-- Center White Shield Badge -->
+                  android:pathData="M25,54 C28,45 38,35 46,35 C42,39 40,45 43,54 C40,63 42,69 46,73 C38,73 28,63 25,54 Z M83,54 C80,45 70,35 62,35 C66,39 68,45 65,54 C68,63 66,69 62,73 C70,73 80,63 83,54 Z"/>
               <path
                   android:fillColor="#FFFFFF"
                   android:pathData="M54,42 C60.6,42 66,47.4 66,54 C66,60.6 60.6,66 54,66 C47.4,66 42,60.6 42,54 C42,47.4 47.4,42 54,42 Z"/>
@@ -204,20 +174,12 @@ jobs:
                   android:strokeColor="#B71C1C"
                   android:strokeWidth="1"
                   android:pathData="M54,42 C60.6,42 66,47.4 66,54 C66,60.6 60.6,66 54,66 C47.4,66 42,60.6 42,54 C42,47.4 47.4,42 54,42 Z"/>
-
-              <!-- Center "AA" Typography Monogram -->
-              <!-- First A -->
               <path
                   android:fillColor="#880E4F"
-                  android:pathData="M48.5,49 L46.5,59 h2.2 l0.5,-2.2 h2.4 l0.5,2.2 h2.2 L52,49 h-3.5 z M49.8,51.8 h1.0 l0.4,3.2 h-1.8 z"/>
-              <!-- Second A -->
-              <path
-                  android:fillColor="#880E4F"
-                  android:pathData="M55.5,49 L53.5,59 h2.2 l0.5,-2.2 h2.4 l0.5,2.2 h2.2 L59,49 h-3.5 z M56.8,51.8 h1.0 l0.4,3.2 h-1.8 z"/>
+                  android:pathData="M48.5,49 L46.5,59 h2.2 l0.5,-2.2 h2.4 l0.5,2.2 h2.2 L52,49 h-3.5 z M49.8,51.8 h1.0 l0.4,3.2 h-1.8 z M55.5,49 L53.5,59 h2.2 l0.5,-2.2 h2.4 l0.5,2.2 h2.2 L59,49 h-3.5 z M56.8,51.8 h1.0 l0.4,3.2 h-1.8 z"/>
           </vector>
           EOF
 
-          # Launcher Background
           cat << 'EOF' > app/src/main/res/drawable/ic_launcher_bg.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="108dp"
@@ -230,7 +192,6 @@ jobs:
           </vector>
           EOF
 
-          # Adaptive Launcher Icon Configuration
           cat << 'EOF' > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           <?xml version="1.0" encoding="utf-8"?>
           <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
@@ -239,7 +200,7 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # Main Application Code with Live Sync & History
+          # Main Application Code with Offline Local Cache + Online Sync
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
@@ -256,6 +217,9 @@ jobs:
           import androidx.compose.foundation.clickable
           import androidx.compose.foundation.layout.*
           import androidx.compose.foundation.lazy.LazyColumn
+          import androidx.compose.foundation.lazy.grid.GridCells
+          import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+          import androidx.compose.foundation.lazy.grid.items
           import androidx.compose.foundation.lazy.items
           import androidx.compose.foundation.rememberScrollState
           import androidx.compose.foundation.shape.RoundedCornerShape
@@ -307,6 +271,12 @@ jobs:
               val timestamp: Long = System.currentTimeMillis()
           )
 
+          enum class TextScale(val factor: Float, val label: String) {
+              SMALL(0.85f, "Small (નાના)"),
+              MEDIUM(1.0f, "Medium (સામાન્ય)"),
+              LARGE(1.2f, "Large (મોટા)")
+          }
+
           object SecurityEngine {
               private const val SECRET_KEY = "AasthaClinic#2026@SecKeySecure99"
 
@@ -317,9 +287,7 @@ jobs:
                       cipher.init(Cipher.ENCRYPT_MODE, keySpec)
                       val encryptedBytes = cipher.doFinal(input.toByteArray(Charsets.UTF_8))
                       Base64.encodeToString(encryptedBytes, Base64.DEFAULT)
-                  } catch (e: Exception) {
-                      input
-                  }
+                  } catch (e: Exception) { input }
               }
 
               fun decrypt(encryptedInput: String): String {
@@ -329,12 +297,72 @@ jobs:
                       cipher.init(Cipher.DECRYPT_MODE, keySpec)
                       val decodedBytes = Base64.decode(encryptedInput, Base64.DEFAULT)
                       String(cipher.doFinal(decodedBytes), Charsets.UTF_8)
+                  } catch (e: Exception) { encryptedInput }
+              }
+          }
+
+          // Offline Local Database Engine
+          object LocalStorageManager {
+              private const val PREF_NAME = "aastha_clinic_local_db"
+              private const val KEY_PATIENTS = "saved_patients_json"
+
+              fun savePatientsLocally(context: Context, list: List<Patient>) {
+                  val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                  val jsonArray = JSONArray()
+                  list.forEach { p ->
+                      val obj = JSONObject()
+                      obj.put("id", p.id)
+                      obj.put("name", p.name)
+                      obj.put("phone", p.phone)
+                      obj.put("village", p.village)
+                      obj.put("age", p.age)
+                      obj.put("disease", p.disease)
+                      obj.put("medicine", p.medicine)
+                      obj.put("amount", p.amount)
+                      obj.put("paymentMode", p.paymentMode)
+                      obj.put("doctorName", p.doctorName)
+                      obj.put("timeSlot", p.timeSlot)
+                      obj.put("date", p.date)
+                      obj.put("timestamp", p.timestamp)
+                      jsonArray.put(obj)
+                  }
+                  prefs.edit().putString(KEY_PATIENTS, jsonArray.toString()).apply()
+              }
+
+              fun getLocalPatients(context: Context): List<Patient> {
+                  val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                  val rawJson = prefs.getString(KEY_PATIENTS, null) ?: return emptyList()
+                  return try {
+                      val jsonArray = JSONArray(rawJson)
+                      val list = mutableListOf<Patient>()
+                      for (i in 0 until jsonArray.length()) {
+                          val obj = jsonArray.getJSONObject(i)
+                          list.add(
+                              Patient(
+                                  id = obj.optString("id", UUID.randomUUID().toString()),
+                                  name = obj.optString("name"),
+                                  phone = obj.optString("phone"),
+                                  village = obj.optString("village"),
+                                  age = obj.optString("age"),
+                                  disease = obj.optString("disease"),
+                                  medicine = obj.optString("medicine"),
+                                  amount = obj.optString("amount"),
+                                  paymentMode = obj.optString("paymentMode"),
+                                  doctorName = obj.optString("doctorName"),
+                                  timeSlot = obj.optString("timeSlot"),
+                                  date = obj.optString("date"),
+                                  timestamp = obj.optLong("timestamp", System.currentTimeMillis())
+                              )
+                          )
+                      }
+                      list.sortedByDescending { it.timestamp }
                   } catch (e: Exception) {
-                      encryptedInput
+                      emptyList()
                   }
               }
           }
 
+          // Online Cloud Sync Engine with Automatic Merge
           object CloudSyncManager {
               private const val CLOUD_URL = "https://jsonblob.com/api/jsonBlob/1341050011854495744"
 
@@ -343,6 +371,8 @@ jobs:
                       try {
                           val url = URL(CLOUD_URL)
                           val conn = url.openConnection() as HttpURLConnection
+                          conn.connectTimeout = 4000
+                          conn.readTimeout = 4000
                           conn.requestMethod = "PUT"
                           conn.setRequestProperty("Content-Type", "application/json")
                           conn.doOutput = true
@@ -370,9 +400,7 @@ jobs:
                           wr.write(jsonArray.toString())
                           wr.flush()
                           conn.responseCode == 200
-                      } catch (e: Exception) {
-                          false
-                      }
+                      } catch (e: Exception) { false }
                   }
               }
 
@@ -381,6 +409,8 @@ jobs:
                       try {
                           val url = URL(CLOUD_URL)
                           val conn = url.openConnection() as HttpURLConnection
+                          conn.connectTimeout = 4000
+                          conn.readTimeout = 4000
                           conn.requestMethod = "GET"
                           conn.setRequestProperty("Accept", "application/json")
 
@@ -410,12 +440,8 @@ jobs:
                                   )
                               }
                               list.sortedByDescending { it.timestamp }
-                          } else {
-                              null
-                          }
-                      } catch (e: Exception) {
-                          null
-                      }
+                          } else { null }
+                      } catch (e: Exception) { null }
                   }
               }
           }
@@ -425,30 +451,36 @@ jobs:
               return sdf.format(Date())
           }
 
-          fun getCurrentTimeSlot(): String {
-              val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
-              return sdf.format(Date())
-          }
+          fun getMorningSlots(): List<String> = listOf(
+              "11:00 AM - 11:15 AM", "11:15 AM - 11:30 AM", "11:30 AM - 11:45 AM", "11:45 AM - 12:00 PM",
+              "12:00 PM - 12:15 PM", "12:15 PM - 12:30 PM", "12:30 PM - 12:45 PM", "12:45 PM - 01:00 PM",
+              "01:00 PM - 01:15 PM", "01:15 PM - 01:30 PM", "01:30 PM - 01:45 PM", "01:45 PM - 02:00 PM",
+              "02:00 PM - 02:15 PM", "02:15 PM - 02:30 PM", "02:30 PM - 02:45 PM", "02:45 PM - 03:00 PM",
+              "03:00 PM - 03:15 PM", "03:15 PM - 03:30 PM"
+          )
 
-          fun sendWhatsAppReceipt(context: Context, patient: Patient) {
+          fun getEveningSlots(): List<String> = listOf(
+              "05:00 PM - 05:15 PM", "05:15 PM - 05:30 PM", "05:30 PM - 05:45 PM", "05:45 PM - 06:00 PM",
+              "06:00 PM - 06:15 PM", "06:15 PM - 06:30 PM", "06:30 PM - 06:45 PM", "06:45 PM - 07:00 PM",
+              "07:00 PM - 07:15 PM", "07:15 PM - 07:30 PM", "07:30 PM - 07:45 PM", "07:45 PM - 08:00 PM"
+          )
+
+          fun sendWhatsAppAppointmentOnly(context: Context, patient: Patient) {
               val cleanPhone = patient.phone.replace("+", "").replace(" ", "").replace("-", "")
               val finalPhone = if (cleanPhone.length == 10) "91$cleanPhone" else cleanPhone
 
               val message = """
-                  🏥 *AASTHA CLINIC & DIAGNOSTIC*
+                  🏥 *AASTHA CLINIC & DIAGNOSTIC* 🏥
                   ---------------------------------
-                  📋 *Patient Name:* ${patient.name}
-                  🎂 *Age:* ${patient.age} | 📍 *Village:* ${patient.village}
-                  👨‍⚕️ *Doctor:* ${patient.doctorName}
-                  📅 *Date:* ${patient.date} (${patient.timeSlot})
+                  નમસ્તે, *${patient.name}*
+                  આપની એપોઇન્ટમેન્ટ કન્ફર્મ થઈ ગઈ છે.
                   
-                  🩺 *Diagnosis:* ${patient.disease}
-                  💊 *Prescription / Advice:*
-                  ${patient.medicine}
-                  
-                  💰 *Amount Paid:* ₹${patient.amount} (${patient.paymentMode})
+                  👨‍⚕️ *ડોક્ટર:* ${patient.doctorName}
+                  📅 *તારીખ:* ${patient.date}
+                  ⏰ *સમય સ્લોટ:* ${patient.timeSlot}
+                  📍 *સ્થળ:* આસ્થા ક્લિનિક
                   ---------------------------------
-                  _Take care & get well soon!_
+                  _મહેરબાની કરીને આપેલા સમય સ્લોટ કરતા ૫ મિનિટ વહેલા ક્લિનિક પર પધારવું._
               """.trimIndent()
 
               try {
@@ -457,7 +489,7 @@ jobs:
                   intent.data = Uri.parse(url)
                   context.startActivity(intent)
               } catch (e: Exception) {
-                  Toast.makeText(context, "WhatsApp open karva ma samasya aavi", Toast.LENGTH_SHORT).show()
+                  Toast.makeText(context, "WhatsApp open nathi thai rahyu", Toast.LENGTH_SHORT).show()
               }
           }
 
@@ -477,11 +509,22 @@ jobs:
               val coroutineScope = rememberCoroutineScope()
               val todayDate = remember { getCurrentDate() }
 
-              val patientList = remember { mutableStateListOf<Patient>() }
-              var selectedTab by remember { mutableStateOf(0) }
-              var isSyncing by remember { mutableStateOf(false) }
+              // First load local storage (Instant startup even without internet)
+              val patientList = remember {
+                  mutableStateListOf<Patient>().apply {
+                      addAll(LocalStorageManager.getLocalPatients(context))
+                  }
+              }
 
-              // New Entry Form State
+              var selectedTab by remember { mutableStateOf(0) }
+              var isOnline by remember { mutableStateOf(true) }
+
+              // Settings State
+              var isDarkMode by remember { mutableStateOf(false) }
+              var textScale by remember { mutableStateOf(TextScale.MEDIUM) }
+              val scale = textScale.factor
+
+              // Entry Form State
               var nameInput by remember { mutableStateOf("") }
               var phoneInput by remember { mutableStateOf("") }
               var villageInput by remember { mutableStateOf("") }
@@ -491,25 +534,41 @@ jobs:
               var amountInput by remember { mutableStateOf("300") }
               var paymentMode by remember { mutableStateOf("Cash") }
               var doctorName by remember { mutableStateOf("DR. BIRJU K. SIRODARIA") }
+              var selectedSlot by remember { mutableStateOf("11:00 AM - 11:15 AM") }
 
-              // Patient History State
+              // History State
               var historySearchQuery by remember { mutableStateOf("") }
               var selectedPatientHistory by remember { mutableStateOf<List<Patient>?>(null) }
               var viewHistoryPatientName by remember { mutableStateOf("") }
 
-              // Live Auto Background Sync Loop (Every 6 seconds)
+              // Auto-Sync and Network Handler Loop
               LaunchedEffect(Unit) {
                   while (true) {
                       try {
                           val cloudData = CloudSyncManager.fetchFromCloud()
-                          if (cloudData != null && cloudData != patientList.toList()) {
-                              patientList.clear()
-                              patientList.addAll(cloudData)
+                          if (cloudData != null) {
+                              isOnline = true
+                              // Merge offline local list with online cloud list
+                              val merged = (patientList + cloudData).distinctBy { it.id }.sortedByDescending { it.timestamp }
+                              if (merged != patientList.toList()) {
+                                  patientList.clear()
+                                  patientList.addAll(merged)
+                                  LocalStorageManager.savePatientsLocally(context, merged)
+                              }
+                          } else {
+                              isOnline = false
                           }
-                      } catch (e: Exception) { }
+                      } catch (e: Exception) {
+                          isOnline = false
+                      }
                       delay(6000)
                   }
               }
+
+              val bgColor = if (isDarkMode) Color(0xFF121212) else Color(0xFFF4F7FB)
+              val cardBg = if (isDarkMode) Color(0xFF1E1E1E) else Color.White
+              val textColor = if (isDarkMode) Color.White else Color(0xFF0D276B)
+              val bodyTextColor = if (isDarkMode) Color(0xFFB0BEC5) else Color(0xFF333333)
 
               Scaffold(
                   topBar = {
@@ -518,27 +577,46 @@ jobs:
                               Row(verticalAlignment = Alignment.CenterVertically) {
                                   Image(
                                       painter = painterResource(id = R.drawable.ic_aastha_brand_logo),
-                                      contentDescription = "Aastha Logo",
-                                      modifier = Modifier.size(36.dp)
+                                      contentDescription = "Logo",
+                                      modifier = Modifier.size((34 * scale).dp)
                                   )
-                                  Spacer(modifier = Modifier.width(10.dp))
+                                  Spacer(modifier = Modifier.width(8.dp))
                                   Column {
-                                      Text("AASTHA CLINIC", fontWeight = FontWeight.Black, fontSize = 18.sp, color = Color.White, letterSpacing = 1.sp)
-                                      Text("Live Staff Portal • Dr. Birju & Dr. Niddhi", fontSize = 11.sp, color = Color(0xFFBBDEFB))
+                                      Text("AASTHA CLINIC", fontWeight = FontWeight.Black, fontSize = (17 * scale).sp, color = Color.White, letterSpacing = 1.sp)
+                                      Row(verticalAlignment = Alignment.CenterVertically) {
+                                          Surface(
+                                              shape = RoundedCornerShape(4.dp),
+                                              color = if (isOnline) Color(0xFF4CAF50) else Color(0xFFFF9800),
+                                              modifier = Modifier.padding(end = 4.dp)
+                                          ) {
+                                              Text(
+                                                  if (isOnline) " ONLINE " else " OFFLINE ",
+                                                  fontSize = (8 * scale).sp,
+                                                  color = Color.White,
+                                                  fontWeight = FontWeight.Bold
+                                              )
+                                          }
+                                          Text("Dr. Birju & Dr. Niddhi", fontSize = (10 * scale).sp, color = Color(0xFFBBDEFB))
+                                      }
                                   }
                               }
                           },
                           actions = {
                               IconButton(onClick = {
                                   coroutineScope.launch {
-                                      isSyncing = true
                                       val cloudData = CloudSyncManager.fetchFromCloud()
                                       if (cloudData != null) {
+                                          isOnline = true
+                                          val merged = (patientList + cloudData).distinctBy { it.id }.sortedByDescending { it.timestamp }
                                           patientList.clear()
-                                          patientList.addAll(cloudData)
-                                          Toast.makeText(context, "Data Updated Live!", Toast.LENGTH_SHORT).show()
+                                          patientList.addAll(merged)
+                                          LocalStorageManager.savePatientsLocally(context, merged)
+                                          CloudSyncManager.pushToCloud(merged)
+                                          Toast.makeText(context, "Data Synced Online!", Toast.LENGTH_SHORT).show()
+                                      } else {
+                                          isOnline = false
+                                          Toast.makeText(context, "Offline Mode: Data saved in phone storage.", Toast.LENGTH_SHORT).show()
                                       }
-                                      isSyncing = false
                                   }
                               }) {
                                   Icon(Icons.Default.Refresh, contentDescription = "Sync", tint = Color.White)
@@ -548,24 +626,36 @@ jobs:
                       )
                   },
                   bottomBar = {
-                      NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
+                      NavigationBar(containerColor = if (isDarkMode) Color(0xFF1E1E1E) else Color.White) {
                           NavigationBarItem(
                               selected = selectedTab == 0,
                               onClick = { selectedTab = 0 },
                               icon = { Icon(Icons.Default.ListAlt, contentDescription = null) },
-                              label = { Text("Today (${patientList.count { it.date == todayDate }})") }
+                              label = { Text("Today (${patientList.count { it.date == todayDate }})", fontSize = (11 * scale).sp) }
                           )
                           NavigationBarItem(
                               selected = selectedTab == 1,
                               onClick = { selectedTab = 1 },
-                              icon = { Icon(Icons.Default.PersonAdd, contentDescription = null) },
-                              label = { Text("New Checkup") }
+                              icon = { Icon(Icons.Default.Schedule, contentDescription = null) },
+                              label = { Text("Dr. Slots", fontSize = (11 * scale).sp) }
                           )
                           NavigationBarItem(
                               selected = selectedTab == 2,
                               onClick = { selectedTab = 2 },
+                              icon = { Icon(Icons.Default.PersonAdd, contentDescription = null) },
+                              label = { Text("New Entry", fontSize = (11 * scale).sp) }
+                          )
+                          NavigationBarItem(
+                              selected = selectedTab == 3,
+                              onClick = { selectedTab = 3 },
                               icon = { Icon(Icons.Default.History, contentDescription = null) },
-                              label = { Text("Search & History") }
+                              label = { Text("History", fontSize = (11 * scale).sp) }
+                          )
+                          NavigationBarItem(
+                              selected = selectedTab == 4,
+                              onClick = { selectedTab = 4 },
+                              icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                              label = { Text("Settings", fontSize = (11 * scale).sp) }
                           )
                       }
                   }
@@ -574,15 +664,30 @@ jobs:
                       modifier = Modifier
                           .fillMaxSize()
                           .padding(innerPadding)
-                          .background(Color(0xFFF4F7FB))
+                          .background(bgColor)
                   ) {
                       when (selectedTab) {
-                          0 -> TodayPatientScreen(patientList, todayDate, onPatientClick = { p ->
+                          0 -> TodayPatientScreen(patientList, todayDate, scale, cardBg, textColor, bodyTextColor, onPatientClick = { p ->
                               viewHistoryPatientName = p.name
                               selectedPatientHistory = patientList.filter { it.phone == p.phone || it.name.equals(p.name, ignoreCase = true) }
                           })
-                          1 -> NewCheckupScreen(
+                          1 -> DoctorSlotsScreen(
                               patientList = patientList,
+                              todayDate = todayDate,
+                              scale = scale,
+                              cardBg = cardBg,
+                              textColor = textColor,
+                              onBookSlot = { doc, slot ->
+                                  doctorName = doc
+                                  selectedSlot = slot
+                                  selectedTab = 2
+                              }
+                          )
+                          2 -> NewCheckupScreen(
+                              patientList = patientList,
+                              scale = scale,
+                              cardBg = cardBg,
+                              textColor = textColor,
                               nameInput = nameInput, onNameChange = { nameInput = it },
                               phoneInput = phoneInput, onPhoneChange = { phoneInput = it },
                               villageInput = villageInput, onVillageChange = { villageInput = it },
@@ -592,15 +697,22 @@ jobs:
                               amountInput = amountInput, onAmountChange = { amountInput = it },
                               paymentMode = paymentMode, onPaymentChange = { paymentMode = it },
                               doctorName = doctorName, onDoctorChange = { doctorName = it },
+                              selectedSlot = selectedSlot, onSlotChange = { selectedSlot = it },
                               onSubmit = { newP ->
+                                  // 1. Add to instant RAM & Phone Storage (Always works 100% offline)
                                   patientList.add(0, newP)
+                                  LocalStorageManager.savePatientsLocally(context, patientList)
+
+                                  // 2. Background push to Cloud if internet is available
                                   coroutineScope.launch {
                                       CloudSyncManager.pushToCloud(patientList)
                                   }
-                                  sendWhatsAppReceipt(context, newP)
+
+                                  // 3. Trigger WhatsApp Confirmation
+                                  sendWhatsAppAppointmentOnly(context, newP)
                                   nameInput = ""; phoneInput = ""; villageInput = ""; ageInput = ""; diseaseInput = ""; medicineInput = ""
                                   selectedTab = 0
-                                  Toast.makeText(context, "Dardi Record Live Save Thai Gayo!", Toast.LENGTH_LONG).show()
+                                  Toast.makeText(context, "Dardi Record Phone & Cloud ma Save Thai Gayo!", Toast.LENGTH_LONG).show()
                               },
                               onSelectExisting = { existing ->
                                   nameInput = existing.name
@@ -611,25 +723,37 @@ jobs:
                                   doctorName = existing.doctorName
                               }
                           )
-                          2 -> PatientHistoryScreen(
+                          3 -> PatientHistoryScreen(
                               patientList = patientList,
                               query = historySearchQuery,
+                              scale = scale,
+                              cardBg = cardBg,
+                              textColor = textColor,
                               onQueryChange = { historySearchQuery = it },
                               onSelectPatient = { p ->
                                   viewHistoryPatientName = p.name
                                   selectedPatientHistory = patientList.filter { it.phone == p.phone || it.name.equals(p.name, ignoreCase = true) }
                               }
                           )
+                          4 -> SettingsScreen(
+                              isDarkMode = isDarkMode,
+                              onToggleDarkMode = { isDarkMode = it },
+                              textScale = textScale,
+                              onSelectTextScale = { textScale = it },
+                              scale = scale,
+                              cardBg = cardBg,
+                              textColor = textColor
+                          )
                       }
 
-                      // Medical History Modal Dialog
+                      // Medical History Dialog
                       if (selectedPatientHistory != null) {
                           AlertDialog(
                               onDismissRequest = { selectedPatientHistory = null },
                               title = {
                                   Column {
-                                      Text("📋 Full Medical History", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF0D276B))
-                                      Text("Patient: $viewHistoryPatientName", fontSize = 13.sp, color = Color.Gray)
+                                      Text("📋 Full Medical History", fontWeight = FontWeight.Bold, fontSize = (17 * scale).sp, color = Color(0xFF0D276B))
+                                      Text("Patient: $viewHistoryPatientName", fontSize = (12 * scale).sp, color = Color.Gray)
                                   }
                               },
                               text = {
@@ -641,14 +765,14 @@ jobs:
                                           ) {
                                               Column(modifier = Modifier.padding(10.dp)) {
                                                   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                                      Text(rec.date, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF0D276B))
-                                                      Text(rec.timeSlot, fontSize = 11.sp, color = Color.DarkGray)
+                                                      Text(rec.date, fontWeight = FontWeight.Bold, fontSize = (13 * scale).sp, color = Color(0xFF0D276B))
+                                                      Text(rec.timeSlot, fontSize = (11 * scale).sp, color = Color.DarkGray)
                                                   }
                                                   Spacer(modifier = Modifier.height(2.dp))
-                                                  Text("👨‍⚕️ Doctor: ${rec.doctorName}", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                                                  Text("🩺 Disease: ${rec.disease}", fontSize = 12.sp, color = Color(0xFFC62828))
-                                                  Text("💊 Medicine: ${rec.medicine}", fontSize = 12.sp, color = Color(0xFF1565C0))
-                                                  Text("💰 Paid: ₹${rec.amount} (${rec.paymentMode})", fontSize = 12.sp, color = Color(0xFF2E7D32))
+                                                  Text("👨‍⚕️ ${rec.doctorName}", fontSize = (12 * scale).sp, fontWeight = FontWeight.SemiBold)
+                                                  Text("🩺 Disease (રોગ): ${rec.disease}", fontSize = (12 * scale).sp, color = Color(0xFFC62828), fontWeight = FontWeight.Medium)
+                                                  Text("💊 Medicine (દવા): ${rec.medicine}", fontSize = (12 * scale).sp, color = Color(0xFF1565C0))
+                                                  Text("💰 Paid: ₹${rec.amount} (${rec.paymentMode})", fontSize = (12 * scale).sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
                                               }
                                           }
                                       }
@@ -666,13 +790,90 @@ jobs:
           }
 
           @Composable
-          fun TodayPatientScreen(patientList: List<Patient>, todayDate: String, onPatientClick: (Patient) -> Unit) {
+          fun DoctorSlotsScreen(
+              patientList: List<Patient>,
+              todayDate: String,
+              scale: Float,
+              cardBg: Color,
+              textColor: Color,
+              onBookSlot: (String, String) -> Unit
+          ) {
+              var selectedDoctorTab by remember { mutableStateOf(0) }
+              val morningSlots = remember { getMorningSlots() }
+              val eveningSlots = remember { getEveningSlots() }
+
+              Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
+                  Text("🩺 Doctor Appointment Slots", fontWeight = FontWeight.Bold, fontSize = (18 * scale).sp, color = textColor)
+                  Text("Morning: 11 AM - 3:30 PM (Dr. Birju) | Evening: 5 PM - 8 PM (Dr. Niddhi)", fontSize = (11 * scale).sp, color = Color.Gray)
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  TabRow(selectedTabIndex = selectedDoctorTab, containerColor = cardBg) {
+                      Tab(
+                          selected = selectedDoctorTab == 0,
+                          onClick = { selectedDoctorTab = 0 },
+                          text = { Text("Dr. Birju (Morning)", fontSize = (12 * scale).sp, fontWeight = FontWeight.Bold) }
+                      )
+                      Tab(
+                          selected = selectedDoctorTab == 1,
+                          onClick = { selectedDoctorTab = 1 },
+                          text = { Text("Dr. Niddhi (Evening)", fontSize = (12 * scale).sp, fontWeight = FontWeight.Bold) }
+                      )
+                  }
+
+                  Spacer(modifier = Modifier.height(12.dp))
+
+                  val currentDoctor = if (selectedDoctorTab == 0) "DR. BIRJU K. SIRODARIA" else "DR. NIDDHI JAVIA"
+                  val currentSlots = if (selectedDoctorTab == 0) morningSlots else eveningSlots
+
+                  LazyVerticalGrid(
+                      columns = GridCells.Fixed(2),
+                      horizontalArrangement = Arrangement.spacedBy(8.dp),
+                      verticalArrangement = Arrangement.spacedBy(8.dp),
+                      modifier = Modifier.fillMaxSize()
+                  ) {
+                      items(currentSlots) { slot ->
+                          val bookedCount = patientList.count { it.date == todayDate && it.doctorName == currentDoctor && it.timeSlot == slot }
+                          val isFull = bookedCount >= 3
+
+                          Card(
+                              modifier = Modifier
+                                  .fillMaxWidth()
+                                  .clickable { onBookSlot(currentDoctor, slot) },
+                              colors = CardDefaults.cardColors(
+                                  containerColor = if (isFull) Color(0xFFFFEBEE) else cardBg
+                              ),
+                              shape = RoundedCornerShape(10.dp),
+                              elevation = CardDefaults.cardElevation(2.dp)
+                          ) {
+                              Column(modifier = Modifier.padding(10.dp)) {
+                                  Text(slot, fontWeight = FontWeight.Bold, fontSize = (12 * scale).sp, color = if (isFull) Color(0xFFC62828) else textColor)
+                                  Spacer(modifier = Modifier.height(4.dp))
+                                  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                      Text("$bookedCount / 3 Dardi", fontSize = (11 * scale).sp, color = if (isFull) Color.Red else Color(0xFF2E7D32), fontWeight = FontWeight.SemiBold)
+                                      Text(if (isFull) "Full" else "Book ➡️", fontSize = (10 * scale).sp, color = if (isFull) Color.Gray else Color(0xFF1565C0))
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun TodayPatientScreen(
+              patientList: List<Patient>,
+              todayDate: String,
+              scale: Float,
+              cardBg: Color,
+              textColor: Color,
+              bodyTextColor: Color,
+              onPatientClick: (Patient) -> Unit
+          ) {
               val todayList = patientList.filter { it.date == todayDate }
               val totalCollection = todayList.sumOf { it.amount.toDoubleOrNull() ?: 0.0 }
               val context = LocalContext.current
 
               Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  // Stats Summary Header
                   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                       Card(
                           modifier = Modifier.weight(1f),
@@ -680,8 +881,8 @@ jobs:
                           shape = RoundedCornerShape(12.dp)
                       ) {
                           Column(modifier = Modifier.padding(12.dp)) {
-                              Text("Today's Patients", color = Color(0xFFBBDEFB), fontSize = 12.sp)
-                              Text("${todayList.size}", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                              Text("Today's Patients", color = Color(0xFFBBDEFB), fontSize = (11 * scale).sp)
+                              Text("${todayList.size}", color = Color.White, fontSize = (22 * scale).sp, fontWeight = FontWeight.Bold)
                           }
                       }
                       Card(
@@ -690,19 +891,19 @@ jobs:
                           shape = RoundedCornerShape(12.dp)
                       ) {
                           Column(modifier = Modifier.padding(12.dp)) {
-                              Text("Collection", color = Color(0xFFA5D6A7), fontSize = 12.sp)
-                              Text("₹${totalCollection.toInt()}", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                              Text("Collection", color = Color(0xFFA5D6A7), fontSize = (11 * scale).sp)
+                              Text("₹${totalCollection.toInt()}", color = Color.White, fontSize = (22 * scale).sp, fontWeight = FontWeight.Bold)
                           }
                       }
                   }
 
                   Spacer(modifier = Modifier.height(14.dp))
-                  Text("🔴 Live Patient Queue (Real-Time)", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF0D276B))
+                  Text("🔴 Live Patient Queue (Real-Time)", fontWeight = FontWeight.Bold, fontSize = (15 * scale).sp, color = textColor)
                   Spacer(modifier = Modifier.height(8.dp))
 
                   if (todayList.isEmpty()) {
                       Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                          Text("Aaje haji sudhi koi dardi aavyu nathi.\nNavu naam umerva 'New Checkup' par jaao.", color = Color.Gray, fontSize = 14.sp)
+                          Text("Aaje haji sudhi koi dardi nathi.\nNavi entry karva 'New Entry' par click karo.", color = Color.Gray, fontSize = (14 * scale).sp)
                       }
                   } else {
                       LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -712,35 +913,46 @@ jobs:
                                       .fillMaxWidth()
                                       .padding(vertical = 5.dp)
                                       .clickable { onPatientClick(patient) },
-                                  colors = CardDefaults.cardColors(containerColor = Color.White),
+                                  colors = CardDefaults.cardColors(containerColor = cardBg),
                                   elevation = CardDefaults.cardElevation(2.dp),
                                   shape = RoundedCornerShape(10.dp)
                               ) {
                                   Column(modifier = Modifier.padding(12.dp)) {
                                       Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                          Text(patient.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF0D276B))
-                                          Text(patient.timeSlot, fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
+                                          Text(patient.name, fontWeight = FontWeight.Bold, fontSize = (15 * scale).sp, color = textColor)
+                                          Text(patient.timeSlot, fontSize = (11 * scale).sp, color = Color.Gray, fontWeight = FontWeight.Medium)
                                       }
-                                      Text("📍 ${patient.village} | 📞 ${patient.phone} | Age: ${patient.age}", fontSize = 13.sp, color = Color.DarkGray)
+                                      Text("👨‍⚕️ ${patient.doctorName}", fontSize = (12 * scale).sp, color = Color(0xFF1565C0), fontWeight = FontWeight.SemiBold)
+                                      Text("📍 ${patient.village} | 📞 ${patient.phone} | Age: ${patient.age}", fontSize = (12 * scale).sp, color = bodyTextColor)
+                                      
                                       Spacer(modifier = Modifier.height(4.dp))
-                                      Text("🩺 ${patient.disease}", fontSize = 13.sp, color = Color(0xFFD32F2F), fontWeight = FontWeight.SemiBold)
-                                      Text("💊 ${patient.medicine}", fontSize = 13.sp, color = Color(0xFF1565C0))
+                                      Surface(
+                                          color = Color(0xFFF1F5F9),
+                                          shape = RoundedCornerShape(6.dp),
+                                          modifier = Modifier.fillMaxWidth()
+                                      ) {
+                                          Column(modifier = Modifier.padding(8.dp)) {
+                                              Text("🩺 રોગ: ${patient.disease.ifBlank { "N/A" }}", fontSize = (12 * scale).sp, color = Color(0xFFC62828), fontWeight = FontWeight.SemiBold)
+                                              Text("💊 દવા: ${patient.medicine.ifBlank { "N/A" }}", fontSize = (12 * scale).sp, color = Color(0xFF0288D1))
+                                          }
+                                      }
+
                                       Spacer(modifier = Modifier.height(6.dp))
                                       Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                          Text("₹${patient.amount} (${patient.paymentMode})", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                          Text("₹${patient.amount} (${patient.paymentMode})", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold, fontSize = (13 * scale).sp)
                                           Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                               OutlinedButton(
                                                   onClick = { onPatientClick(patient) },
                                                   contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
                                               ) {
-                                                  Text("History", fontSize = 11.sp)
+                                                  Text("History", fontSize = (11 * scale).sp)
                                               }
                                               Button(
-                                                  onClick = { sendWhatsAppReceipt(context, patient) },
+                                                  onClick = { sendWhatsAppAppointmentOnly(context, patient) },
                                                   colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)),
                                                   contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
                                               ) {
-                                                  Text("Receipt", fontSize = 11.sp, color = Color.White)
+                                                  Text("WhatsApp Slot", fontSize = (11 * scale).sp, color = Color.White)
                                               }
                                           }
                                       }
@@ -755,6 +967,9 @@ jobs:
           @Composable
           fun NewCheckupScreen(
               patientList: List<Patient>,
+              scale: Float,
+              cardBg: Color,
+              textColor: Color,
               nameInput: String, onNameChange: (String) -> Unit,
               phoneInput: String, onPhoneChange: (String) -> Unit,
               villageInput: String, onVillageChange: (String) -> Unit,
@@ -764,6 +979,7 @@ jobs:
               amountInput: String, onAmountChange: (String) -> Unit,
               paymentMode: String, onPaymentChange: (String) -> Unit,
               doctorName: String, onDoctorChange: (String) -> Unit,
+              selectedSlot: String, onSlotChange: (String) -> Unit,
               onSubmit: (Patient) -> Unit,
               onSelectExisting: (Patient) -> Unit
           ) {
@@ -784,9 +1000,8 @@ jobs:
                       .verticalScroll(scrollState)
                       .padding(16.dp)
               ) {
-                  Text("🩺 Patient Checkup Entry", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF0D276B))
-                  Text("Auto-searches old records for repeat patients", fontSize = 12.sp, color = Color.Gray)
-                  Spacer(modifier = Modifier.height(12.dp))
+                  Text("🩺 Patient Appointment & Clinical Entry", fontWeight = FontWeight.Bold, fontSize = (18 * scale).sp, color = textColor)
+                  Spacer(modifier = Modifier.height(10.dp))
 
                   if (matchingPatients.isNotEmpty()) {
                       Card(
@@ -794,7 +1009,7 @@ jobs:
                           colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4))
                       ) {
                           Column(modifier = Modifier.padding(10.dp)) {
-                              Text("⚡ Returning Patient Found! Click to Auto-fill:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color(0xFFF57F17))
+                              Text("⚡ Returning Patient! Tap to auto-fill:", fontWeight = FontWeight.Bold, fontSize = (12 * scale).sp, color = Color(0xFFF57F17))
                               matchingPatients.take(3).forEach { oldP ->
                                   Row(
                                       modifier = Modifier
@@ -803,8 +1018,8 @@ jobs:
                                           .padding(vertical = 4.dp),
                                       horizontalArrangement = Arrangement.SpaceBetween
                                   ) {
-                                      Text("👤 ${oldP.name} (${oldP.village})", fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                                      Text("Tap to Fill ➡️", fontSize = 12.sp, color = Color(0xFF0D276B))
+                                      Text("👤 ${oldP.name} (${oldP.village})", fontSize = (12 * scale).sp, fontWeight = FontWeight.Medium)
+                                      Text("Fill ➡️", fontSize = (11 * scale).sp, color = Color(0xFF0D276B))
                                   }
                               }
                           }
@@ -814,7 +1029,7 @@ jobs:
                   OutlinedTextField(
                       value = phoneInput,
                       onValueChange = onPhoneChange,
-                      label = { Text("Mobile Number (ફોન નંબર)") },
+                      label = { Text("Mobile Number (વોટ્સએપ નંબર)", fontSize = (13 * scale).sp) },
                       keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                       modifier = Modifier.fillMaxWidth()
                   )
@@ -823,7 +1038,7 @@ jobs:
                   OutlinedTextField(
                       value = nameInput,
                       onValueChange = onNameChange,
-                      label = { Text("Patient Full Name (દર્દીનું નામ)") },
+                      label = { Text("Patient Full Name (દર્દીનું નામ)", fontSize = (13 * scale).sp) },
                       modifier = Modifier.fillMaxWidth()
                   )
                   Spacer(modifier = Modifier.height(8.dp))
@@ -832,38 +1047,56 @@ jobs:
                       OutlinedTextField(
                           value = ageInput,
                           onValueChange = onAgeChange,
-                          label = { Text("Age (ઉંમર)") },
+                          label = { Text("Age (ઉંમર)", fontSize = (13 * scale).sp) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                           modifier = Modifier.weight(1f)
                       )
                       OutlinedTextField(
                           value = villageInput,
                           onValueChange = onVillageChange,
-                          label = { Text("Village / City (ગામ)") },
+                          label = { Text("Village (ગામ)", fontSize = (13 * scale).sp) },
                           modifier = Modifier.weight(1.5f)
                       )
                   }
                   Spacer(modifier = Modifier.height(8.dp))
 
-                  Text("Select Doctor:", fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                  Text("Select Doctor & Timing:", fontSize = (13 * scale).sp, fontWeight = FontWeight.Medium, color = textColor)
                   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                       FilterChip(
                           selected = doctorName == "DR. BIRJU K. SIRODARIA",
-                          onClick = { onDoctorChange("DR. BIRJU K. SIRODARIA") },
-                          label = { Text("Dr. Birju", fontSize = 12.sp) }
+                          onClick = {
+                              onDoctorChange("DR. BIRJU K. SIRODARIA")
+                              onSlotChange(getMorningSlots().first())
+                          },
+                          label = { Text("Dr. Birju (Morning)", fontSize = (11 * scale).sp) }
                       )
                       FilterChip(
                           selected = doctorName == "DR. NIDDHI JAVIA",
-                          onClick = { onDoctorChange("DR. NIDDHI JAVIA") },
-                          label = { Text("Dr. Niddhi", fontSize = 12.sp) }
+                          onClick = {
+                              onDoctorChange("DR. NIDDHI JAVIA")
+                              onSlotChange(getEveningSlots().first())
+                          },
+                          label = { Text("Dr. Niddhi (Evening)", fontSize = (11 * scale).sp) }
                       )
                   }
-                  Spacer(modifier = Modifier.height(8.dp))
+                  Spacer(modifier = Modifier.height(6.dp))
+
+                  OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+                      Column(modifier = Modifier.padding(10.dp)) {
+                          Text("⏰ Current Time Slot: $selectedSlot", fontWeight = FontWeight.Bold, fontSize = (12 * scale).sp, color = Color(0xFF1565C0))
+                          Text("Change slot directly from 'Dr. Slots' tab.", fontSize = (10 * scale).sp, color = Color.Gray)
+                      }
+                  }
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  Text("🩺 Clinical Diagnosis & Medicines (રોગ અને દવાઓ)", fontWeight = FontWeight.Bold, fontSize = (13 * scale).sp, color = textColor)
+                  Spacer(modifier = Modifier.height(4.dp))
 
                   OutlinedTextField(
                       value = diseaseInput,
                       onValueChange = onDiseaseChange,
-                      label = { Text("Diagnosis / Symptoms (રોગ / તકલીફ)") },
+                      label = { Text("Diagnosis / Disease (રોગ / તકલીફ)", fontSize = (13 * scale).sp) },
+                      placeholder = { Text("e.g. Viral Fever, Acidity, Cough...") },
                       modifier = Modifier.fillMaxWidth()
                   )
                   Spacer(modifier = Modifier.height(8.dp))
@@ -871,33 +1104,37 @@ jobs:
                   OutlinedTextField(
                       value = medicineInput,
                       onValueChange = onMedicineChange,
-                      label = { Text("Prescribed Medicine / Advice (દવાઓ)") },
+                      label = { Text("Prescribed Medicine / Treatment (દવાઓની વિગત)", fontSize = (13 * scale).sp) },
+                      placeholder = { Text("e.g. Paracetamol 650mg, Pantocid DSR...") },
                       modifier = Modifier.fillMaxWidth(),
                       minLines = 2
                   )
-                  Spacer(modifier = Modifier.height(8.dp))
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  Text("💰 Payment & Fees Slot (ફી અને ચુકવણી)", fontWeight = FontWeight.Bold, fontSize = (13 * scale).sp, color = textColor)
+                  Spacer(modifier = Modifier.height(4.dp))
 
                   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                       OutlinedTextField(
                           value = amountInput,
                           onValueChange = onAmountChange,
-                          label = { Text("Fees (₹)") },
+                          label = { Text("Fees (₹)", fontSize = (13 * scale).sp) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                           modifier = Modifier.weight(1f)
                       )
                       Column(modifier = Modifier.weight(1.5f)) {
-                          Text("Payment Mode", fontSize = 11.sp, color = Color.Gray)
+                          Text("Payment Mode", fontSize = (11 * scale).sp, color = Color.Gray)
                           Row {
                               FilterChip(
                                   selected = paymentMode == "Cash",
                                   onClick = { onPaymentChange("Cash") },
-                                  label = { Text("Cash", fontSize = 11.sp) }
+                                  label = { Text("💵 Cash", fontSize = (11 * scale).sp) }
                               )
                               Spacer(modifier = Modifier.width(4.dp))
                               FilterChip(
                                   selected = paymentMode == "Online",
                                   onClick = { onPaymentChange("Online") },
-                                  label = { Text("Online", fontSize = 11.sp) }
+                                  label = { Text("📲 Online", fontSize = (11 * scale).sp) }
                               )
                           }
                       }
@@ -918,7 +1155,7 @@ jobs:
                                   amount = amountInput.trim(),
                                   paymentMode = paymentMode,
                                   doctorName = doctorName,
-                                  timeSlot = getCurrentTimeSlot(),
+                                  timeSlot = selectedSlot,
                                   date = getCurrentDate()
                               )
                               onSubmit(p)
@@ -928,7 +1165,7 @@ jobs:
                       colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B)),
                       shape = RoundedCornerShape(10.dp)
                   ) {
-                      Text("SAVE & SEND RECEIPT 🚀", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                      Text("BOOK & SEND APPOINTMENT WHATSAPP 🚀", fontWeight = FontWeight.Bold, fontSize = (13 * scale).sp)
                   }
               }
           }
@@ -937,6 +1174,9 @@ jobs:
           fun PatientHistoryScreen(
               patientList: List<Patient>,
               query: String,
+              scale: Float,
+              cardBg: Color,
+              textColor: Color,
               onQueryChange: (String) -> Unit,
               onSelectPatient: (Patient) -> Unit
           ) {
@@ -954,22 +1194,18 @@ jobs:
               }
 
               Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  Text("🔍 Patient Medical History Finder", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF0D276B))
-                  Text("Search by Name, Phone, Village, or Disease", fontSize = 12.sp, color = Color.Gray)
+                  Text("🔍 Patient Medical History Finder", fontWeight = FontWeight.Bold, fontSize = (18 * scale).sp, color = textColor)
                   Spacer(modifier = Modifier.height(10.dp))
 
                   OutlinedTextField(
                       value = query,
                       onValueChange = onQueryChange,
-                      placeholder = { Text("Type name or phone number...") },
+                      placeholder = { Text("Search by name, phone, village or disease...", fontSize = (13 * scale).sp) },
                       leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                       modifier = Modifier.fillMaxWidth(),
                       shape = RoundedCornerShape(12.dp)
                   )
                   Spacer(modifier = Modifier.height(10.dp))
-
-                  Text("Total Unique Patients: ${filtered.size}", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.DarkGray)
-                  Spacer(modifier = Modifier.height(6.dp))
 
                   LazyColumn(modifier = Modifier.fillMaxSize()) {
                       items(filtered) { patient ->
@@ -979,7 +1215,7 @@ jobs:
                                   .fillMaxWidth()
                                   .padding(vertical = 5.dp)
                                   .clickable { onSelectPatient(patient) },
-                              colors = CardDefaults.cardColors(containerColor = Color.White),
+                              colors = CardDefaults.cardColors(containerColor = cardBg),
                               elevation = CardDefaults.cardElevation(2.dp),
                               shape = RoundedCornerShape(10.dp)
                           ) {
@@ -989,9 +1225,9 @@ jobs:
                                   verticalAlignment = Alignment.CenterVertically
                               ) {
                                   Column(modifier = Modifier.weight(1f)) {
-                                      Text(patient.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF0D276B))
-                                      Text("📞 ${patient.phone} | 📍 ${patient.village}", fontSize = 13.sp, color = Color.Gray)
-                                      Text("Last Checked: ${patient.date} • ${patient.disease}", fontSize = 12.sp, color = Color(0xFFD32F2F))
+                                      Text(patient.name, fontWeight = FontWeight.Bold, fontSize = (15 * scale).sp, color = textColor)
+                                      Text("📞 ${patient.phone} | 📍 ${patient.village}", fontSize = (12 * scale).sp, color = Color.Gray)
+                                      Text("Last Visit: ${patient.date} • ${patient.disease}", fontSize = (11 * scale).sp, color = Color(0xFFD32F2F))
                                   }
                                   Surface(
                                       color = Color(0xFFE3F2FD),
@@ -1000,13 +1236,91 @@ jobs:
                                       Text(
                                           text = "$visitCount Visits",
                                           modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                                          fontSize = 11.sp,
+                                          fontSize = (11 * scale).sp,
                                           fontWeight = FontWeight.Bold,
                                           color = Color(0xFF1565C0)
                                       )
                                   }
                               }
                           }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun SettingsScreen(
+              isDarkMode: Boolean,
+              onToggleDarkMode: (Boolean) -> Unit,
+              textScale: TextScale,
+              onSelectTextScale: (TextScale) -> Unit,
+              scale: Float,
+              cardBg: Color,
+              textColor: Color
+          ) {
+              Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                  Text("⚙️ App Settings (સેટિંગ્સ)", fontWeight = FontWeight.Bold, fontSize = (18 * scale).sp, color = textColor)
+                  Spacer(modifier = Modifier.height(16.dp))
+
+                  Card(
+                      modifier = Modifier.fillMaxWidth(),
+                      colors = CardDefaults.cardColors(containerColor = cardBg),
+                      shape = RoundedCornerShape(12.dp)
+                  ) {
+                      Row(
+                          modifier = Modifier.fillMaxWidth().padding(16.dp),
+                          horizontalArrangement = Arrangement.SpaceBetween,
+                          verticalAlignment = Alignment.CenterVertically
+                      ) {
+                          Column {
+                              Text("Dark Mode (ડાર્ક મોડ)", fontWeight = FontWeight.Bold, fontSize = (15 * scale).sp, color = textColor)
+                              Text(if (isDarkMode) "Dark theme enabled" else "Light theme enabled", fontSize = (12 * scale).sp, color = Color.Gray)
+                          }
+                          Switch(
+                              checked = isDarkMode,
+                              onCheckedChange = onToggleDarkMode
+                          )
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(14.dp))
+
+                  Card(
+                      modifier = Modifier.fillMaxWidth(),
+                      colors = CardDefaults.cardColors(containerColor = cardBg),
+                      shape = RoundedCornerShape(12.dp)
+                  ) {
+                      Column(modifier = Modifier.padding(16.dp)) {
+                          Text("Text Size (અક્ષરોની સાઈઝ)", fontWeight = FontWeight.Bold, fontSize = (15 * scale).sp, color = textColor)
+                          Text("તમારી અનુકૂળતા મુજબ અક્ષરો નાના કે મોટા કરો:", fontSize = (12 * scale).sp, color = Color.Gray)
+                          Spacer(modifier = Modifier.height(10.dp))
+
+                          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                              TextScale.values().forEach { ts ->
+                                  FilterChip(
+                                      selected = textScale == ts,
+                                      onClick = { onSelectTextScale(ts) },
+                                      label = { Text(ts.label, fontSize = (12 * scale).sp) }
+                                  )
+                              }
+                          }
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(14.dp))
+
+                  Card(
+                      modifier = Modifier.fillMaxWidth(),
+                      colors = CardDefaults.cardColors(containerColor = cardBg),
+                      shape = RoundedCornerShape(12.dp)
+                  ) {
+                      Column(modifier = Modifier.padding(16.dp)) {
+                          Text("🏥 Aastha Clinic System", fontWeight = FontWeight.Bold, fontSize = (14 * scale).sp, color = Color(0xFF0D276B))
+                          Spacer(modifier = Modifier.height(4.dp))
+                          Text("• Offline Storage: Active (No Internet Required)", fontSize = (12 * scale).sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.SemiBold)
+                          Text("• Online Cloud Sync: Automatic", fontSize = (12 * scale).sp)
+                          Text("• Dr. Birju K. Sirodaria (11:00 AM - 03:30 PM)", fontSize = (12 * scale).sp)
+                          Text("• Dr. Niddhi Javia (05:00 PM - 08:00 PM)", fontSize = (12 * scale).sp)
                       }
                   }
               }
