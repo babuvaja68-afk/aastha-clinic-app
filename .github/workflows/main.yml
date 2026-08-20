@@ -21,14 +21,17 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Generate Complete App and Build Wrapper
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Setup Encrypted Secure Clinic App
         run: |
+          rm -rf app gradle settings.gradle build.gradle gradlew gradlew.bat
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
           mkdir -p app/src/main/java/com/aastha/clinic
-          mkdir -p gradle/wrapper
 
           # 1. Project Configuration Files
           cat << 'EOF' > settings.gradle
@@ -69,8 +72,8 @@ jobs:
                   applicationId "com.aastha.clinic"
                   minSdk 24
                   targetSdk 34
-                  versionCode 21
-                  versionName "2.1"
+                  versionCode 43
+                  versionName "4.3"
               }
 
               buildTypes {
@@ -179,7 +182,7 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 4. Main Application Source
+          # 4. Main Application Source (No Login, Auto-Fill, History & Real-Time Sync)
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
@@ -191,6 +194,8 @@ jobs:
           import androidx.compose.foundation.Image
           import androidx.compose.foundation.background
           import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.lazy.LazyColumn
+          import androidx.compose.foundation.lazy.items
           import androidx.compose.foundation.rememberScrollState
           import androidx.compose.foundation.shape.RoundedCornerShape
           import androidx.compose.foundation.verticalScroll
@@ -543,34 +548,11 @@ jobs:
           }
           EOF
 
-          # 5. Gradle Wrapper Creation directly in this step
-          cat << 'EOF' > gradle/wrapper/gradle-wrapper.properties
-          distributionBase=GRADLE_USER_HOME
-          distributionPath=wrapper/dists
-          distributionUrl=https\://services.gradle.org/distributions/gradle-8.2-bin.zip
-          networkTimeout=10000
-          validateDistributionUrl=true
-          zipStoreBase=GRADLE_USER_HOME
-          zipStorePath=wrapper/dists
-          EOF
-
-          curl -sLo gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradle/wrapper/gradle-wrapper.jar
-
-          cat << 'EOF' > gradlew
-          #!/bin/sh
-          JAVA_EXE="java"
-          if [ -n "$JAVA_HOME" ] ; then
-              JAVA_EXE="$JAVA_HOME/bin/java"
-          fi
-          exec "$JAVA_EXE" -jar gradle/wrapper/gradle-wrapper.jar "$@"
-          EOF
-          chmod +x gradlew
-
       - name: Build Android APK
-        run: ./gradlew assembleDebug --no-daemon
+        run: gradle assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Aastha-Clinic-Pro-Executive-App
-          path: app/build/outputs/apk/**/*.apk
+          path: app/build/outputs/apk/debug/*.apk
