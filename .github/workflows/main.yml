@@ -1,4 +1,4 @@
-name: Build Aastha Clinic APK
+  name: Build Aastha Clinic APK
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Generate Clean Android Project Files
+      - name: Generate Android Project Files
         run: |
           rm -rf app gradle settings.gradle build.gradle gradlew gradlew.bat
           mkdir -p app/src/main/res/layout
@@ -33,7 +33,7 @@ jobs:
           mkdir -p app/src/main/res/mipmap-anydpi-v26
           mkdir -p app/src/main/java/com/aastha/clinic
 
-          # 1. Root Settings
+          # 1. settings.gradle
           cat << 'EOF' > settings.gradle
           pluginManagement {
               repositories {
@@ -53,7 +53,7 @@ jobs:
           include ':app'
           EOF
 
-          # 2. Root build.gradle
+          # 2. build.gradle (Root)
           cat << 'EOF' > build.gradle
           plugins {
               id 'com.android.application' version '8.2.2' apply false
@@ -61,7 +61,7 @@ jobs:
           }
           EOF
 
-          # 3. App build.gradle
+          # 3. app/build.gradle
           cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
@@ -76,8 +76,8 @@ jobs:
                   applicationId "com.aastha.clinic"
                   minSdk 24
                   targetSdk 34
-                  versionCode 4
-                  versionName "4.0"
+                  versionCode 5
+                  versionName "5.0"
               }
 
               buildTypes {
@@ -102,12 +102,12 @@ jobs:
               implementation 'androidx.core:core-ktx:1.12.0'
               implementation 'androidx.appcompat:appcompat:1.6.1'
               implementation 'com.google.android.material:material:1.11.0'
-              implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+              implementation 'androidx.cardview:cardview:1.0.0'
               implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
           }
           EOF
 
-          # 4. Manifest
+          # 4. AndroidManifest.xml
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -119,7 +119,7 @@ jobs:
                   android:label="Aastha Clinic"
                   android:roundIcon="@mipmap/ic_launcher"
                   android:supportsRtl="true"
-                  android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
+                  android:theme="@style/Theme.AasthaClinic">
                   <activity
                       android:name=".MainActivity"
                       android:exported="true"
@@ -133,7 +133,7 @@ jobs:
           </manifest>
           EOF
 
-          # 5. Resources & Colors
+          # 5. Resources & Styles
           cat << 'EOF' > app/src/main/res/values/colors.xml
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
@@ -142,7 +142,6 @@ jobs:
               <color name="accent">#D32F2F</color>
               <color name="bg_gray">#F4F6F9</color>
               <color name="white">#FFFFFF</color>
-              <color name="card_bg">#E3F2FD</color>
           </resources>
           EOF
 
@@ -157,7 +156,7 @@ jobs:
           </resources>
           EOF
 
-          # 6. Icons
+          # 6. Clinic Brand Logo Vector
           cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="200dp"
@@ -199,7 +198,7 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 7. Layout (activity_main.xml)
+          # 7. Layout XML
           cat << 'EOF' > app/src/main/res/layout/activity_main.xml
           <?xml version="1.0" encoding="utf-8"?>
           <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -214,7 +213,6 @@ jobs:
                   android:orientation="vertical"
                   android:padding="16dp">
 
-                  <!-- Header Title -->
                   <LinearLayout
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -254,7 +252,6 @@ jobs:
                           android:backgroundTint="#0D276B"/>
                   </LinearLayout>
 
-                  <!-- Search Box -->
                   <androidx.cardview.widget.CardView
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -284,7 +281,6 @@ jobs:
                       </LinearLayout>
                   </androidx.cardview.widget.CardView>
 
-                  <!-- Form Card -->
                   <androidx.cardview.widget.CardView
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -354,7 +350,6 @@ jobs:
                       </LinearLayout>
                   </androidx.cardview.widget.CardView>
 
-                  <!-- History Output -->
                   <TextView
                       android:id="@+id/tvHistoryHeader"
                       android:layout_width="wrap_content"
@@ -376,7 +371,7 @@ jobs:
           </ScrollView>
           EOF
 
-          # 8. Kotlin Main Activity Logic
+          # 8. MainActivity Kotlin Source
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
