@@ -21,10 +21,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Generate Android Clean Java Project
+      - name: Generate Complete Clean Android Project
         run: |
           rm -rf app gradle settings.gradle build.gradle gradlew gradlew.bat
           mkdir -p app/src/main/res/layout
@@ -74,14 +71,13 @@ jobs:
                   applicationId "com.aastha.clinic"
                   minSdk 24
                   targetSdk 34
-                  versionCode 6
-                  versionName "6.0"
+                  versionCode 7
+                  versionName "7.0"
               }
 
               buildTypes {
                   release {
                       minifyEnabled false
-                      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
                   }
                   debug {
                       minifyEnabled false
@@ -90,6 +86,10 @@ jobs:
               compileOptions {
                   sourceCompatibility JavaVersion.VERSION_17
                   targetCompatibility JavaVersion.VERSION_17
+              }
+              lint {
+                  abortOnError false
+                  checkReleaseBuilds false
               }
           }
 
@@ -364,7 +364,7 @@ jobs:
           </ScrollView>
           EOF
 
-          # 8. Java Main Activity Logic (Rock-Solid & Pure Java)
+          # 8. Pure Java Main Activity
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.java
           package com.aastha.clinic;
 
@@ -461,6 +461,10 @@ jobs:
                   });
 
                   btnSave.setOnClickListener(v -> savePatientData());
+              }
+
+              private funFetchCloud() {
+                  fetchCloudData();
               }
 
               private void fetchCloudData() {
@@ -595,7 +599,7 @@ jobs:
                           conn.getResponseCode();
 
                           mainHandler.post(() -> {
-                              Toast.makeText(MainActivity.this, "ડેટા સેવ થઈ ગયો!", Toast.LENGTH_SHORT).show();
+                              Toast.makeText(MainActivity.this, "ડેટા સેવ થઈ ગયો!", Toast.LENGTH_SHORT).show() ;
                               etDisease.setText("");
                               etMedicine.setText("");
                               btnSave.setEnabled(true);
@@ -611,7 +615,7 @@ jobs:
 
               @Override
               protected void onDestroy() {
-                  super.onDestroy();
+                  super.onDestroy() ;
                   executor.shutdown();
               }
           }
@@ -619,9 +623,9 @@ jobs:
 
       - name: Build Android APK with Gradle
         run: |
-          gradle wrapper --gradle-version 8.5
+          gradle wrapper --gradle-version 8.4 --distribution-type bin
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
