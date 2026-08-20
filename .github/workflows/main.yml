@@ -50,7 +50,7 @@ jobs:
           include ':app'
           EOF
 
-          # 2. build.gradle (Root - Clean Plugins)
+          # 2. build.gradle (Root)
           cat << 'EOF' > build.gradle
           plugins {
               id 'com.android.application' version '8.2.2' apply false
@@ -58,7 +58,7 @@ jobs:
           }
           EOF
 
-          # 3. app/build.gradle
+          # 3. app/build.gradle (Updated to compileSdk 35)
           cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
@@ -67,14 +67,14 @@ jobs:
 
           android {
               namespace 'com.aastha.clinic'
-              compileSdk 34
+              compileSdk 35
 
               defaultConfig {
                   applicationId "com.aastha.clinic"
                   minSdk 24
-                  targetSdk 34
-                  versionCode 2
-                  versionName "2.0"
+                  targetSdk 35
+                  versionCode 3
+                  versionName "3.0"
               }
 
               buildTypes {
@@ -109,7 +109,6 @@ jobs:
               implementation 'androidx.compose.ui:ui'
               implementation 'androidx.compose.ui:ui-graphics'
               implementation 'androidx.compose.material3:material3'
-              implementation 'androidx.compose.material:material-icons-extended'
               implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
           }
           EOF
@@ -182,7 +181,7 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 6. Main Application Source (No Login, Auto-Fill, History & Real-Time Sync)
+          # 6. Main Application Source
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
@@ -193,8 +192,6 @@ jobs:
           import androidx.compose.foundation.Image
           import androidx.compose.foundation.background
           import androidx.compose.foundation.layout.*
-          import androidx.compose.foundation.lazy.LazyColumn
-          import androidx.compose.foundation.lazy.items
           import androidx.compose.foundation.rememberScrollState
           import androidx.compose.foundation.shape.RoundedCornerShape
           import androidx.compose.foundation.verticalScroll
@@ -501,9 +498,9 @@ jobs:
 
       - name: Build Android APK
         run: |
-          gradle wrapper
+          gradle wrapper --gradle-version 8.4
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon || ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
