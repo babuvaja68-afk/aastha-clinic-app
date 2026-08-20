@@ -21,7 +21,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Clinic App with Offline Storage and Live Online Cloud Sync
+      - name: Setup Clinic App with Smart Medical Dictionary Auto Suggestion
         run: |
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
@@ -78,8 +78,8 @@ jobs:
                   applicationId "com.aastha.clinic"
                   minSdk 24
                   targetSdk 34
-                  versionCode 7
-                  versionName "7.0"
+                  versionCode 8
+                  versionName "8.0"
               }
 
               buildTypes {
@@ -200,7 +200,7 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # Main Application Code with Offline Local Cache + Online Sync
+          # Main Application Code with Built-in Medical Dictionary & Auto-Suggest
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
@@ -271,6 +271,42 @@ jobs:
               val timestamp: Long = System.currentTimeMillis()
           )
 
+          data class MedicalCondition(
+              val name: String,
+              val keywords: List<String>,
+              val defaultMedicine: String
+          )
+
+          // Built-in English Medical Dictionary for Auto-Suggest
+          object MedicalDictionary {
+              val conditions = listOf(
+                  MedicalCondition("Hypertension (High Blood Pressure)", listOf("bp", "high bp", "blood pressure", "hyper"), "Tab. Telmisartan 40mg (OD), Tab. Amlodipine 5mg (OD)"),
+                  MedicalCondition("Hypotension (Low Blood Pressure)", listOf("low bp", "bp low", "hypotension", "dizziness"), "Tab. Fludrocortisone, ORS Drink & Salt Intake"),
+                  MedicalCondition("Type 2 Diabetes Mellitus", listOf("sugar", "diabetes", "diabetic", "glycemia"), "Tab. Metformin 500mg (BD), Tab. Glimepiride 1mg (OD)"),
+                  MedicalCondition("Acute Viral Fever & Bodyache", listOf("fever", "taav", "viral", "body ache", "headache"), "Tab. Paracetamol 650mg (TDS), Tab. Pantocid 40mg"),
+                  MedicalCondition("GERD / Hyperacidity & Gastritis", listOf("gas", "acidity", "acid", "heartburn", "pet"), "Cap. Pantocid DSR (OD before food), Gelusil Syrup"),
+                  MedicalCondition("Upper Respiratory Tract Infection (Cold & Cough)", listOf("cold", "cough", "shardi", "throat", "urti"), "Tab. Montair LC (HS), Tab. Azithromycin 500mg (OD), Benadryl Syrup"),
+                  MedicalCondition("Allergic Bronchial Asthma", listOf("asthma", "breath", "dham", "wheezing"), "Levolin Inhaler 2 puffs SOS, Tab. Deriphyllin 150mg"),
+                  MedicalCondition("Acute Gastroenteritis (Diarrhea & Vomiting)", listOf("vomit", "ulati", "loose motion", "diarrhea", "jhad"), "Tab. Norflox-TZ (BD), Tab. Ondansetron 4mg, ORS Sachets"),
+                  MedicalCondition("Hypothyroidism", listOf("thyroid", "thyro", "tsh"), "Tab. Thyronorm 50mcg (OD Empty Stomach)"),
+                  MedicalCondition("Migraine & Tension Headache", listOf("headache", "migraine", "mathu"), "Tab. Naproxen 500mg SOS, Tab. Flunarizine 10mg (HS)"),
+                  MedicalCondition("Lumbar Spondylosis / Low Back Pain", listOf("back pain", "kamar", "spine", "spondylitis"), "Tab. Zerodol-P (BD), Tab. Thiocolchicoside 4mg, Volini Gel"),
+                  MedicalCondition("Osteoarthritis (Knee Joint Pain)", listOf("knee pain", "sandha", "arthritis", "joint"), "Tab. Osteocare, Tab. Etoricoxib 90mg (OD)"),
+                  MedicalCondition("Urinary Tract Infection (UTI)", listOf("urine", "peshab", "uti", "burning urine"), "Tab. Ciprofloxacin 500mg (BD), Citralka Liquid with water"),
+                  MedicalCondition("Skin Allergy / Urticaria / Dermatitis", listOf("skin", "allergy", "itch", "kharas", "rash"), "Tab. Allegra 120mg (OD), Betnovate-C Ointment"),
+                  MedicalCondition("Iron Deficiency Anemia", listOf("anemia", "weakness", "low hemoglobin", "thak"), "Tab. Autrin / Orofer XT (OD after meal)")
+              )
+
+              fun search(query: String): List<MedicalCondition> {
+                  if (query.isBlank()) return emptyList()
+                  val clean = query.trim().lowercase()
+                  return conditions.filter { condition ->
+                      condition.name.lowercase().contains(clean) ||
+                      condition.keywords.any { it.contains(clean) || clean.contains(it) }
+                  }
+              }
+          }
+
           enum class TextScale(val factor: Float, val label: String) {
               SMALL(0.85f, "Small (નાના)"),
               MEDIUM(1.0f, "Medium (સામાન્ય)"),
@@ -301,7 +337,6 @@ jobs:
               }
           }
 
-          // Offline Local Database Engine
           object LocalStorageManager {
               private const val PREF_NAME = "aastha_clinic_local_db"
               private const val KEY_PATIENTS = "saved_patients_json"
@@ -362,7 +397,6 @@ jobs:
               }
           }
 
-          // Online Cloud Sync Engine with Automatic Merge
           object CloudSyncManager {
               private const val CLOUD_URL = "https://jsonblob.com/api/jsonBlob/1341050011854495744"
 
@@ -509,7 +543,6 @@ jobs:
               val coroutineScope = rememberCoroutineScope()
               val todayDate = remember { getCurrentDate() }
 
-              // First load local storage (Instant startup even without internet)
               val patientList = remember {
                   mutableStateListOf<Patient>().apply {
                       addAll(LocalStorageManager.getLocalPatients(context))
@@ -548,7 +581,6 @@ jobs:
                           val cloudData = CloudSyncManager.fetchFromCloud()
                           if (cloudData != null) {
                               isOnline = true
-                              // Merge offline local list with online cloud list
                               val merged = (patientList + cloudData).distinctBy { it.id }.sortedByDescending { it.timestamp }
                               if (merged != patientList.toList()) {
                                   patientList.clear()
@@ -615,7 +647,7 @@ jobs:
                                           Toast.makeText(context, "Data Synced Online!", Toast.LENGTH_SHORT).show()
                                       } else {
                                           isOnline = false
-                                          Toast.makeText(context, "Offline Mode: Data saved in phone storage.", Toast.LENGTH_SHORT).show()
+                                          Toast.makeText(context, "Offline Mode: Saved locally in phone storage.", Toast.LENGTH_SHORT).show()
                                       }
                                   }
                               }) {
@@ -699,16 +731,13 @@ jobs:
                               doctorName = doctorName, onDoctorChange = { doctorName = it },
                               selectedSlot = selectedSlot, onSlotChange = { selectedSlot = it },
                               onSubmit = { newP ->
-                                  // 1. Add to instant RAM & Phone Storage (Always works 100% offline)
                                   patientList.add(0, newP)
                                   LocalStorageManager.savePatientsLocally(context, patientList)
 
-                                  // 2. Background push to Cloud if internet is available
                                   coroutineScope.launch {
                                       CloudSyncManager.pushToCloud(patientList)
                                   }
 
-                                  // 3. Trigger WhatsApp Confirmation
                                   sendWhatsAppAppointmentOnly(context, newP)
                                   nameInput = ""; phoneInput = ""; villageInput = ""; ageInput = ""; diseaseInput = ""; medicineInput = ""
                                   selectedTab = 0
@@ -720,6 +749,7 @@ jobs:
                                   villageInput = existing.village
                                   ageInput = existing.age
                                   diseaseInput = existing.disease
+                                  medicineInput = existing.medicine
                                   doctorName = existing.doctorName
                               }
                           )
@@ -985,12 +1015,20 @@ jobs:
           ) {
               val scrollState = rememberScrollState()
 
+              // Auto Match Returning Patients
               val matchingPatients = remember(phoneInput, nameInput) {
                   if (phoneInput.length >= 3 || nameInput.length >= 2) {
                       patientList.filter {
                           (phoneInput.isNotBlank() && it.phone.contains(phoneInput)) ||
                           (nameInput.isNotBlank() && it.name.contains(nameInput, ignoreCase = true))
                       }.distinctBy { it.phone }
+                  } else emptyList()
+              }
+
+              // Auto Search English Medical Conditions
+              val suggestedConditions = remember(diseaseInput) {
+                  if (diseaseInput.isNotBlank()) {
+                      MedicalDictionary.search(diseaseInput)
                   } else emptyList()
               }
 
@@ -1089,23 +1127,58 @@ jobs:
                   }
                   Spacer(modifier = Modifier.height(10.dp))
 
-                  Text("🩺 Clinical Diagnosis & Medicines (રોગ અને દવાઓ)", fontWeight = FontWeight.Bold, fontSize = (13 * scale).sp, color = textColor)
+                  // Smart Disease Auto-Suggest Search Input
+                  Text("🩺 Smart Diagnosis (બીમારી / રોગનું નામ ટાઈપ કરો):", fontWeight = FontWeight.Bold, fontSize = (13 * scale).sp, color = textColor)
                   Spacer(modifier = Modifier.height(4.dp))
 
                   OutlinedTextField(
                       value = diseaseInput,
                       onValueChange = onDiseaseChange,
-                      label = { Text("Diagnosis / Disease (રોગ / તકલીફ)", fontSize = (13 * scale).sp) },
-                      placeholder = { Text("e.g. Viral Fever, Acidity, Cough...") },
-                      modifier = Modifier.fillMaxWidth()
+                      label = { Text("Type English / Gujarati keyword (e.g. BP, Sugar, Taav, Gas)", fontSize = (12 * scale).sp) },
+                      modifier = Modifier.fillMaxWidth(),
+                      leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) }
                   )
+
+                  // Instant Auto-Suggestion Dropdown Card
+                  if (suggestedConditions.isNotEmpty()) {
+                      Card(
+                          modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                          colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                          elevation = CardDefaults.cardElevation(3.dp)
+                      ) {
+                          Column(modifier = Modifier.padding(8.dp)) {
+                              Text("💡 Tap below to auto-fill Disease & Standard Medicine:", fontSize = (11 * scale).sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                              suggestedConditions.take(4).forEach { cond ->
+                                  Row(
+                                      modifier = Modifier
+                                          .fillMaxWidth()
+                                          .clickable {
+                                              onDiseaseChange(cond.name)
+                                              if (medicineInput.isBlank()) {
+                                                  onMedicineChange(cond.defaultMedicine)
+                                              }
+                                          }
+                                          .padding(vertical = 6.dp),
+                                      horizontalArrangement = Arrangement.SpaceBetween,
+                                      verticalAlignment = Alignment.CenterVertically
+                                  ) {
+                                      Column(modifier = Modifier.weight(1f)) {
+                                          Text("• ${cond.name}", fontWeight = FontWeight.SemiBold, fontSize = (12 * scale).sp, color = Color(0xFF1B5E20))
+                                          Text("Rx: ${cond.defaultMedicine}", fontSize = (10 * scale).sp, color = Color(0xFF388E3C), maxLines = 1)
+                                      }
+                                      Text("Select ➡️", fontSize = (11 * scale).sp, color = Color(0xFF1565C0), fontWeight = FontWeight.Bold)
+                                  }
+                              }
+                          }
+                      }
+                  }
+
                   Spacer(modifier = Modifier.height(8.dp))
 
                   OutlinedTextField(
                       value = medicineInput,
                       onValueChange = onMedicineChange,
                       label = { Text("Prescribed Medicine / Treatment (દવાઓની વિગત)", fontSize = (13 * scale).sp) },
-                      placeholder = { Text("e.g. Paracetamol 650mg, Pantocid DSR...") },
                       modifier = Modifier.fillMaxWidth(),
                       minLines = 2
                   )
@@ -1317,7 +1390,8 @@ jobs:
                       Column(modifier = Modifier.padding(16.dp)) {
                           Text("🏥 Aastha Clinic System", fontWeight = FontWeight.Bold, fontSize = (14 * scale).sp, color = Color(0xFF0D276B))
                           Spacer(modifier = Modifier.height(4.dp))
-                          Text("• Offline Storage: Active (No Internet Required)", fontSize = (12 * scale).sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.SemiBold)
+                          Text("• Smart Medical Auto-Suggest: Active", fontSize = (12 * scale).sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.SemiBold)
+                          Text("• Offline Storage: Active (No Internet Required)", fontSize = (12 * scale).sp)
                           Text("• Online Cloud Sync: Automatic", fontSize = (12 * scale).sp)
                           Text("• Dr. Birju K. Sirodaria (11:00 AM - 03:30 PM)", fontSize = (12 * scale).sp)
                           Text("• Dr. Niddhi Javia (05:00 PM - 08:00 PM)", fontSize = (12 * scale).sp)
