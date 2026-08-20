@@ -21,15 +21,123 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Encrypted Secure Clinic App with Master PIN Lock
+      - name: Generate Complete App and Build Wrapper
         run: |
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
           mkdir -p app/src/main/java/com/aastha/clinic
+          mkdir -p gradle/wrapper
 
-          # 1. Clean Vector Brand Logo
+          # 1. Project Configuration Files
+          cat << 'EOF' > settings.gradle
+          rootProject.name = "AasthaClinic"
+          include ':app'
+          EOF
+
+          cat << 'EOF' > build.gradle
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.2.2'
+                  classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22'
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOF
+
+          cat << 'EOF' > app/build.gradle
+          plugins {
+              id 'com.android.application'
+              id 'org.jetbrains.kotlin.android'
+          }
+
+          android {
+              namespace 'com.aastha.clinic'
+              compileSdk 34
+
+              defaultConfig {
+                  applicationId "com.aastha.clinic"
+                  minSdk 24
+                  targetSdk 34
+                  versionCode 21
+                  versionName "2.1"
+              }
+
+              buildTypes {
+                  release {
+                      minifyEnabled false
+                      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+                  }
+                  debug {
+                      minifyEnabled false
+                  }
+              }
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = '17'
+              }
+              buildFeatures {
+                  compose true
+              }
+              composeOptions {
+                  kotlinCompilerExtensionVersion '1.5.8'
+              }
+          }
+
+          dependencies {
+              implementation platform('androidx.compose:compose-bom:2024.02.00')
+              implementation 'androidx.core:core-ktx:1.12.0'
+              implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+              implementation 'androidx.activity:activity-compose:1.8.2'
+              implementation 'androidx.compose.ui:ui'
+              implementation 'androidx.compose.ui:ui-graphics'
+              implementation 'androidx.compose.ui:ui-tooling-preview'
+              implementation 'androidx.compose.material3:material3'
+              implementation 'androidx.compose.material:material-icons-extended'
+              implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+          }
+          EOF
+
+          # 2. Android Manifest
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+              <application
+                  android:allowBackup="true"
+                  android:icon="@mipmap/ic_launcher"
+                  android:label="Aastha Clinic"
+                  android:roundIcon="@mipmap/ic_launcher"
+                  android:supportsRtl="true"
+                  android:theme="@android:style/Theme.Material.NoActionBar">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:windowSoftInputMode="adjustResize">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+
+          # 3. Clean Vector Brand Logo
           cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="200dp"
@@ -71,13 +179,10 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 2. Main Application Source
+          # 4. Main Application Source
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
-          import android.content.Context
-          import android.content.Intent
-          import android.net.Uri
           import android.os.Bundle
           import android.util.Base64
           import android.widget.Toast
@@ -86,8 +191,6 @@ jobs:
           import androidx.compose.foundation.Image
           import androidx.compose.foundation.background
           import androidx.compose.foundation.layout.*
-          import androidx.compose.foundation.lazy.LazyColumn
-          import androidx.compose.foundation.lazy.items
           import androidx.compose.foundation.rememberScrollState
           import androidx.compose.foundation.shape.RoundedCornerShape
           import androidx.compose.foundation.verticalScroll
@@ -440,10 +543,31 @@ jobs:
           }
           EOF
 
-      - name: Build Android APK
-        run: |
+          # 5. Gradle Wrapper Creation directly in this step
+          cat << 'EOF' > gradle/wrapper/gradle-wrapper.properties
+          distributionBase=GRADLE_USER_HOME
+          distributionPath=wrapper/dists
+          distributionUrl=https\://services.gradle.org/distributions/gradle-8.2-bin.zip
+          networkTimeout=10000
+          validateDistributionUrl=true
+          zipStoreBase=GRADLE_USER_HOME
+          zipStorePath=wrapper/dists
+          EOF
+
+          curl -sLo gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradle/wrapper/gradle-wrapper.jar
+
+          cat << 'EOF' > gradlew
+          #!/bin/sh
+          JAVA_EXE="java"
+          if [ -n "$JAVA_HOME" ] ; then
+              JAVA_EXE="$JAVA_HOME/bin/java"
+          fi
+          exec "$JAVA_EXE" -jar gradle/wrapper/gradle-wrapper.jar "$@"
+          EOF
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon || ./gradlew assembleDebug --no-daemon
+
+      - name: Build Android APK
+        run: ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
