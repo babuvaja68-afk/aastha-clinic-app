@@ -1,4 +1,4 @@
-  name: Build Aastha Clinic APK
+name: Build Aastha Clinic APK
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Generate Android Project Files
+      - name: Generate Android Clean Java Project
         run: |
           rm -rf app gradle settings.gradle build.gradle gradlew gradlew.bat
           mkdir -p app/src/main/res/layout
@@ -57,7 +57,6 @@ jobs:
           cat << 'EOF' > build.gradle
           plugins {
               id 'com.android.application' version '8.2.2' apply false
-              id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
           }
           EOF
 
@@ -65,7 +64,6 @@ jobs:
           cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
-              id 'org.jetbrains.kotlin.android'
           }
 
           android {
@@ -76,8 +74,8 @@ jobs:
                   applicationId "com.aastha.clinic"
                   minSdk 24
                   targetSdk 34
-                  versionCode 5
-                  versionName "5.0"
+                  versionCode 6
+                  versionName "6.0"
               }
 
               buildTypes {
@@ -93,17 +91,12 @@ jobs:
                   sourceCompatibility JavaVersion.VERSION_17
                   targetCompatibility JavaVersion.VERSION_17
               }
-              kotlinOptions {
-                  jvmTarget = '17'
-              }
           }
 
           dependencies {
-              implementation 'androidx.core:core-ktx:1.12.0'
               implementation 'androidx.appcompat:appcompat:1.6.1'
               implementation 'com.google.android.material:material:1.11.0'
               implementation 'androidx.cardview:cardview:1.0.0'
-              implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
           }
           EOF
 
@@ -371,223 +364,255 @@ jobs:
           </ScrollView>
           EOF
 
-          # 8. MainActivity Kotlin Source
-          cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
-          package com.aastha.clinic
+          # 8. Java Main Activity Logic (Rock-Solid & Pure Java)
+          cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.java
+          package com.aastha.clinic;
 
-          import android.os.Bundle
-          import android.text.Editable
-          import android.text.TextWatcher
-          import android.view.View
-          import android.widget.*
-          import androidx.appcompat.app.AppCompatActivity
-          import androidx.cardview.widget.CardView
-          import kotlinx.coroutines.*
-          import org.json.JSONArray
-          import org.json.JSONObject
-          import java.io.BufferedReader
-          import java.io.InputStreamReader
-          import java.io.OutputStreamWriter
-          import java.net.HttpURLConnection
-          import java.net.URL
-          import java.text.SimpleDateFormat
-          import java.util.*
+          import android.os.Bundle;
+          import android.os.Handler;
+          import android.os.Looper;
+          import android.text.Editable;
+          import android.text.TextWatcher;
+          import android.view.View;
+          import android.widget.Button;
+          import android.widget.EditText;
+          import android.widget.LinearLayout;
+          import android.widget.TextView;
+          import android.widget.Toast;
+          import androidx.appcompat.app.AppCompatActivity;
+          import androidx.cardview.widget.CardView;
+          import org.json.JSONArray;
+          import org.json.JSONObject;
+          import java.io.BufferedReader;
+          import java.io.InputStreamReader;
+          import java.io.OutputStreamWriter;
+          import java.net.HttpURLConnection;
+          import java.net.URL;
+          import java.text.SimpleDateFormat;
+          import java.util.ArrayList;
+          import java.util.Date;
+          import java.util.List;
+          import java.util.Locale;
+          import java.util.concurrent.ExecutorService;
+          import java.util.concurrent.Executors;
 
-          data class PatientRecord(
-              val name: String,
-              val phone: String,
-              val village: String,
-              val disease: String,
-              val medicine: String,
-              val date: String
-          )
+          public class MainActivity extends AppCompatActivity {
 
-          class MainActivity : AppCompatActivity() {
+              public static class PatientRecord {
+                  public String name;
+                  public String phone;
+                  public String village;
+                  public String disease;
+                  public String medicine;
+                  public String date;
 
-              private val cloudUrl = "https://jsonblob.com/api/jsonBlob/1341050011854495744"
-              private val patientList = mutableListOf<PatientRecord>()
-              private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
-
-              private lateinit var etSearch: EditText
-              private lateinit var etName: EditText
-              private lateinit var etVillage: EditText
-              private lateinit var etMobile: EditText
-              private lateinit var etDisease: EditText
-              private lateinit var etMedicine: EditText
-              private lateinit var btnSave: Button
-              private lateinit var btnSync: Button
-              private lateinit var tvHistoryHeader: TextView
-              private lateinit var historyContainer: LinearLayout
-
-              override fun onCreate(savedInstanceState: Bundle?) {
-                  super.onCreate(savedInstanceState)
-                  setContentView(R.layout.activity_main)
-
-                  etSearch = findViewById(R.id.etSearch)
-                  etName = findViewById(R.id.etName)
-                  etVillage = findViewById(R.id.etVillage)
-                  etMobile = findViewById(R.id.etMobile)
-                  etDisease = findViewById(R.id.etDisease)
-                  etMedicine = findViewById(R.id.etMedicine)
-                  btnSave = findViewById(R.id.btnSave)
-                  btnSync = findViewById(R.id.btnSync)
-                  tvHistoryHeader = findViewById(R.id.tvHistoryHeader)
-                  historyContainer = findViewById(R.id.historyContainer)
-
-                  fetchCloudData()
-
-                  btnSync.setOnClickListener {
-                      fetchCloudData()
-                      Toast.makeText(this, "સિંક થઈ રહ્યું છે...", Toast.LENGTH_SHORT).show()
-                  }
-
-                  etSearch.addTextChangedListener(object : TextWatcher {
-                      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                          filterAndAutofill(s.toString().trim())
-                      }
-                      override fun afterTextChanged(s: Editable?) {}
-                  })
-
-                  btnSave.setOnClickListener {
-                      savePatientData()
+                  public PatientRecord(String name, String phone, String village, String disease, String medicine, String date) {
+                      this.name = name;
+                      this.phone = phone;
+                      this.village = village;
+                      this.disease = disease;
+                      this.medicine = medicine;
+                      this.date = date;
                   }
               }
 
-              private fun fetchCloudData() {
-                  coroutineScope.launch(Dispatchers.IO) {
+              private final String cloudUrl = "https://jsonblob.com/api/jsonBlob/1341050011854495744";
+              private final List<PatientRecord> patientList = new ArrayList<>();
+              private final ExecutorService executor = Executors.newSingleThreadExecutor();
+              private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+              private EditText etSearch, etName, etVillage, etMobile, etDisease, etMedicine;
+              private Button btnSave, btnSync;
+              private TextView tvHistoryHeader;
+              private LinearLayout historyContainer;
+
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  setContentView(R.layout.activity_main);
+
+                  etSearch = findViewById(R.id.etSearch);
+                  etName = findViewById(R.id.etName);
+                  etVillage = findViewById(R.id.etVillage);
+                  etMobile = findViewById(R.id.etMobile);
+                  etDisease = findViewById(R.id.etDisease);
+                  etMedicine = findViewById(R.id.etMedicine);
+                  btnSave = findViewById(R.id.btnSave);
+                  btnSync = findViewById(R.id.btnSync);
+                  tvHistoryHeader = findViewById(R.id.tvHistoryHeader);
+                  historyContainer = findViewById(R.id.historyContainer);
+
+                  fetchCloudData();
+
+                  btnSync.setOnClickListener(v -> {
+                      fetchCloudData();
+                      Toast.makeText(MainActivity.this, "સિંક થઈ રહ્યું છે...", Toast.LENGTH_SHORT).show();
+                  });
+
+                  etSearch.addTextChangedListener(new TextWatcher() {
+                      @Override
+                      public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                      @Override
+                      public void onTextChanged(CharSequence s, int start, int before, int count) {
+                          filterAndAutofill(s.toString().trim());
+                      }
+                      @Override
+                      public void afterTextChanged(Editable s) {}
+                  });
+
+                  btnSave.setOnClickListener(v -> savePatientData());
+              }
+
+              private void fetchCloudData() {
+                  executor.execute(() -> {
                       try {
-                          val conn = URL(cloudUrl).openConnection() as HttpURLConnection
-                          conn.requestMethod = "GET"
-                          if (conn.responseCode == 200) {
-                              val reader = BufferedReader(InputStreamReader(conn.inputStream))
-                              val response = reader.readText()
-                              val jsonArray = JSONArray(response)
-                              val list = mutableListOf<PatientRecord>()
-                              for (i in 0 until jsonArray.length()) {
-                                  val obj = jsonArray.getJSONObject(i)
-                                  list.add(
-                                      PatientRecord(
-                                          name = obj.optString("name"),
-                                          phone = obj.optString("phone"),
-                                          village = obj.optString("village"),
-                                          disease = obj.optString("disease"),
-                                          medicine = obj.optString("medicine"),
-                                          date = obj.optString("date")
-                                      )
-                                  )
+                          URL url = new URL(cloudUrl);
+                          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                          conn.setRequestMethod("GET");
+                          if (conn.getResponseCode() == 200) {
+                              BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                              StringBuilder response = new StringBuilder();
+                              String line;
+                              while ((line = reader.readLine()) != null) {
+                                  response.append(line);
                               }
-                              withContext(Dispatchers.Main) {
-                                  patientList.clear()
-                                  patientList.addAll(list)
+                              reader.close();
+
+                              JSONArray jsonArray = new JSONArray(response.toString());
+                              final List<PatientRecord> fetchedList = new ArrayList<>();
+                              for (int i = 0; i < jsonArray.length(); i++) {
+                                  JSONObject obj = jsonArray.getJSONObject(i);
+                                  fetchedList.add(new PatientRecord(
+                                          obj.optString("name"),
+                                          obj.optString("phone"),
+                                          obj.optString("village"),
+                                          obj.optString("disease"),
+                                          obj.optString("medicine"),
+                                          obj.optString("date")
+                                  ));
                               }
+
+                              mainHandler.post(() -> {
+                                  patientList.clear();
+                                  patientList.addAll(fetchedList);
+                              });
                           }
-                      } catch (e: Exception) {
-                          e.printStackTrace()
+                      } catch (Exception e) {
+                          e.printStackTrace();
                       }
-                  }
+                  });
               }
 
-              private fun filterAndAutofill(query: String) {
-                  historyContainer.removeAllViews()
-                  if (query.length < 2) {
-                      tvHistoryHeader.visibility = View.GONE
-                      return
+              private void filterAndAutofill(String query) {
+                  historyContainer.removeAllViews();
+                  if (query.length() < 2) {
+                      tvHistoryHeader.setVisibility(View.GONE);
+                      return;
                   }
 
-                  val matches = patientList.filter {
-                      it.name.contains(query, ignoreCase = true) || it.phone.contains(query)
+                  List<PatientRecord> matches = new ArrayList<>();
+                  for (PatientRecord p : patientList) {
+                      if (p.name.toLowerCase().contains(query.toLowerCase()) || p.phone.contains(query)) {
+                          matches.add(p);
+                      }
                   }
 
-                  if (matches.isNotEmpty()) {
-                      val latest = matches.last()
-                      etName.setText(latest.name)
-                      etVillage.setText(latest.village)
-                      etMobile.setText(latest.phone)
+                  if (!matches.isEmpty()) {
+                      PatientRecord latest = matches.get(matches.size() - 1);
+                      etName.setText(latest.name);
+                      etVillage.setText(latest.village);
+                      etMobile.setText(latest.phone);
 
-                      tvHistoryHeader.visibility = View.VISIBLE
-                      matches.reversed().forEach { item ->
-                          val card = CardView(this).apply {
-                              radius = 16f
-                              setCardBackgroundColor(0xFFF8FAFC.toInt())
-                              setContentPadding(20, 20, 20, 20)
-                              val params = LinearLayout.LayoutParams(
+                      tvHistoryHeader.setVisibility(View.VISIBLE);
+                      for (int i = matches.size() - 1; i >= 0; i--) {
+                          PatientRecord item = matches.get(i);
+                          CardView card = new CardView(this);
+                          card.setRadius(16f);
+                          card.setCardBackgroundColor(0xFFF8FAFC);
+                          card.setContentPadding(24, 24, 24, 24);
+
+                          LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                   LinearLayout.LayoutParams.MATCH_PARENT,
                                   LinearLayout.LayoutParams.WRAP_CONTENT
-                              ).apply { setMargins(0, 0, 0, 16) }
-                              layoutParams = params
-                          }
+                          );
+                          params.setMargins(0, 0, 0, 16);
+                          card.setLayoutParams(params);
 
-                          val text = TextView(this).apply {
-                              this.text = "📅 ${item.date}\n🩺 રોગ: ${item.disease}\n💊 દવા: ${item.medicine}"
-                              setTextColor(0xFF1E293B.toInt())
-                              textSize = 14f
-                          }
-                          card.addView(text)
-                          historyContainer.addView(card)
+                          TextView text = new TextView(this);
+                          text.setText("📅 " + item.date + "\n🩺 રોગ: " + item.disease + "\n💊 દવા: " + item.medicine);
+                          text.setTextColor(0xFF1E293B);
+                          text.setTextSize(14f);
+
+                          card.addView(text);
+                          historyContainer.addView(card);
                       }
                   } else {
-                      tvHistoryHeader.visibility = View.GONE
+                      tvHistoryHeader.setVisibility(View.GONE);
                   }
               }
 
-              private fun savePatientData() {
-                  val name = etName.text.toString().trim()
-                  val village = etVillage.text.toString().trim()
-                  val mobile = etMobile.text.toString().trim()
-                  val disease = etDisease.text.toString().trim()
-                  val medicine = etMedicine.text.toString().trim()
+              private void savePatientData() {
+                  String name = etName.getText().toString().trim();
+                  String village = etVillage.getText().toString().trim();
+                  String mobile = etMobile.getText().toString().trim();
+                  String disease = etDisease.getText().toString().trim();
+                  String medicine = etMedicine.getText().toString().trim();
 
                   if (name.isEmpty() || mobile.isEmpty()) {
-                      Toast.makeText(this, "નામ અને મોબાઈલ નંબર જરૂરી છે", Toast.LENGTH_SHORT).show()
-                      return
+                      Toast.makeText(this, "નામ અને મોબાઈલ નંબર જરૂરી છે", Toast.LENGTH_SHORT).show();
+                      return;
                   }
 
-                  btnSave.isEnabled = false
-                  val sdf = SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault())
-                  val record = PatientRecord(name, mobile, village, disease, medicine, sdf.format(Date()))
-                  patientList.add(record)
+                  btnSave.setEnabled(false);
+                  SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault());
+                  PatientRecord record = new PatientRecord(name, mobile, village, disease, medicine, sdf.format(new Date()));
+                  patientList.add(record);
 
-                  coroutineScope.launch(Dispatchers.IO) {
+                  executor.execute(() -> {
                       try {
-                          val conn = URL(cloudUrl).openConnection() as HttpURLConnection
-                          conn.requestMethod = "PUT"
-                          conn.setRequestProperty("Content-Type", "application/json")
-                          conn.doOutput = true
+                          URL url = new URL(cloudUrl);
+                          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                          conn.setRequestMethod("PUT");
+                          conn.setRequestProperty("Content-Type", "application/json");
+                          conn.setDoOutput(true);
 
-                          val array = JSONArray()
-                          patientList.forEach { p ->
-                              val obj = JSONObject()
-                              obj.put("name", p.name)
-                              obj.put("phone", p.phone)
-                              obj.put("village", p.village)
-                              obj.put("disease", p.disease)
-                              obj.put("medicine", p.medicine)
-                              obj.put("date", p.date)
-                              array.put(obj)
+                          JSONArray array = new JSONArray();
+                          for (PatientRecord p : patientList) {
+                              JSONObject obj = new JSONObject();
+                              obj.put("name", p.name);
+                              obj.put("phone", p.phone);
+                              obj.put("village", p.village);
+                              obj.put("disease", p.disease);
+                              obj.put("medicine", p.medicine);
+                              obj.put("date", p.date);
+                              array.put(obj);
                           }
-                          val wr = OutputStreamWriter(conn.outputStream)
-                          wr.write(array.toString())
-                          wr.flush()
 
-                          withContext(Dispatchers.Main) {
-                              Toast.makeText(this@MainActivity, "ડેટા સેવ થઈ ગયો!", Toast.LENGTH_SHORT).show()
-                              etDisease.setText("")
-                              etMedicine.setText("")
-                              btnSave.isEnabled = true
-                          }
-                      } catch (e: Exception) {
-                          withContext(Dispatchers.Main) {
-                              Toast.makeText(this@MainActivity, "સેવ કરવામાં ભૂલ આવી", Toast.LENGTH_SHORT).show()
-                              btnSave.isEnabled = true
-                          }
+                          OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                          wr.write(array.toString());
+                          wr.flush();
+                          wr.close();
+                          conn.getResponseCode();
+
+                          mainHandler.post(() -> {
+                              Toast.makeText(MainActivity.this, "ડેટા સેવ થઈ ગયો!", Toast.LENGTH_SHORT).show();
+                              etDisease.setText("");
+                              etMedicine.setText("");
+                              btnSave.setEnabled(true);
+                          });
+                      } catch (Exception e) {
+                          mainHandler.post(() -> {
+                              Toast.makeText(MainActivity.this, "સેવ કરવામાં ભૂલ આવી", Toast.LENGTH_SHORT).show();
+                              btnSave.setEnabled(true);
+                          });
                       }
-                  }
+                  });
               }
 
-              override fun onDestroy() {
-                  super.onDestroy()
-                  coroutineScope.cancel()
+              @Override
+              protected void onDestroy() {
+                  super.onDestroy();
+                  executor.shutdown();
               }
           }
           EOF
