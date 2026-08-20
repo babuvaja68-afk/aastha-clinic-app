@@ -27,6 +27,7 @@ jobs:
       - name: Generate Clean Android Project Files
         run: |
           rm -rf app gradle settings.gradle build.gradle gradlew gradlew.bat
+          mkdir -p app/src/main/res/layout
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
@@ -75,8 +76,8 @@ jobs:
                   applicationId "com.aastha.clinic"
                   minSdk 24
                   targetSdk 34
-                  versionCode 3
-                  versionName "3.0"
+                  versionCode 4
+                  versionName "4.0"
               }
 
               buildTypes {
@@ -95,24 +96,13 @@ jobs:
               kotlinOptions {
                   jvmTarget = '17'
               }
-              buildFeatures {
-                  compose true
-              }
-              composeOptions {
-                  kotlinCompilerExtensionVersion '1.5.8'
-              }
           }
 
           dependencies {
               implementation 'androidx.core:core-ktx:1.12.0'
-              implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
-              implementation 'androidx.activity:activity-compose:1.8.2'
-              implementation platform('androidx.compose:compose-bom:2024.02.00')
-              implementation 'androidx.compose.ui:ui'
-              implementation 'androidx.compose.ui:ui-graphics'
-              implementation 'androidx.compose.ui:ui-tooling-preview'
-              implementation 'androidx.compose.material3:material3'
-              implementation 'androidx.compose.material:material-icons-extended'
+              implementation 'androidx.appcompat:appcompat:1.6.1'
+              implementation 'com.google.android.material:material:1.11.0'
+              implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
               implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
           }
           EOF
@@ -129,7 +119,7 @@ jobs:
                   android:label="Aastha Clinic"
                   android:roundIcon="@mipmap/ic_launcher"
                   android:supportsRtl="true"
-                  android:theme="@android:style/Theme.Material.NoActionBar">
+                  android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
                   <activity
                       android:name=".MainActivity"
                       android:exported="true"
@@ -143,7 +133,31 @@ jobs:
           </manifest>
           EOF
 
-          # 5. Icons
+          # 5. Resources & Colors
+          cat << 'EOF' > app/src/main/res/values/colors.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="primary">#0D276B</color>
+              <color name="primary_dark">#081842</color>
+              <color name="accent">#D32F2F</color>
+              <color name="bg_gray">#F4F6F9</color>
+              <color name="white">#FFFFFF</color>
+              <color name="card_bg">#E3F2FD</color>
+          </resources>
+          EOF
+
+          cat << 'EOF' > app/src/main/res/values/themes.xml
+          <resources>
+              <style name="Theme.AasthaClinic" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+                  <item name="colorPrimary">@color/primary</item>
+                  <item name="colorPrimaryDark">@color/primary_dark</item>
+                  <item name="colorAccent">@color/accent</item>
+                  <item name="android:windowBackground">@color/bg_gray</item>
+              </style>
+          </resources>
+          EOF
+
+          # 6. Icons
           cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="200dp"
@@ -185,32 +199,195 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 6. Source Code (Direct Access, Cloud Sync & Auto-Fill)
+          # 7. Layout (activity_main.xml)
+          cat << 'EOF' > app/src/main/res/layout/activity_main.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#F4F6F9">
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:padding="16dp">
+
+                  <!-- Header Title -->
+                  <LinearLayout
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:gravity="center_vertical"
+                      android:padding="8dp">
+                      <ImageView
+                          android:layout_width="45dp"
+                          android:layout_height="45dp"
+                          android:src="@drawable/ic_aastha_brand_logo"/>
+                      <LinearLayout
+                          android:layout_width="0dp"
+                          android:layout_weight="1"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:layout_marginStart="12dp">
+                          <TextView
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="Aastha Clinic"
+                              android:textSize="20sp"
+                              android:textStyle="bold"
+                              android:textColor="#0D276B"/>
+                          <TextView
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="દર્દી રજીસ્ટ્રેશન &amp; રેકોર્ડ"
+                              android:textSize="12sp"
+                              android:textColor="#546E7A"/>
+                      </LinearLayout>
+                      <Button
+                          android:id="@+id/btnSync"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="Sync"
+                          android:textSize="12sp"
+                          android:backgroundTint="#0D276B"/>
+                  </LinearLayout>
+
+                  <!-- Search Box -->
+                  <androidx.cardview.widget.CardView
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      app:cardCornerRadius="10dp"
+                      app:cardElevation="2dp"
+                      app:cardBackgroundColor="#E3F2FD"
+                      android:layout_marginTop="12dp">
+                      <LinearLayout
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:padding="12dp">
+                          <TextView
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="🔍 જૂના દર્દી શોધો (નામ અથવા નંબર):"
+                              android:textStyle="bold"
+                              android:textColor="#0D276B"/>
+                          <EditText
+                              android:id="@+id/etSearch"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:hint="દા.ત. Raju Pandit અથવા 9898..."
+                              android:background="@android:drawable/editbox_background_normal"
+                              android:padding="10dp"
+                              android:layout_marginTop="6dp"/>
+                      </LinearLayout>
+                  </androidx.cardview.widget.CardView>
+
+                  <!-- Form Card -->
+                  <androidx.cardview.widget.CardView
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      app:cardCornerRadius="10dp"
+                      app:cardElevation="3dp"
+                      app:cardBackgroundColor="#FFFFFF"
+                      android:layout_marginTop="16dp">
+                      <LinearLayout
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:padding="16dp">
+
+                          <TextView
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="દર્દીની વિગત ઉમેરો"
+                              android:textStyle="bold"
+                              android:textSize="16sp"
+                              android:textColor="#0D276B"/>
+
+                          <EditText
+                              android:id="@+id/etName"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:hint="દર્દીનું પૂરું નામ"
+                              android:layout_marginTop="10dp"/>
+
+                          <EditText
+                              android:id="@+id/etVillage"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:hint="ગામ / શહેર"
+                              android:layout_marginTop="8dp"/>
+
+                          <EditText
+                              android:id="@+id/etMobile"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:hint="મોબાઈલ નંબર"
+                              android:inputType="phone"
+                              android:layout_marginTop="8dp"/>
+
+                          <EditText
+                              android:id="@+id/etDisease"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:hint="શેના માટે દવા લીધી (તકલીફ / રોગ)"
+                              android:layout_marginTop="8dp"/>
+
+                          <EditText
+                              android:id="@+id/etMedicine"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:hint="આપેલી દવાઓની વિગત"
+                              android:layout_marginTop="8dp"/>
+
+                          <Button
+                              android:id="@+id/btnSave"
+                              android:layout_width="match_parent"
+                              android:layout_height="50dp"
+                              android:text="ડેટા સેવ કરો (Save Visit)"
+                              android:backgroundTint="#0D276B"
+                              android:textColor="#FFFFFF"
+                              android:textStyle="bold"
+                              android:layout_marginTop="16dp"/>
+                      </LinearLayout>
+                  </androidx.cardview.widget.CardView>
+
+                  <!-- History Output -->
+                  <TextView
+                      android:id="@+id/tvHistoryHeader"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="📋 અગાઉની હિસ્ટ્રી:"
+                      android:textStyle="bold"
+                      android:textColor="#0D276B"
+                      android:layout_marginTop="20dp"
+                      android:visibility="gone"/>
+
+                  <LinearLayout
+                      android:id="@+id/historyContainer"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:layout_marginTop="8dp"/>
+
+              </LinearLayout>
+          </ScrollView>
+          EOF
+
+          # 8. Kotlin Main Activity Logic
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
           import android.os.Bundle
-          import android.widget.Toast
-          import androidx.activity.ComponentActivity
-          import androidx.activity.compose.setContent
-          import androidx.compose.foundation.background
-          import androidx.compose.foundation.layout.*
-          import androidx.compose.foundation.rememberScrollState
-          import androidx.compose.foundation.shape.RoundedCornerShape
-          import androidx.compose.foundation.verticalScroll
-          import androidx.compose.material.icons.Icons
-          import androidx.compose.material.icons.filled.Refresh
-          import androidx.compose.material3.*
-          import androidx.compose.runtime.*
-          import androidx.compose.ui.Modifier
-          import androidx.compose.ui.graphics.Color
-          import androidx.compose.ui.platform.LocalContext
-          import androidx.compose.ui.text.font.FontWeight
-          import androidx.compose.ui.unit.dp
-          import androidx.compose.ui.unit.sp
-          import kotlinx.coroutines.Dispatchers
-          import kotlinx.coroutines.launch
-          import kotlinx.coroutines.withContext
+          import android.text.Editable
+          import android.text.TextWatcher
+          import android.view.View
+          import android.widget.*
+          import androidx.appcompat.app.AppCompatActivity
+          import androidx.cardview.widget.CardView
+          import kotlinx.coroutines.*
           import org.json.JSONArray
           import org.json.JSONObject
           import java.io.BufferedReader
@@ -222,7 +399,6 @@ jobs:
           import java.util.*
 
           data class PatientRecord(
-              val id: String = UUID.randomUUID().toString(),
               val name: String,
               val phone: String,
               val village: String,
@@ -231,49 +407,63 @@ jobs:
               val date: String
           )
 
-          object CloudDBManager {
-              private const val CLOUD_URL = "https://jsonblob.com/api/jsonBlob/1341050011854495744"
+          class MainActivity : AppCompatActivity() {
 
-              suspend fun pushToCloud(records: List<PatientRecord>) {
-                  withContext(Dispatchers.IO) {
-                      try {
-                          val url = URL(CLOUD_URL)
-                          val conn = url.openConnection() as HttpURLConnection
-                          conn.requestMethod = "PUT"
-                          conn.setRequestProperty("Content-Type", "application/json")
-                          conn.doOutput = true
+              private val cloudUrl = "https://jsonblob.com/api/jsonBlob/1341050011854495744"
+              private val patientList = mutableListOf<PatientRecord>()
+              private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
-                          val jsonArray = JSONArray()
-                          records.forEach { p ->
-                              val obj = JSONObject()
-                              obj.put("id", p.id)
-                              obj.put("name", p.name)
-                              obj.put("phone", p.phone)
-                              obj.put("village", p.village)
-                              obj.put("disease", p.disease)
-                              obj.put("medicine", p.medicine)
-                              obj.put("date", p.date)
-                              jsonArray.put(obj)
-                          }
+              private lateinit var etSearch: EditText
+              private lateinit var etName: EditText
+              private lateinit var etVillage: EditText
+              private lateinit var etMobile: EditText
+              private lateinit var etDisease: EditText
+              private lateinit var etMedicine: EditText
+              private lateinit var btnSave: Button
+              private lateinit var btnSync: Button
+              private lateinit var tvHistoryHeader: TextView
+              private lateinit var historyContainer: LinearLayout
 
-                          val wr = OutputStreamWriter(conn.outputStream)
-                          wr.write(jsonArray.toString())
-                          wr.flush()
-                          conn.responseCode
-                      } catch (e: Exception) {
-                          e.printStackTrace()
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+                  setContentView(R.layout.activity_main)
+
+                  etSearch = findViewById(R.id.etSearch)
+                  etName = findViewById(R.id.etName)
+                  etVillage = findViewById(R.id.etVillage)
+                  etMobile = findViewById(R.id.etMobile)
+                  etDisease = findViewById(R.id.etDisease)
+                  etMedicine = findViewById(R.id.etMedicine)
+                  btnSave = findViewById(R.id.btnSave)
+                  btnSync = findViewById(R.id.btnSync)
+                  tvHistoryHeader = findViewById(R.id.tvHistoryHeader)
+                  historyContainer = findViewById(R.id.historyContainer)
+
+                  fetchCloudData()
+
+                  btnSync.setOnClickListener {
+                      fetchCloudData()
+                      Toast.makeText(this, "સિંક થઈ રહ્યું છે...", Toast.LENGTH_SHORT).show()
+                  }
+
+                  etSearch.addTextChangedListener(object : TextWatcher {
+                      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                          filterAndAutofill(s.toString().trim())
                       }
+                      override fun afterTextChanged(s: Editable?) {}
+                  })
+
+                  btnSave.setOnClickListener {
+                      savePatientData()
                   }
               }
 
-              suspend fun fetchFromCloud(): List<PatientRecord>? {
-                  return withContext(Dispatchers.IO) {
+              private fun fetchCloudData() {
+                  coroutineScope.launch(Dispatchers.IO) {
                       try {
-                          val url = URL(CLOUD_URL)
-                          val conn = url.openConnection() as HttpURLConnection
+                          val conn = URL(cloudUrl).openConnection() as HttpURLConnection
                           conn.requestMethod = "GET"
-                          conn.setRequestProperty("Accept", "application/json")
-
                           if (conn.responseCode == 200) {
                               val reader = BufferedReader(InputStreamReader(conn.inputStream))
                               val response = reader.readText()
@@ -283,240 +473,126 @@ jobs:
                                   val obj = jsonArray.getJSONObject(i)
                                   list.add(
                                       PatientRecord(
-                                          id = obj.optString("id", UUID.randomUUID().toString()),
-                                          name = obj.optString("name", ""),
-                                          phone = obj.optString("phone", ""),
-                                          village = obj.optString("village", ""),
-                                          disease = obj.optString("disease", ""),
-                                          medicine = obj.optString("medicine", ""),
-                                          date = obj.optString("date", "")
+                                          name = obj.optString("name"),
+                                          phone = obj.optString("phone"),
+                                          village = obj.optString("village"),
+                                          disease = obj.optString("disease"),
+                                          medicine = obj.optString("medicine"),
+                                          date = obj.optString("date")
                                       )
                                   )
                               }
-                              list
-                          } else {
-                              null
+                              withContext(Dispatchers.Main) {
+                                  patientList.clear()
+                                  patientList.addAll(list)
+                              }
                           }
                       } catch (e: Exception) {
-                          null
-                      }
-                  }
-              }
-          }
-
-          class MainActivity : ComponentActivity() {
-              override fun onCreate(savedInstanceState: Bundle?) {
-                  super.onCreate(savedInstanceState)
-                  setContent {
-                      AasthaClinicApp()
-                  }
-              }
-          }
-
-          @OptIn(ExperimentalMaterial3Api::class)
-          @Composable
-          fun AasthaClinicApp() {
-              val context = LocalContext.current
-              val coroutineScope = rememberCoroutineScope()
-
-              val allPatients = remember { mutableStateListOf<PatientRecord>() }
-              var searchQuery by remember { mutableStateOf("") }
-
-              var patientName by remember { mutableStateOf("") }
-              var villageName by remember { mutableStateOf("") }
-              var mobileNumber by remember { mutableStateOf("") }
-              var diseaseText by remember { mutableStateOf("") }
-              var medicineText by remember { mutableStateOf("") }
-
-              var matchedHistory by remember { mutableStateOf<List<PatientRecord>>(emptyList()) }
-              var isSaving by remember { mutableStateOf(false) }
-
-              fun refreshCloud() {
-                  coroutineScope.launch {
-                      val cloudData = CloudDBManager.fetchFromCloud()
-                      if (!cloudData.isNullOrEmpty()) {
-                          allPatients.clear()
-                          allPatients.addAll(cloudData)
+                          e.printStackTrace()
                       }
                   }
               }
 
-              LaunchedEffect(Unit) {
-                  refreshCloud()
-              }
+              private fun filterAndAutofill(query: String) {
+                  historyContainer.removeAllViews()
+                  if (query.length < 2) {
+                      tvHistoryHeader.visibility = View.GONE
+                      return
+                  }
 
-              fun onSearchInput(query: String) {
-                  searchQuery = query
-                  if (query.trim().length >= 2) {
-                      val matches = allPatients.filter {
-                          it.name.contains(query, ignoreCase = true) || it.phone.contains(query)
-                      }
-                      matchedHistory = matches
-                      if (matches.isNotEmpty()) {
-                          val latest = matches.last()
-                          patientName = latest.name
-                          villageName = latest.village
-                          mobileNumber = latest.phone
+                  val matches = patientList.filter {
+                      it.name.contains(query, ignoreCase = true) || it.phone.contains(query)
+                  }
+
+                  if (matches.isNotEmpty()) {
+                      val latest = matches.last()
+                      etName.setText(latest.name)
+                      etVillage.setText(latest.village)
+                      etMobile.setText(latest.phone)
+
+                      tvHistoryHeader.visibility = View.VISIBLE
+                      matches.reversed().forEach { item ->
+                          val card = CardView(this).apply {
+                              radius = 16f
+                              setCardBackgroundColor(0xFFF8FAFC.toInt())
+                              setContentPadding(20, 20, 20, 20)
+                              val params = LinearLayout.LayoutParams(
+                                  LinearLayout.LayoutParams.MATCH_PARENT,
+                                  LinearLayout.LayoutParams.WRAP_CONTENT
+                              ).apply { setMargins(0, 0, 0, 16) }
+                              layoutParams = params
+                          }
+
+                          val text = TextView(this).apply {
+                              this.text = "📅 ${item.date}\n🩺 રોગ: ${item.disease}\n💊 દવા: ${item.medicine}"
+                              setTextColor(0xFF1E293B.toInt())
+                              textSize = 14f
+                          }
+                          card.addView(text)
+                          historyContainer.addView(card)
                       }
                   } else {
-                      matchedHistory = emptyList()
+                      tvHistoryHeader.visibility = View.GONE
                   }
               }
 
-              Scaffold(
-                  topBar = {
-                      TopAppBar(
-                          title = {
-                              Column {
-                                  Text("Aastha Clinic", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
-                                  Text("દર્દી રજીસ્ટ્રેશન & રેકોર્ડ", fontSize = 12.sp, color = Color(0xFFBBDEFB))
-                              }
-                          },
-                          colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0D276B)),
-                          actions = {
-                              IconButton(onClick = { refreshCloud() }) {
-                                  Icon(Icons.Default.Refresh, contentDescription = "Sync", tint = Color.White)
-                              }
-                          }
-                      )
+              private fun savePatientData() {
+                  val name = etName.text.toString().trim()
+                  val village = etVillage.text.toString().trim()
+                  val mobile = etMobile.text.toString().trim()
+                  val disease = etDisease.text.toString().trim()
+                  val medicine = etMedicine.text.toString().trim()
+
+                  if (name.isEmpty() || mobile.isEmpty()) {
+                      Toast.makeText(this, "નામ અને મોબાઈલ નંબર જરૂરી છે", Toast.LENGTH_SHORT).show()
+                      return
                   }
-              ) { padding ->
-                  Column(
-                      modifier = Modifier
-                          .fillMaxSize()
-                          .padding(padding)
-                          .background(Color(0xFFF4F6F9))
-                          .verticalScroll(rememberScrollState())
-                          .padding(16.dp)
-                  ) {
-                      Card(
-                          modifier = Modifier.fillMaxWidth(),
-                          colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
-                          shape = RoundedCornerShape(12.dp)
-                      ) {
-                          Column(modifier = Modifier.padding(14.dp)) {
-                              Text("🔍 જૂના દર્દી શોધો (નામ અથવા નંબર):", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF0D276B))
-                              Spacer(modifier = Modifier.height(6.dp))
-                              OutlinedTextField(
-                                  value = searchQuery,
-                                  onValueChange = { onSearchInput(it) },
-                                  placeholder = { Text("દા.ત. Raju Pandit અથવા 9898...") },
-                                  modifier = Modifier.fillMaxWidth(),
-                                  singleLine = true,
-                                  colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
-                              )
+
+                  btnSave.isEnabled = false
+                  val sdf = SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault())
+                  val record = PatientRecord(name, mobile, village, disease, medicine, sdf.format(Date()))
+                  patientList.add(record)
+
+                  coroutineScope.launch(Dispatchers.IO) {
+                      try {
+                          val conn = URL(cloudUrl).openConnection() as HttpURLConnection
+                          conn.requestMethod = "PUT"
+                          conn.setRequestProperty("Content-Type", "application/json")
+                          conn.doOutput = true
+
+                          val array = JSONArray()
+                          patientList.forEach { p ->
+                              val obj = JSONObject()
+                              obj.put("name", p.name)
+                              obj.put("phone", p.phone)
+                              obj.put("village", p.village)
+                              obj.put("disease", p.disease)
+                              obj.put("medicine", p.medicine)
+                              obj.put("date", p.date)
+                              array.put(obj)
                           }
-                      }
+                          val wr = OutputStreamWriter(conn.outputStream)
+                          wr.write(array.toString())
+                          wr.flush()
 
-                      Spacer(modifier = Modifier.height(16.dp))
-
-                      Card(
-                          modifier = Modifier.fillMaxWidth(),
-                          colors = CardDefaults.cardColors(containerColor = Color.White),
-                          shape = RoundedCornerShape(12.dp),
-                          elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                      ) {
-                          Column(modifier = Modifier.padding(16.dp)) {
-                              Text("દર્દીની વિગત ઉમેરો", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF0D276B))
-                              Spacer(modifier = Modifier.height(12.dp))
-
-                              OutlinedTextField(
-                                  value = patientName,
-                                  onValueChange = { patientName = it },
-                                  label = { Text("દર્દીનું પૂરું નામ") },
-                                  modifier = Modifier.fillMaxWidth()
-                              )
-                              Spacer(modifier = Modifier.height(8.dp))
-
-                              OutlinedTextField(
-                                  value = villageName,
-                                  onValueChange = { villageName = it },
-                                  label = { Text("ગામ / શહેર") },
-                                  modifier = Modifier.fillMaxWidth()
-                              )
-                              Spacer(modifier = Modifier.height(8.dp))
-
-                              OutlinedTextField(
-                                  value = mobileNumber,
-                                  onValueChange = { mobileNumber = it },
-                                  label = { Text("મોબાઈલ નંબર") },
-                                  modifier = Modifier.fillMaxWidth()
-                              )
-                              Spacer(modifier = Modifier.height(8.dp))
-
-                              OutlinedTextField(
-                                  value = diseaseText,
-                                  onValueChange = { diseaseText = it },
-                                  label = { Text("શેના માટે દવા લીધી (તકલીફ / રોગ)") },
-                                  modifier = Modifier.fillMaxWidth()
-                              )
-                              Spacer(modifier = Modifier.height(8.dp))
-
-                              OutlinedTextField(
-                                  value = medicineText,
-                                  onValueChange = { medicineText = it },
-                                  label = { Text("આપેલી દવાઓની વિગત") },
-                                  modifier = Modifier.fillMaxWidth()
-                              )
-                              Spacer(modifier = Modifier.height(16.dp))
-
-                              Button(
-                                  onClick = {
-                                      if (patientName.isBlank() || mobileNumber.isBlank()) {
-                                          Toast.makeText(context, "નામ અને મોબાઈલ નંબર જરૂરી છે", Toast.LENGTH_SHORT).show()
-                                          return@Button
-                                      }
-                                      isSaving = true
-                                      val sdf = SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault())
-                                      val newRecord = PatientRecord(
-                                          name = patientName.trim(),
-                                          village = villageName.trim(),
-                                          phone = mobileNumber.trim(),
-                                          disease = diseaseText.trim(),
-                                          medicine = medicineText.trim(),
-                                          date = sdf.format(Date())
-                                      )
-                                      allPatients.add(newRecord)
-                                      coroutineScope.launch {
-                                          CloudDBManager.pushToCloud(allPatients)
-                                          isSaving = false
-                                          Toast.makeText(context, "ડેટા સેવ થઈ ગયો!", Toast.LENGTH_SHORT).show()
-                                          diseaseText = ""
-                                          medicineText = ""
-                                      }
-                                  },
-                                  modifier = Modifier.fillMaxWidth().height(48.dp),
-                                  shape = RoundedCornerShape(8.dp),
-                                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B)),
-                                  enabled = !isSaving
-                              ) {
-                                  Text(if (isSaving) "સેવ થઈ રહ્યું છે..." else "ડેટા સેવ કરો (Save Visit)", fontWeight = FontWeight.Bold)
-                              }
+                          withContext(Dispatchers.Main) {
+                              Toast.makeText(this@MainActivity, "ડેટા સેવ થઈ ગયો!", Toast.LENGTH_SHORT).show()
+                              etDisease.setText("")
+                              etMedicine.setText("")
+                              btnSave.isEnabled = true
                           }
-                      }
-
-                      if (matchedHistory.isNotEmpty()) {
-                          Spacer(modifier = Modifier.height(18.dp))
-                          Text("📋 અગાઉની હિસ્ટ્રી (${matchedHistory.size}):", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF0D276B))
-                          Spacer(modifier = Modifier.height(8.dp))
-
-                          matchedHistory.reversed().forEach { item ->
-                              Card(
-                                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                  colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
-                                  shape = RoundedCornerShape(8.dp),
-                                  border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0))
-                              ) {
-                                  Column(modifier = Modifier.padding(12.dp)) {
-                                      Text("📅 તારીખ: ${item.date}", fontSize = 12.sp, color = Color(0xFF0284C7), fontWeight = FontWeight.Bold)
-                                      Spacer(modifier = Modifier.height(4.dp))
-                                      Text("🩺 રોગ/તકલીફ: ${item.disease}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color(0xFF1E293B))
-                                      Text("💊 દવાઓ: ${item.medicine}", fontSize = 13.sp, color = Color(0xFF475569))
-                                  }
-                              }
+                      } catch (e: Exception) {
+                          withContext(Dispatchers.Main) {
+                              Toast.makeText(this@MainActivity, "સેવ કરવામાં ભૂલ આવી", Toast.LENGTH_SHORT).show()
+                              btnSave.isEnabled = true
                           }
                       }
                   }
+              }
+
+              override fun onDestroy() {
+                  super.onDestroy()
+                  coroutineScope.cancel()
               }
           }
           EOF
