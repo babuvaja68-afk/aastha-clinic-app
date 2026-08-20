@@ -50,23 +50,11 @@ jobs:
           include ':app'
           EOF
 
-          # 2. build.gradle (Root)
+          # 2. build.gradle (Root - Clean Plugins)
           cat << 'EOF' > build.gradle
-          buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.2.2'
-                  classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22'
-              }
-          }
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
+          plugins {
+              id 'com.android.application' version '8.2.2' apply false
+              id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
           }
           EOF
 
@@ -194,11 +182,10 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 6. Main Application Source
+          # 6. Main Application Source (No Login, Auto-Fill, History & Real-Time Sync)
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
-          import android.content.Context
           import android.os.Bundle
           import android.widget.Toast
           import androidx.activity.ComponentActivity
