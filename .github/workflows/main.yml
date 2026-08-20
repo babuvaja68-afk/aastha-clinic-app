@@ -21,40 +21,46 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Create Complete Android Project Files Without Login
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Generate Clean Android Project Files
         run: |
-          mkdir -p app/src/main/res/xml
+          rm -rf app gradle settings.gradle build.gradle gradlew gradlew.bat
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
           mkdir -p app/src/main/java/com/aastha/clinic
-          mkdir -p gradle/wrapper
 
-          # 1. Project Configuration Files
+          # 1. Root Settings
           cat << 'EOF' > settings.gradle
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
           rootProject.name = "AasthaClinic"
           include ':app'
           EOF
 
+          # 2. Root build.gradle
           cat << 'EOF' > build.gradle
-          buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.2.2'
-                  classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22'
-              }
-          }
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
+          plugins {
+              id 'com.android.application' version '8.2.2' apply false
+              id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
           }
           EOF
 
+          # 3. App build.gradle
           cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
@@ -78,6 +84,9 @@ jobs:
                       minifyEnabled false
                       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
                   }
+                  debug {
+                      minifyEnabled false
+                  }
               }
               compileOptions {
                   sourceCompatibility JavaVersion.VERSION_17
@@ -95,10 +104,10 @@ jobs:
           }
 
           dependencies {
-              implementation platform('androidx.compose:compose-bom:2024.02.00')
               implementation 'androidx.core:core-ktx:1.12.0'
               implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
               implementation 'androidx.activity:activity-compose:1.8.2'
+              implementation platform('androidx.compose:compose-bom:2024.02.00')
               implementation 'androidx.compose.ui:ui'
               implementation 'androidx.compose.ui:ui-graphics'
               implementation 'androidx.compose.ui:ui-tooling-preview'
@@ -108,7 +117,7 @@ jobs:
           }
           EOF
 
-          # 2. Android Manifest & Permissions
+          # 4. Manifest
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -134,7 +143,7 @@ jobs:
           </manifest>
           EOF
 
-          # 3. Clinic Brand Logo & Icons
+          # 5. Icons
           cat << 'EOF' > app/src/main/res/drawable/ic_aastha_brand_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="200dp"
@@ -176,7 +185,7 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # 4. Main Activity (Direct Access - No Login Screen)
+          # 6. Source Code (Direct Access, Cloud Sync & Auto-Fill)
           cat << 'EOF' > app/src/main/java/com/aastha/clinic/MainActivity.kt
           package com.aastha.clinic
 
@@ -186,8 +195,6 @@ jobs:
           import androidx.activity.compose.setContent
           import androidx.compose.foundation.background
           import androidx.compose.foundation.layout.*
-          import androidx.compose.foundation.lazy.LazyColumn
-          import androidx.compose.foundation.lazy.items
           import androidx.compose.foundation.rememberScrollState
           import androidx.compose.foundation.shape.RoundedCornerShape
           import androidx.compose.foundation.verticalScroll
@@ -382,7 +389,6 @@ jobs:
                           .verticalScroll(rememberScrollState())
                           .padding(16.dp)
                   ) {
-                      // Search Card
                       Card(
                           modifier = Modifier.fillMaxWidth(),
                           colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
@@ -404,7 +410,6 @@ jobs:
 
                       Spacer(modifier = Modifier.height(16.dp))
 
-                      // Form Card
                       Card(
                           modifier = Modifier.fillMaxWidth(),
                           colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -490,7 +495,6 @@ jobs:
                           }
                       }
 
-                      // History Section
                       if (matchedHistory.isNotEmpty()) {
                           Spacer(modifier = Modifier.height(18.dp))
                           Text("📋 અગાઉની હિસ્ટ્રી (${matchedHistory.size}):", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF0D276B))
@@ -517,13 +521,14 @@ jobs:
           }
           EOF
 
-      - name: Build Android APK
+      - name: Build Android APK with Gradle
         run: |
-          chmod +x gradlew || gradle wrapper
-          ./gradlew assembleRelease --no-daemon || ./gradlew assembleDebug --no-daemon
+          gradle wrapper --gradle-version 8.5
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Aastha-Clinic-Pro-App
-          path: app/build/outputs/apk/**/*.apk
+          name: Aastha-Clinic-App
+          path: app/build/outputs/apk/debug/*.apk
