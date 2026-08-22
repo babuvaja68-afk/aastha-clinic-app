@@ -21,7 +21,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Full Course Bilingual Education App with Complete Stories and Q&A
+      - name: Setup Complete Education App with Dark Mode and Deep In-Depth Content
         run: |
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
@@ -77,8 +77,8 @@ jobs:
                   applicationId "com.gseb.vidyasetu"
                   minSdk 24
                   targetSdk 34
-                  versionCode 9
-                  versionName "9.0"
+                  versionCode 12
+                  versionName "12.0"
               }
 
               buildTypes {
@@ -208,6 +208,9 @@ jobs:
           cat << 'EOF' > app/src/main/java/com/gseb/vidyasetu/MainActivity.kt
           package com.gseb.vidyasetu
 
+          import android.content.Context
+          import android.content.Intent
+          import android.net.Uri
           import android.os.Bundle
           import android.widget.Toast
           import androidx.activity.ComponentActivity
@@ -234,8 +237,6 @@ jobs:
           import androidx.compose.ui.text.font.FontWeight
           import androidx.compose.ui.unit.dp
           import androidx.compose.ui.unit.sp
-          import kotlinx.coroutines.delay
-          import kotlinx.coroutines.launch
 
           enum class AppMedium { GUJARATI, ENGLISH }
 
@@ -249,6 +250,10 @@ jobs:
               val chapterNumber: Int,
               val titleGu: String,
               val titleEn: String,
+              val textbookUrlGu: String,
+              val textbookUrlEn: String,
+              val swadhyayPothiUrlGu: String,
+              val swadhyayPothiUrlEn: String,
               val storyAndSummaryGu: String,
               val storyAndSummaryEn: String,
               val swadhyayAnswersGu: List<QuestionAnswer>,
@@ -278,6 +283,8 @@ jobs:
               val subtitleGu: String,
               val subtitleEn: String,
               val icon: String,
+              val fullArticleGu: String,
+              val fullArticleEn: String,
               val detailsGu: List<Pair<String, String>>,
               val detailsEn: List<Pair<String, String>>
           )
@@ -299,7 +306,60 @@ jobs:
                       }
 
                       val subjects = when (std) {
-                          10 -> listOf(
+                          in 1..5 -> listOf(
+                              Subject(
+                                  nameGu = "ગણિત ગમ્મત (Mathematics)",
+                                  nameEn = "Mathematics",
+                                  iconEmoji = "📐",
+                                  color = Color(0xFF1E88E5),
+                                  chapters = listOf(
+                                      Chapter(
+                                          1, "પ્રકરણ ૧: આકારો અને જગ્યા", "Chapter 1: Shapes & Space",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ પાઠ્યપુસ્તક સારાંશ:\nઅંદર-બહાર, નાનું-મોટું, સૌથી નાનું-સૌથી મોટું, ઉપર-નીચે, નજીક-દૂર, ગબડતી અને સરકતી વસ્તુઓ તેમજ ભૂમિતિના આકારો (ગોળ, ત્રિકોણ, ચોરસ, લંબચોરસ) ની વ્યવહારુ સમજ.",
+                                          "📘 Complete Summary:\nConcepts of inside-outside, bigger-smaller, top-bottom, rolling-sliding, and 2D geometric shapes (Circle, Square, Rectangle, Triangle).",
+                                          listOf(QuestionAnswer("ચોરસ અને લંબચોરસ વચ્ચેનો તફાવત આપો.", "જવાબ:\nચોરસની ચારેય બાજુઓ સમાન હોય છે, જ્યારે લંબચોરસની સામસામેની બાજુઓ સમાન હોય છે.")),
+                                          listOf(QuestionAnswer("Difference between square and rectangle?", "Answer:\nA square has all four sides equal; a rectangle has opposite sides equal."))
+                                      )
+                                  )
+                              ),
+                              Subject(
+                                  nameGu = "કલ્લોલ / કુહૂ (ગુજરાતી)",
+                                  nameEn = "Gujarati / English Marigold",
+                                  iconEmoji = "📚",
+                                  color = Color(0xFF43A047),
+                                  chapters = listOf(
+                                      Chapter(
+                                          1, "પાઠ ૧: શાળા તત્પરતા અને વાર્તા", "Unit 1: A Happy Child & Stories",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ વાર્તા:\nશાળાના પ્રથમ દિવસે બાળકોનો ઉત્સાહ, મિત્રો સાથે પરિચય અને વર્ગખંડની રમતો.",
+                                          "📘 Full Story:\nJoy of school life, playful learning, and moral tales of teamwork.",
+                                          listOf(QuestionAnswer("શાળામાં આપણે શું શીખીએ છીએ?", "જવાબ:\nવાંચન, લેખન, ગણતરી, ચિત્રકામ અને સારા સંસ્કારો શીખીએ છીએ.")),
+                                          listOf(QuestionAnswer("What do we learn at school?", "Answer:\nReading, writing, math, arts, friendship and good discipline."))
+                                      )
+                                  )
+                              ),
+                              Subject(
+                                  nameGu = "આસપાસ (પર્યાવરણ)",
+                                  nameEn = "Environmental Studies (EVS)",
+                                  iconEmoji = "🌱",
+                                  color = Color(0xFFFB8C00),
+                                  chapters = listOf(
+                                      Chapter(
+                                          1, "પાઠ ૧: પૂનમે શું જોયું? (પ્રાણીઓ)", "Chapter 1: Poonam's Day Out",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ વાર્તા:\nપૂનમ ઝાડ પર પક્ષીઓ અને તળાવ પાસે પ્રાણીઓનું અવલોકન કરે છે.",
+                                          "📘 Summary:\nObservation of various animal habitats, movements, sounds and behaviors.",
+                                          listOf(QuestionAnswer("ઉડી શકે તેવા પક્ષીઓ જણાવો.", "જવાબ:\nપોપટ, ચકલી, કબૂતર, કાગડો.")),
+                                          listOf(QuestionAnswer("Name birds that can fly.", "Answer:\nSparrow, Parrot, Pigeon, Crow."))
+                                      )
+                                  )
+                              )
+                          )
+                          in 6..8 -> listOf(
                               Subject(
                                   nameGu = "ગણિત (Mathematics)",
                                   nameEn = "Mathematics",
@@ -307,80 +367,13 @@ jobs:
                                   color = Color(0xFF1E88E5),
                                   chapters = listOf(
                                       Chapter(
-                                          chapterNumber = 1,
-                                          titleGu = "પ્રકરણ ૧: વાસ્તવિક સંખ્યાઓ",
-                                          titleEn = "Chapter 1: Real Numbers",
-                                          storyAndSummaryGu = """
-                                              📘 સંપૂર્ણ પ્રકરણ સારાંશ અને થિયરી:
-                                              વાસ્તવિક સંખ્યાઓ એ સંમેય અને અસંમેય સંખ્યાઓનો સમૂહ છે. આ પ્રકરણમાં યુક્લિડની ભાગપ્રવિધિ અને અંકગણિતનું મૂળભૂત પ્રમેય મુખ્ય આધારસ્તંભ છે.
-                                              
-                                              ૧. યુક્લિડનું ભાગાકારનું પૂર્વપ્રમેય:
-                                              આપેલ ધન પૂર્ણાંકો a અને b માટે અનન્ય અનૃણ પૂર્ણાંકો q અને r એવા મળે કે જેથી:
-                                              a = bq + r, જ્યાં 0 ≤ r < b
-                                              (ભાજ્ય = ભાજક × ભાગફળ + શેષ)
-                                              
-                                              ૨. અંકગણિતનું મૂળભૂત પ્રમેય:
-                                              કોઈપણ વિભાજ્ય સંખ્યાને તેના અવિભાજ્ય અવયવોના ગુણાકાર તરીકે અનન્ય રીતે દર્શાવી શકાય છે.
-                                              
-                                              ૩. સંબંધ સૂત્ર:
-                                              ગુ.સા.અ.(a, b) × લ.સા.અ.(a, b) = a × b
-                                          """.trimIndent(),
-                                          storyAndSummaryEn = """
-                                              📘 Complete Chapter Summary & Theory:
-                                              Real numbers comprise both rational and irrational numbers. The fundamental theorem of arithmetic and Euclid's division lemma are the core pillars of this chapter.
-                                              
-                                              1. Euclid's Division Lemma:
-                                              Given positive integers a and b, there exist unique whole numbers q and r satisfying:
-                                              a = bq + r, where 0 ≤ r < b
-                                              (Dividend = Divisor × Quotient + Remainder)
-                                              
-                                              2. Fundamental Theorem of Arithmetic:
-                                              Every composite number can be uniquely expressed (factored) as a product of prime numbers.
-                                              
-                                              3. Master Formula:
-                                              HCF(a, b) × LCM(a, b) = a × b
-                                          """.trimIndent(),
-                                          swadhyayAnswersGu = listOf(
-                                              QuestionAnswer("યુક્લિડની ભાગપ્રવિધિનો ઉપયોગ કરીને ગુ.સા.અ. શોધો: ૧૩૫ અને ૨૨૫", "સંપૂર્ણ સ્ટેપ-બાય-સ્ટેપ ગણતરી:\nઅહીં ૨૨૫ > ૧૩૫ છે.\nપગલું ૧: ૨૨૫ = ૧૩૫ × ૧ + ૯૦\nપગલું ૨: ૧૩૫ = ૯૦ × ૧ + ૪૫\nપગલું ૩: ૯૦ = ૪૫ × ૨ + ૦\nઅહીં છેલ્લી શેષ શૂન્ય છે અને તે તબક્કે ભાજક ૪૫ છે.\nમાટે ગુ.સા.અ.(૧૩૫, ૨૨૫) = ૪૫ થાય."),
-                                              QuestionAnswer("સાબિત કરો કે √૫ અસંમેય સંખ્યા છે.", "સંપૂર્ણ સાબિતી:\nધારો કે √૫ સંમેય સંખ્યા છે.\nતેથી √૫ = a/b લખી શકાય (જ્યાં a અને b પરસ્પર અવિભાજ્ય પૂર્ણાંકો છે, b ≠ 0).\nબંને બાજુ વર્ગ કરતાં:\n૫ = a²/b²  =>  ૫b² = a²  --- (સમીકરણ ૧)\nઆથી a² એ ૫ વડે વિભાજ્ય છે, માટે પ્રમેય મુજબ a પણ ૫ વડે વિભાજ્ય થાય.\nહવે a = ૫c મુકતાં:\n૫b² = (૫c)² = ૨૫c²  =>  b² = ૫c²\nઆથી b² એ ૫ વડે વિભાજ્ય છે, માટે b પણ ૫ વડે વિભાજ્ય થાય.\nઆમ, a અને b બંનેનો સામાન્ય અવયવ ૫ મળે છે, જે આપણી મૂળ ધારણાથી વિરોધાભાસ દર્શાવે છે.\nમાટે સાબિત થાય છે કે √૫ અસંમેય સંખ્યા છે.")
-                                          ),
-                                          swadhyayAnswersEn = listOf(
-                                              QuestionAnswer("Use Euclid's division algorithm to find HCF of 135 and 225.", "Step-by-Step Solution:\nSince 225 > 135, apply division lemma:\nStep 1: 225 = 135 × 1 + 90\nStep 2: 135 = 90 × 1 + 45\nStep 3: 90 = 45 × 2 + 0\nThe remainder is now 0, and the divisor at this step is 45.\nTherefore, HCF(135, 225) = 45."),
-                                              QuestionAnswer("Prove that √5 is an irrational number.", "Proof by Contradiction:\nLet us assume that √5 is a rational number.\nThen √5 = a/b, where a and b are coprime integers (b ≠ 0).\nSquaring both sides:\n5 = a²/b²  =>  5b² = a²  --- (Equation 1)\nThis implies a² is divisible by 5, hence 'a' is also divisible by 5.\nLet a = 5c for some integer c.\nSubstituting a = 5c in Eq 1:\n5b² = 25c²  =>  b² = 5c²\nThis implies b² is divisible by 5, hence 'b' is also divisible by 5.\nTherefore, a and b have at least 5 as a common factor, which contradicts the fact that a and b are coprime.\nHence, √5 is an irrational number.")
-                                          )
-                                      ),
-                                      Chapter(
-                                          chapterNumber = 2,
-                                          titleGu = "પ્રકરણ ૨: બહુપદીઓ",
-                                          titleEn = "Chapter 2: Polynomials",
-                                          storyAndSummaryGu = """
-                                              📘 સંપૂર્ણ પ્રકરણ સારાંશ:
-                                              બહુપદીના પ્રકારો: સુરેખ (ઘાત ૧), દ્વિઘાત (ઘાત ૨), ત્રિઘાત (ઘાત ૩).
-                                              
-                                              ૧. દ્વિઘાત બહુપદીનું પ્રમાણિત સ્વરૂપ:
-                                              p(x) = ax² + bx + c (જ્યાં a ≠ 0)
-                                              
-                                              ૨. શૂન્યો અને સહગુણકો વચ્ચેનો સંબંધ:
-                                              • શૂન્યોનો સરવાળો (α + β) = -b/a = -(x નો સહગુણક) / (x² નો સહગુણક)
-                                              • શૂન્યોનો ગુણાકાર (α · β) = c/a = અચળ પદ / (x² નો સહગુણક)
-                                          """.trimIndent(),
-                                          storyAndSummaryEn = """
-                                              📘 Complete Chapter Summary:
-                                              Types of polynomials: Linear (Degree 1), Quadratic (Degree 2), Cubic (Degree 3).
-                                              
-                                              1. Standard Form of Quadratic Polynomial:
-                                              p(x) = ax² + bx + c (where a ≠ 0)
-                                              
-                                              2. Relationship between Zeroes and Coefficients:
-                                              • Sum of zeroes (α + β) = -b/a = -(Coefficient of x) / (Coefficient of x²)
-                                              • Product of zeroes (α · β) = c/a = Constant term / (Coefficient of x²)
-                                          """.trimIndent(),
-                                          swadhyayAnswersGu = listOf(
-                                              QuestionAnswer("દ્વિઘાત બહુપદી x² - ૨x - ૮ નાં શૂન્યો શોધો અને સહગુણકો વચ્ચેનો સંબંધ ચકાસો.", "જવાબ:\nx² - ૨x - ૮ = ૦\nx² - ૪x + ૨x - ૮ = ૦\nx(x - ૪) + ૨(x - ૪) = ૦\n(x - ૪)(x + ૨) = ૦\nમાટે શૂન્યો α = ૪ અને β = -૨ મળે.\n\nસંબંધની ચકાસણી:\n• સરવાળો: α + β = ૪ + (-૨) = ૨ = -(-૨)/૧ = -b/a (સત્ય છે)\n• ગુણાકાર: α · β = ૪ × (-૨) = -૮ = -૮/૧ = c/a (સત્ય છે)")
-                                          ),
-                                          swadhyayAnswersEn = listOf(
-                                              QuestionAnswer("Find the zeroes of quadratic polynomial x² - 2x - 8 and verify the relationship.", "Solution:\nx² - 2x - 8 = 0\nx² - 4x + 2x - 8 = 0\nx(x - 4) + 2(x - 4) = 0\n(x - 4)(x + 2) = 0\nZeroes are α = 4 and β = -2.\n\nVerification:\n• Sum of zeroes: α + β = 4 + (-2) = 2 = -(-2)/1 = -b/a (Verified)\n• Product of zeroes: α · β = 4 × (-2) = -8 = -8/1 = c/a (Verified)")
-                                          )
+                                          1, "પ્રકરણ ૧: પૂર્ણાંક સંખ્યાઓ (Integers)", "Chapter 1: Integers",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ સારાંશ:\nધન પૂર્ણાંકો, ઋણ પૂર્ણાંકો, સંખ્યારેખા અને ગુણાકાર-ભાગાકારના ચિહ્નોના નિયમો.",
+                                          "📘 Summary:\nPositive and negative integers, number line representation and sign rules.",
+                                          listOf(QuestionAnswer("(-૫) × (-૪) નું મૂલ્ય કેટલું થાય?", "જવાબ:\n(-૫) × (-૪) = +૨૦ (બે ઋણનો ગુણાકાર ધન થાય).")),
+                                          listOf(QuestionAnswer("What is (-5) × (-4)?", "Answer:\n(-5) × (-4) = +20 (Product of two negatives is positive)."))
                                       )
                                   )
                               ),
@@ -391,751 +384,21 @@ jobs:
                                   color = Color(0xFF43A047),
                                   chapters = listOf(
                                       Chapter(
-                                          chapterNumber = 1,
-                                          titleGu = "પ્રકરણ ૧: રાસાયણિક પ્રક્રિયાઓ અને સમીકરણો",
-                                          titleEn = "Chapter 1: Chemical Reactions and Equations",
-                                          storyAndSummaryGu = """
-                                              📘 સંપૂર્ણ પ્રકરણ સારાંશ:
-                                              જ્યારે રાસાયણિક ફેરફાર થાય ત્યારે રાસાયણિક પ્રક્રિયા થઈ તેમ કહેવાય.
-                                              
-                                              મુખ્ય પ્રક્રિયાઓના પ્રકારો:
-                                              ૧. સંયોગીકરણ પ્રક્રિયા: બે કે વધુ પ્રક્રિયકો જોડાઈને એક જ નીપજ બનાવે. (C + O₂ -> CO₂)
-                                              ૨. વિઘટન પ્રક્રિયા: એક જ પ્રક્રિયક તૂટીને વધુ સરળ નીપજો આપે. (CaCO₃ -> CaO + CO₂)
-                                              ૩. વિસ્થાપન પ્રક્રિયા: વધુ સક્રિય તત્વ ઓછા સક્રિય તત્વને તેના દ્રાવણમાંથી દૂર કરે.
-                                              ૪. ઓક્સિડેશન & રિડક્શન: O₂ ઉમેરાય તો ઓક્સિડેશન, H₂ ઉમેરાય તો રિડક્શન.
-                                          """.trimIndent(),
-                                          storyAndSummaryEn = """
-                                              📘 Complete Chapter Summary:
-                                              A chemical reaction occurs when chemical bonds between atoms are formed or broken.
-                                              
-                                              Major Types of Reactions:
-                                              1. Combination Reaction: Two or more reactants combine to form a single product. (C + O₂ -> CO₂)
-                                              2. Decomposition Reaction: A single reactant breaks down into simpler products. (CaCO₃ -> CaO + CO₂)
-                                              3. Displacement Reaction: Highly reactive element displaces a less reactive element.
-                                              4. Redox Reaction: Simultaneous oxidation and reduction.
-                                          """.trimIndent(),
-                                          swadhyayAnswersGu = listOf(
-                                              QuestionAnswer("વિસ્થાપન અને દ્વિવિસ્થાપન પ્રક્રિયા વચ્ચેનો મુખ્ય તફાવત ઉદાહરણ સાથે આપો.", "જવાબ:\n૧. વિસ્થાપન પ્રક્રિયા: વધુ સક્રિય ધાતુ ઓછી સક્રિય ધાતુને તેના ક્ષારના દ્રાવણમાંથી મુક્ત કરે છે.\nસમીકરણ: Fe (લોખંડ) + CuSO₄ -> FeSO₄ + Cu\n\n૨. દ્વિવિસ્થાપન પ્રક્રિયા: બે પ્રક્રિયકો વચ્ચે આયનોની પરસ્પર આપ-લે થાય છે.\nસમીકરણ: Na₂SO₄ (સોડિયમ સલ્ફેટ) + BaCl₂ (બેરિયમ ક્લોરાઇડ) -> BaSO₄ (અવક્ષેપ) + ૨NaCl")
-                                          ),
-                                          swadhyayAnswersEn = listOf(
-                                              QuestionAnswer("Differentiate between Displacement and Double Displacement reaction with equations.", "Answer:\n1. Displacement Reaction: A more reactive element displaces a less reactive element from its compound.\nEquation: Fe + CuSO₄ -> FeSO₄ + Cu\n\n2. Double Displacement Reaction: Mutual exchange of ions takes place between two reactants.\nEquation: Na₂SO₄ + BaCl₂ -> BaSO₄ (White Precipitate) + 2NaCl")
-                                          )
+                                          1, "પાઠ ૧: વનસ્પતિમાં પોષણ", "Chapter 1: Nutrition in Plants",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ સારાંશ:\nપ્રકાશસંશ્લેષણ પ્રક્રિયા: સૂર્યપ્રકાશ, હરિતદ્રવ્ય, CO2 અને પાણી દ્વારા ગ્લુકોઝ અને O2 નું નિર્માણ.",
+                                          "📘 Summary:\nAutotrophic photosynthesis reaction and parasitic plant nutrition.",
+                                          listOf(QuestionAnswer("પ્રકાશસંશ્લેષણનું સમીકરણ લખો.", "જવાબ:\n૬CO₂ + ૬H₂O -> C₆H₁₂O₆ (ગ્લુકોઝ) + ૬O₂")),
+                                          listOf(QuestionAnswer("Write Photosynthesis equation.", "Answer:\n6CO2 + 6H2O -> C6H12O6 + 6O2"))
                                       )
                                   )
                               ),
                               Subject(
-                                  nameGu = "ગુજરાતી / English Literature",
-                                  nameEn = "English First Flight",
-                                  iconEmoji = "📖",
-                                  color = Color(0xFF8E24AA),
+                                  nameGu = "સામાજિક વિજ્ઞાન",
+                                  nameEn = "Social Science",
+                                  iconEmoji = "🌍",
+                                  color = Color(0xFFFB8C00),
                                   chapters = listOf(
                                       Chapter(
-                                          chapterNumber = 1,
-                                          titleGu = "પાઠ ૧: અ લેટર ટુ ગોડ (લેન્ચોની વાર્તા)",
-                                          titleEn = "Chapter 1: A Letter to God",
-                                          storyAndSummaryGu = """
-                                              📘 સંપૂર્ણ વાર્તા (Full Story):
-                                              લેન્ચો એક મહેનતુ ખેડૂત હતો. તેને પોતાના પાક માટે સારા વરસાદની આશા હતી, પરંતુ અચાનક કરા સાથે ભારે વાવાઝોડું આવ્યું અને તેના પાકનો સંપૂર્ણ નાશ થઈ ગયો.
-                                              
-                                              લેન્ચોને ઈશ્વરમાં અતૂટ શ્રદ્ધા હતી. તેથી તેણે ભગવાનને પત્ર લખીને ૧૦૦ પેસોની માંગણી કરી જેથી તે પોતાનો પરિવાર ચલાવી શકે અને નવો પાક વાવી શકે.
-                                              
-                                              પોસ્ટમાસ્ટરે આ પત્ર વાંચ્યો અને લેન્ચોની શ્રદ્ધા ડગે નહીં તે માટે પોતાના પગાર અને કર્મચારીઓ પાસેથી ૭૦ પેસો ભેગા કરીને લેન્ચોને મોકલ્યા. પરંતુ લેન્ચોએ ગણતરી કરી ત્યારે ૩૦ પેસો ઓછા હતા. તેને લાગ્યું કે પોસ્ટ ઓફિસના કર્મચારીઓએ ચોરી કરી છે, જેથી તેણે ફરી પત્ર લખીને બાકીના ૩૦ પેસો સીધા મોકલવા કહ્યું.
-                                          """.trimIndent(),
-                                          storyAndSummaryEn = """
-                                              📘 Complete Story:
-                                              Lencho was a hardworking farmer whose cornfields were completely destroyed by a devastating hailstorm. He had immense and unshakeable faith in God.
-                                              
-                                              Believing that God would never let him starve, Lencho wrote a letter directly addressed to God asking for 100 pesos to sow his field again and support his family.
-                                              
-                                              The generous postmaster read the letter and, wanting to keep Lencho's pure faith alive, collected 70 pesos from his own salary and colleagues. When Lencho opened the envelope and found only 70 pesos, he believed the post office employees were crooks who stole the remaining 30 pesos.
-                                          """.trimIndent(),
-                                          swadhyayAnswersGu = listOf(
-                                              QuestionAnswer("લેન્ચોને ભગવાનમાં કેવી શ્રદ્ધા હતી? પોસ્ટમાસ્ટરે શું કર્યું?", "જવાબ:\nલેન્ચોને ભગવાનમાં અતૂટ અને નિઃસ્વાર્થ શ્રદ્ધા હતી. પોસ્ટમાસ્ટર તેના આ વિશ્વાસથી પ્રભાવિત થયા અને પોતાના સાથીઓ સાથે મળીને ૭૦ પેસો એકત્ર કરીને 'ભગવાન' ના નામથી લેન્ચોને મોકલ્યા.")
-                                          ),
-                                          swadhyayAnswersEn = listOf(
-                                              QuestionAnswer("Why did Lencho say the raindrops were like 'new coins'?", "Answer:\nLencho's crops were in dire need of rain for a rich harvest. Rain meant a prosperous crop yield which would bring money and prosperity, hence he compared raindrops to new coins.")
-                                          )
-                                      )
-                                  )
-                              )
-                          )
-                          else -> listOf(
-                              Subject(
-                                  nameGu = "ગણિત (Mathematics)",
-                                  nameEn = "Mathematics",
-                                  iconEmoji = "📐",
-                                  color = Color(0xFF1E88E5),
-                                  chapters = listOf(
-                                      Chapter(
-                                          chapterNumber = 1,
-                                          titleGu = "પ્રકરણ ૧: પાયાની ગણતરી અને સ્થાનકિંમત",
-                                          titleEn = "Chapter 1: Number Systems & Place Value",
-                                          storyAndSummaryGu = "સંખ્યા જ્ઞાન, સ્થાનકિંમત, સરવાળા, બાદબાકી, ગુણાકાર અને ભાગાકારના વ્યવહારુ નિયમો.",
-                                          storyAndSummaryEn = "Understanding natural numbers, whole numbers, place values, addition, subtraction and multiplication rules.",
-                                          swadhyayAnswersGu = listOf(QuestionAnswer("સંખ્યા ૭,૪૫૨ માં દરેક અંકની સ્થાનકિંમત આપો.", "૭ = ૭,૦૦૦ | ૪ = ૪૦૦ | ૫ = ૫૦ | ૨ = ૨")),
-                                          swadhyayAnswersEn = listOf(QuestionAnswer("Write the place value of each digit in 7,452.", "7 = 7,000 (Thousands) | 4 = 400 (Hundreds) | 5 = 50 (Tens) | 2 = 2 (Units)"))
-                                      )
-                                  )
-                              )
-                          )
-                      }
-
-                      Standard(
-                          stdNumber = std,
-                          nameGu = "ધોરણ $std (Standard $std)",
-                          nameEn = "Standard $std",
-                          sectionGu = sectionGu,
-                          sectionEn = sectionEn,
-                          subjects = subjects
-                      )
-                  }
-              }
-
-              // COMPLETE COMPUTER LEARNING COURSE
-              fun getComputerFolders(): List<FolderItem> {
-                  return listOf(
-                      FolderItem(
-                          titleGu = "૧. કમ્પ્યુટર બેઝિક્સ પરિચય",
-                          titleEn = "1. Computer Fundamentals",
-                          subtitleGu = "હાર્ડવેર, સોફ્ટવેર અને કમ્પ્યુટરના ભાગો",
-                          subtitleEn = "Hardware, Software & System Architecture",
-                          icon = "💻",
-                          detailsGu = listOf(
-                              "કમ્પ્યુટર શું છે?" to "કમ્પ્યુટર એક ઇલેક્ટ્રોનિક ડિવાઇસ છે જે યુઝર પાસેથી Input લે છે, CPU માં Process કરે છે અને Monitor/Printer પર Output આપે છે.",
-                              "Input Devices" to "Keyboard (લખાણ માટે), Mouse (ક્લિક કરવા), Scanner, Microphone, Web Camera.",
-                              "Output Devices" to "Monitor (ડિસ્પ્લે), Printer (પ્રિન્ટિંગ), Speaker (અવાજ).",
-                              "CPU (Central Processing Unit)" to "કમ્પ્યુટરનું મગજ: તેમાં ALU (ગણતરી), CU (કંટ્રોલ) અને Cache Memory હોય છે.",
-                              "RAM vs ROM" to "RAM: હંગામી મેમરી (સ્પીડ વધારે છે). ROM: કાયમી મેમરી (કમ્પ્યુટર બૂટિંગ માટે)."
-                          ),
-                          detailsEn = listOf(
-                              "What is a Computer?" to "An electronic device that accepts raw data as Input, processes it through CPU, and generates meaningful Output.",
-                              "Input Devices" to "Keyboard, Mouse, Scanner, Microphone, Webcam, Touchscreen.",
-                              "Output Devices" to "Monitor (VDU), Printer, Speaker, Projector.",
-                              "CPU Architecture" to "Central Processing Unit consists of ALU (Arithmetic Logic Unit), CU (Control Unit), and Registers.",
-                              "RAM vs ROM" to "RAM is volatile memory used for high-speed task execution. ROM is non-volatile memory storing BIOS startup instructions."
-                          )
-                      ),
-                      FolderItem(
-                          titleGu = "૨. કીબોર્ડ શોર્ટકટ કીઝ (A to Z Shortcuts)",
-                          titleEn = "2. Master Keyboard Shortcuts",
-                          subtitleGu = "સુપરફાસ્ટ ટાઈપિંગ અને કમાન્ડ્સ",
-                          subtitleEn = "Speed up Windows & MS Office tasks",
-                          icon = "⌨️",
-                          detailsGu = listOf(
-                              "Ctrl + C / Ctrl + V" to "Copy (કોપી) / Paste (પેસ્ટ)",
-                              "Ctrl + X / Ctrl + Z" to "Cut (કટ) / Undo (પાછું લાવવા)",
-                              "Ctrl + A / Ctrl + S" to "Select All (બધું પસંદ કરવા) / Save (ફાઇલ સાચવવા)",
-                              "Ctrl + Shift + Esc" to "Task Manager ખોલવા માટે",
-                              "Windows Key + D" to "સીધા Desktop સ્ક્રીન પર જવા"
-                          ),
-                          detailsEn = listOf(
-                              "Ctrl + C / Ctrl + V" to "Copy selected item / Paste clipboard item",
-                              "Ctrl + X / Ctrl + Z" to "Cut selected item / Undo last action",
-                              "Ctrl + A / Ctrl + S" to "Select entire document / Save current file",
-                              "Ctrl + Shift + Esc" to "Open Windows Task Manager directly",
-                              "Win + D / Win + L" to "Show Desktop / Instantly Lock Computer"
-                          )
-                      ),
-                      FolderItem(
-                          titleGu = "૩. માઇક્રોસોફ્ટ ઓફિસ (Word, Excel, PPT)",
-                          titleEn = "3. Microsoft Office Mastery",
-                          subtitleGu = "ડોક્યુમેન્ટ, હિસાબ અને પ્રેઝન્ટેશન",
-                          subtitleEn = "Word Processing, Formulas & Slide Shows",
-                          icon = "📑",
-                          detailsGu = listOf(
-                              "MS Word" to "ઓફિસ લેટર, એપ્લિકેશન, રેઝ્યુમે અને પુસ્તક ટાઈપિંગ માટે વપરાય છે.",
-                              "MS Excel" to "સ્પ્રેડશીટમાં સૂત્રો: =SUM(A1:A10), =AVERAGE(), =IF() દ્વારા મોટા હિસાબ અને ગ્રાફ બને છે.",
-                              "MS PowerPoint" to "એનિમેશન, ટ્રાન્ઝિશન અને સ્લાઇડ્સ દ્વારા પ્રોફેશનલ પ્રેઝન્ટેશન બને છે."
-                          ),
-                          detailsEn = listOf(
-                              "MS Word" to "Word processing software used for documents, letters, reports, formatting, and tables.",
-                              "MS Excel" to "Spreadsheet program for data calculation using formulas like =SUM(), =VLOOKUP(), =IF(), and Pivot Charts.",
-                              "MS PowerPoint" to "Presentation tool designed for interactive slide decks, animations, and business transitions."
-                          )
-                      )
-                  )
-              }
-
-              // COMPLETE SPOKEN ENGLISH MASTER COURSE
-              fun getSpokenEnglishFolders(): List<FolderItem> {
-                  return listOf(
-                      FolderItem(
-                          titleGu = "૧. રોજિંદા ૧૦૦+ બોલાતા વાક્યો",
-                          titleEn = "1. 100+ Daily Use English Sentences",
-                          subtitleGu = "રોજિંદી વાતચીત માટે સરળ વાક્યો",
-                          subtitleEn = "Everyday Fluency for Beginners",
-                          icon = "🗣️",
-                          detailsGu = listOf(
-                              "How are you doing today?" to "તમે આજે કેમ છો?",
-                              "I am doing great, thank you!" to "હું એકદમ મજામાં છું, આભાર!",
-                              "Could you please repeat that?" to "શું તમે ફરીથી બોલી શકો?",
-                              "It was really nice meeting you." to "તમને મળીને ઘણો આનંદ થયો.",
-                              "Don't worry, everything is under control." to "ચિંતા ન કરો, બધું બરાબર છે."
-                          ),
-                          detailsEn = listOf(
-                              "How are you doing today?" to "Common friendly greeting asking about well-being.",
-                              "I am doing great, thank you!" to "Polite affirmative response to a greeting.",
-                              "Could you please repeat that?" to "Formal request when you didn't hear clearly.",
-                              "It was really nice meeting you." to "Polite closing sentence after meeting someone.",
-                              "Don't worry, everything is under control." to "Reassuring statement in difficult situations."
-                          )
-                      ),
-                      FolderItem(
-                          titleGu = "૨. અંગ્રેજી વ્યાકરણ & કાળ (Grammar & Tenses)",
-                          titleEn = "2. Complete English Tenses Guide",
-                          subtitleGu = "નિયમો, સૂત્રો અને ઉદાહરણો",
-                          subtitleEn = "Grammar Formulas with Examples",
-                          icon = "✍️",
-                          detailsGu = listOf(
-                              "Simple Present (સાદો વર્તમાનકાળ)" to "સૂત્ર: Sub + Verb(s/es) + Obj\nઉદા: He speaks English fluently. (તે અસ્ખલિત અંગ્રેજી બોલે છે.)",
-                              "Simple Past (સાદો ભૂતકાળ)" to "સૂત્ર: Sub + V2 + Obj\nઉદા: We achieved our goal yesterday. (અમે ગઈકાલે લક્ષ્ય પ્રાપ્ત કર્યું.)",
-                              "Simple Future (સાદો ભવિષ્યકાળ)" to "સૂત્ર: Sub + will + Verb + Obj\nઉદા: India will win the match. (ભારત મેચ જીતશે.)"
-                          ),
-                          detailsEn = listOf(
-                              "Simple Present Tense" to "Formula: Sub + Verb(s/es) + Obj\nExample: She teaches English with passion.",
-                              "Simple Past Tense" to "Formula: Sub + V2 + Obj\nExample: They completed the software project on time.",
-                              "Simple Future Tense" to "Formula: Sub + will + Base Verb + Obj\nExample: We will launch our app tomorrow."
-                          )
-                      )
-                  )
-              }
-
-              // COMPLETE BHARAT KO JANO & WORLD KNOWLEDGE
-              fun getKnowledgeFolders(): List<FolderItem> {
-                  return listOf(
-                      FolderItem(
-                          titleGu = "૧. ભારત કો જાનો (Know India)",
-                          titleEn = "1. National Heritage & Pride of India",
-                          subtitleGu = "ઇતિહાસ, પ્રતીકો અને મહાનુભાવો",
-                          subtitleEn = "History, National Symbols & Heroes",
-                          icon = "🇮🇳",
-                          detailsGu = listOf(
-                              "રાષ્ટ્રીય ધ્વજ (Tiranga)" to "કેસરી (શૌર્ય), સફેદ (શાંતિ), લીલો (સમૃદ્ધિ) અને ૨૪ આરાવાળું અશોક ચક્ર.",
-                              "સરદાર વલ્લભભાઈ પટેલ" to "ભારતના લોખંડી પુરુષ: ૫૬૨ દેશી રજવાડાંઓનું ઐતિહાસિક એકીકરણ કરનાર યુગપુરુષ.",
-                              "સ્ટેચ્યુ ઓફ યુનિટી" to "ગુજરાતના નર્મદા ખાતે આવેલી વિશ્વની સૌથી ઊંચી ૧૮૨ મીટરની ભવ્ય પ્રતિમા.",
-                              "ચંદ્રયાન-૩ ની સિદ્ધિ" to "ચંદ્રના દક્ષિણ ધ્રુવ પર સફળ સોફ્ટ લેન્ડિંગ કરનાર ભારત વિશ્વનો પ્રથમ દેશ બન્યો."
-                          ),
-                          detailsEn = listOf(
-                              "National Flag (Tricolour)" to "Saffron (Courage), White (Peace), Green (Prosperity), and 24-spoke Ashoka Chakra.",
-                              "Sardar Vallabhbhai Patel" to "Iron Man of India: United 562 princely states into one integrated nation.",
-                              "Statue of Unity" to "World's tallest statue standing at 182 meters located in Gujarat, India.",
-                              "Chandrayaan-3 Moon Landing" to "India became the first nation to successfully land on the lunar South Pole on Aug 23, 2023."
-                          )
-                      ),
-                      FolderItem(
-                          titleGu = "૨. વિશ્વ ઇતિહાસ, ભૂગોળ & વિજ્ઞાન",
-                          titleEn = "2. World History, Geography & Space",
-                          subtitleGu = "ખંડો, મહાસાગરો અને અવકાશ વિજ્ઞાન",
-                          subtitleEn = "Continents, Oceans, Physics & Astronomy",
-                          icon = "🌍",
-                          detailsGu = listOf(
-                              "વિશ્વના ૭ ખંડો" to "એશિયા (સૌથી મોટો), આફ્રિકા, ઉત્તર અમેરિકા, દક્ષિણ અમેરિકા, એન્ટાર્કટિકા, યુરોપ, ઓસ્ટ્રેલિયા (સૌથી નાનો).",
-                              "વિશ્વની સૌથી લાંબી નદી" to "નાઈલ નદી (આફ્રિકા - લંબાઈ: ૬,૬૫૦ કિલોમીટર).",
-                              "પ્રકાશની ઝડપ" to "૩,૦૦,૦૦૦ કિમી/સેકન્ડ (સૂર્યપ્રકાશ પૃથ્વી પર પહોંચતા ૮ મિનિટ ૨૦ સેકન્ડ લાગે છે).",
-                              "ગુરુત્વાકર્ષણ બળ" to "સર આઇઝેક ન્યૂટન દ્વારા શોધાયેલ બળ જે ગ્રહોને ભ્રમણકક્ષામાં રાખે છે."
-                          ),
-                          detailsEn = listOf(
-                              "7 Continents of Earth" to "Asia (Largest), Africa, North America, South America, Antarctica, Europe, Australia (Smallest).",
-                              "Longest River on Earth" to "Nile River in Africa flowing across 6,650 kilometers.",
-                              "Speed of Light" to "Approximately 300,000 km/s in vacuum (Reaches Earth in 8 minutes and 20 seconds).",
-                              "Universal Gravitation" to "Formulated by Sir Isaac Newton governing planetary orbits and free fall."
-                          )
-                      )
-                  )
-              }
-          }
-
-          class MainActivity : ComponentActivity() {
-              override fun onCreate(savedInstanceState: Bundle?) {
-                  super.onCreate(savedInstanceState)
-                  setContent {
-                      GSEBVidyaSetuApp()
-                  }
-              }
-          }
-
-          @OptIn(ExperimentalMaterial3Api::class)
-          @Composable
-          fun GSEBVidyaSetuApp() {
-              val context = LocalContext.current
-              val coroutineScope = rememberCoroutineScope()
-
-              var currentMedium by remember { mutableStateOf(AppMedium.GUJARATI) }
-              val isGu = currentMedium == AppMedium.GUJARATI
-
-              val standards = remember { EducationRepository.getStandards() }
-              val computerFolders = remember { EducationRepository.getComputerFolders() }
-              val spokenEnglishFolders = remember { EducationRepository.getSpokenEnglishFolders() }
-              val knowledgeFolders = remember { EducationRepository.getKnowledgeFolders() }
-
-              var selectedTab by remember { mutableStateOf(0) }
-              var selectedStandard by remember { mutableStateOf<Standard?>(null) }
-              var selectedSubject by remember { mutableStateOf<Subject?>(null) }
-              var selectedChapter by remember { mutableStateOf<Chapter?>(null) }
-              var activeFolder by remember { mutableStateOf<FolderItem?>(null) }
-
-              Scaffold(
-                  topBar = {
-                      TopAppBar(
-                          title = {
-                              Row(verticalAlignment = Alignment.CenterVertically) {
-                                  Image(
-                                      painter = painterResource(id = R.drawable.ic_education_logo),
-                                      contentDescription = "Logo",
-                                      modifier = Modifier.size(36.dp)
-                                  )
-                                  Spacer(modifier = Modifier.width(8.dp))
-                                  Column {
-                                      Text(
-                                          text = when (selectedTab) {
-                                              0 -> if (selectedChapter != null) (if (isGu) selectedChapter!!.titleGu else selectedChapter!!.titleEn)
-                                                   else if (selectedSubject != null) (if (isGu) selectedSubject!!.nameGu else selectedSubject!!.nameEn)
-                                                   else if (selectedStandard != null) (if (isGu) selectedStandard!!.nameGu else selectedStandard!!.nameEn)
-                                                   else (if (isGu) "GSEB વિદ્યાસેતુ (ધોરણ ૧-૧૨)" else "GSEB VidyaSetu (Std 1-12)")
-                                              1 -> if (activeFolder != null) (if (isGu) activeFolder!!.titleGu else activeFolder!!.titleEn) else (if (isGu) "💻 કમ્પ્યુટર કોર્સ" else "💻 Computer Course")
-                                              2 -> if (activeFolder != null) (if (isGu) activeFolder!!.titleGu else activeFolder!!.titleEn) else (if (isGu) "🗣️ સ્પોકન ઇંગ્લિશ" else "🗣️ Spoken English")
-                                              else -> if (activeFolder != null) (if (isGu) activeFolder!!.titleGu else activeFolder!!.titleEn) else (if (isGu) "🇮🇳 ભારત & વિશ્વ જ્ઞાન" else "🇮🇳 India & World GK")
-                                          },
-                                          fontWeight = FontWeight.Bold,
-                                          fontSize = 16.sp,
-                                          color = Color.White,
-                                          maxLines = 1
-                                      )
-                                      Text(
-                                          text = if (isGu) "સંપૂર્ણ અભ્યાસક્રમ • કમ્પ્યુટર • ઇંગ્લિશ" else "Complete Curriculum • Computer • English",
-                                          fontSize = 11.sp,
-                                          color = Color(0xFFE1F5FE)
-                                      )
-                                  }
-                              }
-                          },
-                          actions = {
-                              // Language Medium Switcher Button
-                              Button(
-                                  onClick = {
-                                      currentMedium = if (isGu) AppMedium.ENGLISH else AppMedium.GUJARATI
-                                  },
-                                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),
-                                  contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
-                              ) {
-                                  Text(
-                                      text = if (isGu) "English" else "ગુજરાતી",
-                                      color = Color(0xFF0D276B),
-                                      fontWeight = FontWeight.Bold,
-                                      fontSize = 12.sp
-                                  )
-                              }
-                          },
-                          navigationIcon = {
-                              val canGoBack = (selectedTab == 0 && selectedStandard != null) || (selectedTab != 0 && activeFolder != null)
-                              if (canGoBack) {
-                                  IconButton(onClick = {
-                                      if (selectedTab == 0) {
-                                          if (selectedChapter != null) selectedChapter = null
-                                          else if (selectedSubject != null) selectedSubject = null
-                                          else selectedStandard = null
-                                      } else {
-                                          activeFolder = null
-                                      }
-                                  }) {
-                                      Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
-                                  }
-                              }
-                          },
-                          colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0D276B))
-                      )
-                  },
-                  bottomBar = {
-                      NavigationBar(containerColor = Color.White) {
-                          NavigationBarItem(
-                              selected = selectedTab == 0,
-                              onClick = { selectedTab = 0; activeFolder = null },
-                              icon = { Icon(Icons.Default.MenuBook, contentDescription = null) },
-                              label = { Text(if (isGu) "ધોરણ ૧-૧૨" else "Std 1-12", fontSize = 11.sp) }
-                          )
-                          NavigationBarItem(
-                              selected = selectedTab == 1,
-                              onClick = { selectedTab = 1; activeFolder = null },
-                              icon = { Icon(Icons.Default.Computer, contentDescription = null) },
-                              label = { Text(if (isGu) "કમ્પ્યુટર" else "Computer", fontSize = 11.sp) }
-                          )
-                          NavigationBarItem(
-                              selected = selectedTab == 2,
-                              onClick = { selectedTab = 2; activeFolder = null },
-                              icon = { Icon(Icons.Default.RecordVoiceOver, contentDescription = null) },
-                              label = { Text(if (isGu) "ઇંગ્લિશ" else "English", fontSize = 11.sp) }
-                          )
-                          NavigationBarItem(
-                              selected = selectedTab == 3,
-                              onClick = { selectedTab = 3; activeFolder = null },
-                              icon = { Icon(Icons.Default.Public, contentDescription = null) },
-                              label = { Text(if (isGu) "વિશ્વ & GK" else "World GK", fontSize = 11.sp) }
-                          )
-                      }
-                  }
-              ) { padding ->
-                  Box(
-                      modifier = Modifier
-                          .fillMaxSize()
-                          .padding(padding)
-                          .background(Color(0xFFF4F7FB))
-                  ) {
-                      when (selectedTab) {
-                          0 -> {
-                              when {
-                                  selectedChapter != null -> ChapterDetailScreen(selectedChapter!!, isGu)
-                                  selectedSubject != null -> SubjectChaptersScreen(selectedSubject!!, isGu, onChapterSelect = { selectedChapter = it })
-                                  selectedStandard != null -> StandardSubjectsScreen(selectedStandard!!, isGu, onSubjectSelect = { selectedSubject = it })
-                                  else -> StandardsListScreen(standards, isGu, onStandardSelect = { selectedStandard = it })
-                              }
-                          }
-                          1 -> FolderViewScreen(
-                              folderList = computerFolders,
-                              activeFolder = activeFolder,
-                              isGu = isGu,
-                              onSelectFolder = { activeFolder = it },
-                              headerTitle = if (isGu) "💻 કમ્પ્યુટર શીખો (Complete Course)" else "💻 Learn Computer Course",
-                              headerSubtitle = if (isGu) "બેઝિક્સ, શોર્ટકટ્સ, MS Office, ઈન્ટરનેટ અને AI" else "Basics, Shortcuts, MS Office, Internet & AI"
-                          )
-                          2 -> FolderViewScreen(
-                              folderList = spokenEnglishFolders,
-                              activeFolder = activeFolder,
-                              isGu = isGu,
-                              onSelectFolder = { activeFolder = it },
-                              headerTitle = if (isGu) "🗣️ સ્પોકન ઇંગ્લિશ (Spoken English)" else "🗣️ Spoken English Mastery",
-                              headerSubtitle = if (isGu) "રોજિંદા વાક્યો, શબ્દભંડોળ અને વ્યાકરણ" else "Daily Sentences, Vocabulary & Grammar"
-                          )
-                          3 -> FolderViewScreen(
-                              folderList = knowledgeFolders,
-                              activeFolder = activeFolder,
-                              isGu = isGu,
-                              onSelectFolder = { activeFolder = it },
-                              headerTitle = if (isGu) "🇮🇳 ભારત & વિશ્વ જ્ઞાન (World & India GK)" else "🇮🇳 India & World General Knowledge",
-                              headerSubtitle = if (isGu) "ઇતિહાસ, ભૂગોળ, અજાયબીઓ અને વિજ્ઞાન" else "History, Geography, Space & Monuments"
-                          )
-                      }
-                  }
-              }
-          }
-
-          @Composable
-          fun FolderViewScreen(
-              folderList: List<FolderItem>,
-              activeFolder: FolderItem?,
-              isGu: Boolean,
-              onSelectFolder: (FolderItem) -> Unit,
-              headerTitle: String,
-              headerSubtitle: String
-          ) {
-              if (activeFolder == null) {
-                  LazyColumn(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                      item {
-                          Text(headerTitle, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF0D276B))
-                          Text(headerSubtitle, fontSize = 12.sp, color = Color.Gray)
-                          Spacer(modifier = Modifier.height(12.dp))
-                      }
-
-                      items(folderList) { folder ->
-                          Card(
-                              modifier = Modifier
-                                  .fillMaxWidth()
-                                  .padding(vertical = 5.dp)
-                                  .clickable { onSelectFolder(folder) },
-                              colors = CardDefaults.cardColors(containerColor = Color.White),
-                              elevation = CardDefaults.cardElevation(2.dp),
-                              shape = RoundedCornerShape(12.dp)
-                          ) {
-                              Row(
-                                  modifier = Modifier.padding(16.dp),
-                                  horizontalArrangement = Arrangement.SpaceBetween,
-                                  verticalAlignment = Alignment.CenterVertically
-                              ) {
-                                  Row(verticalAlignment = Alignment.CenterVertically) {
-                                      Surface(
-                                          shape = RoundedCornerShape(10.dp),
-                                          color = Color(0xFFE8EAF6),
-                                          modifier = Modifier.size(46.dp)
-                                      ) {
-                                          Box(contentAlignment = Alignment.Center) {
-                                              Text(folder.icon, fontSize = 22.sp)
-                                          }
-                                      }
-                                      Spacer(modifier = Modifier.width(14.dp))
-                                      Column {
-                                          Text(if (isGu) folder.titleGu else folder.titleEn, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF1E293B))
-                                          Text(if (isGu) folder.subtitleGu else folder.subtitleEn, fontSize = 12.sp, color = Color.Gray)
-                                      }
-                                  }
-                                  Icon(Icons.Default.Folder, contentDescription = null, tint = Color(0xFF0D276B))
-                              }
-                          }
-                      }
-                  }
-              } else {
-                  val details = if (isGu) activeFolder.detailsGu else activeFolder.detailsEn
-                  LazyColumn(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                      item {
-                          Card(
-                              modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                              colors = CardDefaults.cardColors(containerColor = Color(0xFF0D276B)),
-                              shape = RoundedCornerShape(12.dp)
-                          ) {
-                              Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                                  Text(activeFolder.icon, fontSize = 26.sp)
-                                  Spacer(modifier = Modifier.width(10.dp))
-                                  Column {
-                                      Text(if (isGu) activeFolder.titleGu else activeFolder.titleEn, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
-                                      Text(if (isGu) activeFolder.subtitleGu else activeFolder.subtitleEn, fontSize = 11.sp, color = Color(0xFFBBDEFB))
-                                  }
-                              }
-                          }
-                      }
-
-                      items(details) { (itemKey, itemVal) ->
-                          Card(
-                              modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                              colors = CardDefaults.cardColors(containerColor = Color.White),
-                              elevation = CardDefaults.cardElevation(1.dp),
-                              shape = RoundedCornerShape(10.dp)
-                          ) {
-                              Column(modifier = Modifier.padding(12.dp)) {
-                                  Text("📌 $itemKey", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF1565C0))
-                                  Spacer(modifier = Modifier.height(4.dp))
-                                  Text(itemVal, fontSize = 13.sp, color = Color(0xFF334155), lineHeight = 20.sp)
-                              }
-                          }
-                      }
-                  }
-              }
-          }
-
-          @Composable
-          fun StandardsListScreen(standards: List<Standard>, isGu: Boolean, onStandardSelect: (Standard) -> Unit) {
-              LazyColumn(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  item {
-                      Card(
-                          modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp),
-                          colors = CardDefaults.cardColors(containerColor = Color(0xFF0D276B)),
-                          shape = RoundedCornerShape(14.dp)
-                      ) {
-                          Row(
-                              modifier = Modifier.padding(16.dp),
-                              verticalAlignment = Alignment.CenterVertically
-                          ) {
-                              Image(
-                                  painter = painterResource(id = R.drawable.ic_education_logo),
-                                  contentDescription = "Education Logo",
-                                  modifier = Modifier.size(54.dp)
-                              )
-                              Spacer(modifier = Modifier.width(14.dp))
-                              Column {
-                                  Text(if (isGu) "તમારું ધોરણ પસંદ કરો" else "Select Your Standard", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
-                                  Text(if (isGu) "ધોરણ ૧ થી ૧૨ ના તમામ પુસ્તકો અને જવાબો" else "Standard 1 to 12 Books & Full Solutions", fontSize = 12.sp, color = Color(0xFFBBDEFB))
-                              }
-                          }
-                      }
-                  }
-
-                  items(standards) { std ->
-                      Card(
-                          modifier = Modifier
-                              .fillMaxWidth()
-                              .padding(vertical = 5.dp)
-                              .clickable { onStandardSelect(std) },
-                          colors = CardDefaults.cardColors(containerColor = Color.White),
-                          elevation = CardDefaults.cardElevation(2.dp),
-                          shape = RoundedCornerShape(12.dp)
-                      ) {
-                          Row(
-                              modifier = Modifier.padding(16.dp),
-                              horizontalArrangement = Arrangement.SpaceBetween,
-                              verticalAlignment = Alignment.CenterVertically
-                          ) {
-                              Row(verticalAlignment = Alignment.CenterVertically) {
-                                  Surface(
-                                      shape = RoundedCornerShape(10.dp),
-                                      color = Color(0xFFE8EAF6),
-                                      modifier = Modifier.size(46.dp)
-                                  ) {
-                                      Box(contentAlignment = Alignment.Center) {
-                                          Text("${std.stdNumber}", fontWeight = FontWeight.Black, fontSize = 20.sp, color = Color(0xFF0D276B))
-                                      }
-                                  }
-                                  Spacer(modifier = Modifier.width(14.dp))
-                                  Column {
-                                      Text(if (isGu) std.nameGu else std.nameEn, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1E293B))
-                                      Text(if (isGu) std.sectionGu else std.sectionEn, fontSize = 12.sp, color = Color.Gray)
-                                  }
-                              }
-                              Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color(0xFF0D276B))
-                          }
-                      }
-                  }
-              }
-          }
-
-          @Composable
-          fun StandardSubjectsScreen(standard: Standard, isGu: Boolean, onSubjectSelect: (Subject) -> Unit) {
-              Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  Text(if (isGu) "વિષય પસંદ કરો" else "Select Subject", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color(0xFF1E293B))
-                  Text(if (isGu) standard.nameGu else standard.nameEn, fontSize = 13.sp, color = Color.Gray)
-                  Spacer(modifier = Modifier.height(12.dp))
-
-                  LazyVerticalGrid(
-                      columns = GridCells.Fixed(2),
-                      horizontalArrangement = Arrangement.spacedBy(10.dp),
-                      verticalArrangement = Arrangement.spacedBy(10.dp),
-                      modifier = Modifier.fillMaxSize()
-                  ) {
-                      items(standard.subjects) { subject ->
-                          Card(
-                              modifier = Modifier
-                                  .fillMaxWidth()
-                                  .height(130.dp)
-                                  .clickable { onSubjectSelect(subject) },
-                              colors = CardDefaults.cardColors(containerColor = Color.White),
-                              elevation = CardDefaults.cardElevation(3.dp),
-                              shape = RoundedCornerShape(14.dp)
-                          ) {
-                              Column(
-                                  modifier = Modifier
-                                      .fillMaxSize()
-                                      .padding(12.dp),
-                                  verticalArrangement = Arrangement.SpaceBetween
-                              ) {
-                                  Text(subject.iconEmoji, fontSize = 28.sp)
-                                  Column {
-                                      Text(if (isGu) subject.nameGu else subject.nameEn, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF1E293B))
-                                      Text("${subject.chapters.size} ${if (isGu) "પ્રકરણો" else "Chapters"}", fontSize = 11.sp, color = Color.Gray)
-                                  }
-                              }
-                          }
-                      }
-                  }
-              }
-          }
-
-          @Composable
-          fun SubjectChaptersScreen(subject: Subject, isGu: Boolean, onChapterSelect: (Chapter) -> Unit) {
-              Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  Text(if (isGu) "પ્રકરણોની યાદી" else "Chapters List", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color(0xFF1E293B))
-                  Text(if (isGu) subject.nameGu else subject.nameEn, fontSize = 13.sp, color = Color.Gray)
-                  Spacer(modifier = Modifier.height(12.dp))
-
-                  LazyColumn(modifier = Modifier.fillMaxSize()) {
-                      items(subject.chapters) { chapter ->
-                          Card(
-                              modifier = Modifier
-                                  .fillMaxWidth()
-                                  .padding(vertical = 5.dp)
-                                  .clickable { onChapterSelect(chapter) },
-                              colors = CardDefaults.cardColors(containerColor = Color.White),
-                              elevation = CardDefaults.cardElevation(2.dp),
-                              shape = RoundedCornerShape(12.dp)
-                          ) {
-                              Row(
-                                  modifier = Modifier.padding(16.dp),
-                                  horizontalArrangement = Arrangement.SpaceBetween,
-                                  verticalAlignment = Alignment.CenterVertically
-                              ) {
-                                  Column(modifier = Modifier.weight(1f)) {
-                                      Text(if (isGu) chapter.titleGu else chapter.titleEn, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF1E293B))
-                                      Text(if (isGu) "📖 સંપૂર્ણ વાર્તા/સારાંશ + ✍️ સ્વાધ્યાય જવાબો" else "📖 Story/Summary + ✍️ Exercise Solutions", fontSize = 12.sp, color = Color(0xFF0D276B))
-                                  }
-                                  Icon(Icons.Default.ArrowForwardIos, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-                              }
-                          }
-                      }
-                  }
-              }
-          }
-
-          @Composable
-          fun ChapterDetailScreen(chapter: Chapter, isGu: Boolean) {
-              var selectedViewTab by remember { mutableStateOf(0) }
-
-              Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  TabRow(selectedTabIndex = selectedViewTab, containerColor = Color.White) {
-                      Tab(
-                          selected = selectedViewTab == 0,
-                          onClick = { selectedViewTab = 0 },
-                          text = { Text(if (isGu) "📖 સંપૂર્ણ વાર્તા & સારાંશ" else "📖 Full Story & Theory", fontWeight = FontWeight.Bold, fontSize = 13.sp) }
-                      )
-                      Tab(
-                          selected = selectedViewTab == 1,
-                          onClick = { selectedViewTab = 1 },
-                          text = { Text(if (isGu) "✍️ સ્વાધ્યાય પ્રશ્નોત્તરો" else "✍️ Exercise Q&A", fontWeight = FontWeight.Bold, fontSize = 13.sp) }
-                      )
-                  }
-
-                  Spacer(modifier = Modifier.height(10.dp))
-
-                  if (selectedViewTab == 0) {
-                      Card(
-                          modifier = Modifier.fillMaxSize(),
-                          colors = CardDefaults.cardColors(containerColor = Color.White),
-                          shape = RoundedCornerShape(12.dp),
-                          elevation = CardDefaults.cardElevation(2.dp)
-                      ) {
-                          LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                              item {
-                                  Text(if (isGu) chapter.titleGu else chapter.titleEn, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color(0xFF0D276B))
-                                  Spacer(modifier = Modifier.height(8.dp))
-                                  Text(
-                                      text = if (isGu) chapter.storyAndSummaryGu else chapter.storyAndSummaryEn,
-                                      fontSize = 14.sp,
-                                      color = Color(0xFF334155),
-                                      lineHeight = 22.sp
-                                  )
-                              }
-                          }
-                      }
-                  } else {
-                      val qaList = if (isGu) chapter.swadhyayAnswersGu else chapter.swadhyayAnswersEn
-                      LazyColumn(modifier = Modifier.fillMaxSize()) {
-                          items(qaList) { qa ->
-                              Card(
-                                  modifier = Modifier
-                                      .fillMaxWidth()
-                                      .padding(vertical = 6.dp),
-                                  colors = CardDefaults.cardColors(containerColor = Color.White),
-                                  elevation = CardDefaults.cardElevation(2.dp),
-                                  shape = RoundedCornerShape(12.dp)
-                              ) {
-                                  Column(modifier = Modifier.padding(14.dp)) {
-                                      Surface(
-                                          color = Color(0xFFFFF3E0),
-                                          shape = RoundedCornerShape(6.dp)
-                                      ) {
-                                          Text(
-                                              text = qa.type,
-                                              modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                              fontSize = 11.sp,
-                                              fontWeight = FontWeight.Bold,
-                                              color = Color(0xFFE65100)
-                                          )
-                                      }
-                                      Spacer(modifier = Modifier.height(6.dp))
-                                      Text("${if (isGu) "પ્રશ્ન" else "Question"}: ${qa.question}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF1E293B))
-                                      Spacer(modifier = Modifier.height(6.dp))
-                                      Text(qa.answer, fontSize = 13.sp, color = Color(0xFF334155), lineHeight = 20.sp)
-                                  }
-                              }
-                          }
-                      }
-                  }
-              }
-          }
-          EOF
-
-      - name: Build Android APK
-        run: |
-          chmod +x gradlew || gradle wrapper --gradle-version 8.4
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: GSEB-VidyaSetu-Edu-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+                                      
