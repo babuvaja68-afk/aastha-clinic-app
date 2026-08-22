@@ -1,4 +1,4 @@
-name: Build GSEB VidyaSetu App APK
+name: Build Ludo Star Club Final Installable Edition APK
 
 on:
   push:
@@ -21,12 +21,12 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Complete Offline Education App with Full Books and Swadhyay Solutions
+      - name: Setup Final Installable Ludo Multiplayer App
         run: |
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
-          mkdir -p app/src/main/java/com/gseb/vidyasetu
+          mkdir -p app/src/main/java/com/ludo/starclub
           mkdir -p gradle/wrapper
 
           # 0. Gradle Properties
@@ -58,7 +58,7 @@ jobs:
 
           # settings.gradle
           cat << 'EOF' > settings.gradle
-          rootProject.name = "GSEBVidyaSetu"
+          rootProject.name = "LudoStarClub"
           include ':app'
           EOF
 
@@ -70,15 +70,15 @@ jobs:
           }
 
           android {
-              namespace 'com.gseb.vidyasetu'
+              namespace 'com.ludo.starclub'
               compileSdk 34
 
               defaultConfig {
-                  applicationId "com.gseb.vidyasetu"
+                  applicationId "com.ludo.starclub"
                   minSdk 24
                   targetSdk 34
-                  versionCode 13
-                  versionName "13.0"
+                  versionCode 6
+                  versionName "6.0"
               }
 
               buildTypes {
@@ -120,10 +120,12 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+              <uses-permission android:name="android.permission.VIBRATE" />
               <application
                   android:allowBackup="true"
                   android:icon="@mipmap/ic_launcher"
-                  android:label="GSEB વિદ્યાસેતુ"
+                  android:label="Ludo Star Club"
                   android:roundIcon="@mipmap/ic_launcher"
                   android:supportsRtl="true"
                   android:theme="@android:style/Theme.Material.Light.NoActionBar">
@@ -139,41 +141,23 @@ jobs:
           </manifest>
           EOF
 
-          # EDUCATION VECTOR LOGO
-          cat << 'EOF' > app/src/main/res/drawable/ic_education_logo.xml
+          # PRO GAMING LOGO
+          cat << 'EOF' > app/src/main/res/drawable/ic_ludo_pro_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="108dp"
               android:height="108dp"
               android:viewportWidth="108"
               android:viewportHeight="108">
-              <path
-                  android:fillColor="#0D276B"
-                  android:pathData="M54,8 C79.4,8 100,28.6 100,54 C100,79.4 79.4,100 54,100 C28.6,100 8,79.4 8,54 C8,28.6 28.6,8 54,8 Z"/>
-              <path
-                  android:strokeColor="#FFC107"
-                  android:strokeWidth="2"
-                  android:pathData="M54,12 C77.2,12 96,30.8 96,54 C96,77.2 77.2,96 54,96 C30.8,96 12,77.2 12,54 C12,30.8 30.8,12 54,12 Z"/>
-              <path
-                  android:fillColor="#FFA000"
-                  android:pathData="M54,42 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0"/>
-              <path
-                  android:fillColor="#FFD54F"
-                  android:pathData="M54,20 L78,30 L54,40 L30,30 Z"/>
-              <path
-                  android:fillColor="#FFB300"
-                  android:pathData="M38,34 L38,44 C38,49 50,54 54,54 C58,54 70,49 70,44 L70,34 L54,41 Z"/>
-              <path
-                  android:fillColor="#FFFFFF"
-                  android:pathData="M72,32 L76,46 L73,46 L70,33 Z"/>
-              <path
-                  android:fillColor="#FFFFFF"
-                  android:pathData="M24,56 C34,53 46,55 53,60 L53,84 C46,79 34,77 24,80 Z"/>
-              <path
-                  android:fillColor="#ECEFF1"
-                  android:pathData="M84,56 C74,53 62,55 55,60 L55,84 C62,79 74,77 84,80 Z"/>
-              <path
-                  android:fillColor="#FFC107"
-                  android:pathData="M53,60 L55,60 L55,84 L53,84 Z"/>
+              <path android:fillColor="#0B132B" android:pathData="M54,6 C78,6 98,18 98,44 C98,74 54,102 54,102 C54,102 10,74 10,44 C10,18 30,6 54,6 Z"/>
+              <path android:strokeColor="#FFC107" android:strokeWidth="2.5" android:pathData="M54,8 C76,8 95,20 95,44 C95,72 54,98 54,98 C54,98 13,72 13,44 C13,20 32,8 54,8 Z"/>
+              <path android:fillColor="#E53935" android:pathData="M54,20 C38,20 24,32 24,50 L54,50 Z"/>
+              <path android:fillColor="#43A047" android:pathData="M54,20 C70,20 84,32 84,50 L54,50 Z"/>
+              <path android:fillColor="#1E88E5" android:pathData="M24,50 C24,68 38,80 54,80 L54,50 Z"/>
+              <path android:fillColor="#FDD835" android:pathData="M84,50 C84,68 70,80 54,80 L54,50 Z"/>
+              <path android:fillColor="#FFFFFF" android:pathData="M38,36 h32 v32 h-32 z"/>
+              <path android:fillColor="#E53935" android:pathData="M54,52 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+              <path android:fillColor="#E53935" android:pathData="M44,42 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 M64,42 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 M44,62 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 M64,62 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0"/>
+              <path android:fillColor="#FFD54F" android:pathData="M40,18 L46,26 L54,16 L62,26 L68,18 L66,28 L42,28 Z"/>
           </vector>
           EOF
 
@@ -183,9 +167,7 @@ jobs:
               android:height="108dp"
               android:viewportWidth="108"
               android:viewportHeight="108">
-              <path
-                  android:fillColor="#0D276B"
-                  android:pathData="M0,0h108v108h-108z"/>
+              <path android:fillColor="#0B132B" android:pathData="M0,0h108v108h-108z"/>
           </vector>
           EOF
 
@@ -193,26 +175,35 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
               <background android:drawable="@drawable/ic_launcher_bg"/>
-              <foreground android:drawable="@drawable/ic_education_logo"/>
+              <foreground android:drawable="@drawable/ic_ludo_pro_logo"/>
           </adaptive-icon>
           EOF
 
-          # Main Application Source Code
-          cat << 'EOF' > app/src/main/java/com/gseb/vidyasetu/MainActivity.kt
-          package com.gseb.vidyasetu
+          # Main Application Source Code with Direct APK & Room Sharing
+          cat << 'EOF' > app/src/main/java/com/ludo/starclub/MainActivity.kt
+          package com.ludo.starclub
 
+          import android.content.Context
+          import android.content.Intent
+          import android.media.AudioAttributes
+          import android.media.AudioFormat
+          import android.media.AudioTrack
+          import android.net.Uri
           import android.os.Bundle
+          import android.widget.Toast
           import androidx.activity.ComponentActivity
           import androidx.activity.compose.setContent
+          import androidx.compose.animation.*
+          import androidx.compose.animation.core.*
+          import androidx.compose.foundation.BorderStroke
           import androidx.compose.foundation.Image
           import androidx.compose.foundation.background
+          import androidx.compose.foundation.border
           import androidx.compose.foundation.clickable
           import androidx.compose.foundation.layout.*
-          import androidx.compose.foundation.lazy.LazyColumn
-          import androidx.compose.foundation.lazy.grid.GridCells
-          import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-          import androidx.compose.foundation.lazy.grid.items
+          import androidx.compose.foundation.lazy.LazyRow
           import androidx.compose.foundation.lazy.items
+          import androidx.compose.foundation.shape.CircleShape
           import androidx.compose.foundation.shape.RoundedCornerShape
           import androidx.compose.material.icons.Icons
           import androidx.compose.material.icons.filled.*
@@ -220,560 +211,203 @@ jobs:
           import androidx.compose.runtime.*
           import androidx.compose.ui.Alignment
           import androidx.compose.ui.Modifier
+          import androidx.compose.ui.draw.rotate
+          import androidx.compose.ui.draw.scale
+          import androidx.compose.ui.draw.shadow
+          import androidx.compose.ui.graphics.Brush
           import androidx.compose.ui.graphics.Color
+          import androidx.compose.ui.platform.LocalContext
           import androidx.compose.ui.res.painterResource
           import androidx.compose.ui.text.font.FontWeight
           import androidx.compose.ui.unit.dp
           import androidx.compose.ui.unit.sp
+          import kotlinx.coroutines.Dispatchers
+          import kotlinx.coroutines.delay
+          import kotlinx.coroutines.launch
+          import kotlinx.coroutines.withContext
+          import org.json.JSONObject
+          import java.io.BufferedReader
+          import java.io.InputStreamReader
+          import java.io.OutputStreamWriter
+          import java.net.HttpURLConnection
+          import java.net.URL
+          import java.net.URLEncoder
+          import kotlin.math.sin
+          import kotlin.random.Random
 
-          enum class AppMedium { GUJARATI, ENGLISH }
+          enum class PlayerColor(val label: String, val primary: Color, val dark: Color, val light: Color) {
+              RED("લાલ (Red)", Color(0xFFE53935), Color(0xFFB71C1C), Color(0xFFFFCDD2)),
+              GREEN("લીલો (Green)", Color(0xFF43A047), Color(0xFF1B5E20), Color(0xFFC8E6C9)),
+              YELLOW("પીળો (Yellow)", Color(0xFFFDD835), Color(0xFFF57F17), Color(0xFFFFF9C4)),
+              BLUE("વાદળી (Blue)", Color(0xFF1E88E5), Color(0xFF0D47A1), Color(0xFFBBDEFB))
+          }
 
-          data class QuestionAnswer(
-              val question: String,
-              val answer: String,
-              val type: String = "સ્વાધ્યાય પ્રશ્ન / Solution"
+          data class GameState(
+              val roomCode: String = "",
+              val turn: PlayerColor = PlayerColor.RED,
+              val diceValue: Int = 1,
+              val isRolled: Boolean = false,
+              val message: String = "ડાઈસ રોલ કરો!",
+              val activeEmoji: String = "",
+              val activeComment: String = "",
+              val lastKilledPlayer: String = ""
           )
 
-          data class Chapter(
-              val chapterNumber: Int,
-              val titleGu: String,
-              val titleEn: String,
-              val fullBookContentGu: String,
-              val fullBookContentEn: String,
-              val swadhyayAnswersGu: List<QuestionAnswer>,
-              val swadhyayAnswersEn: List<QuestionAnswer>
-          )
+          object FunnySoundEngine {
+              fun playGotiKilledSound() {
+                  Thread {
+                      try {
+                          val sampleRate = 44100
+                          val notes = doubleArrayOf(466.16, 440.0, 415.30, 311.13)
+                          val durations = doubleArrayOf(0.28, 0.28, 0.28, 0.75)
+                          val totalSamples = (sampleRate * durations.sum()).toInt()
+                          val buffer = ShortArray(totalSamples)
+                          var offset = 0
+                          for (i in notes.indices) {
+                              val freq = notes[i]
+                              val numSamples = (sampleRate * durations[i]).toInt()
+                              for (j in 0 until numSamples) {
+                                  val angle = 2.0 * Math.PI * j / (sampleRate / freq)
+                                  val sampleVal = (sin(angle) * (1.0 - (j.toDouble() / numSamples) * 0.4) * Short.MAX_VALUE * 0.7).toInt().toShort()
+                                  buffer[offset + j] = sampleVal
+                              }
+                              offset += numSamples
+                          }
+                          val track = AudioTrack.Builder()
+                              .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
+                              .setAudioFormat(AudioFormat.Builder().setEncoding(AudioFormat.ENCODING_PCM_16BIT).setSampleRate(sampleRate).setChannelMask(AudioFormat.CHANNEL_OUT_MONO).build())
+                              .setBufferSizeInBytes(buffer.size * 2)
+                              .setTransferMode(AudioTrack.MODE_STATIC)
+                              .build()
+                          track.write(buffer, 0, buffer.size)
+                          track.play()
+                      } catch (e: Exception) {}
+                  }.start()
+              }
 
-          data class Subject(
-              val nameGu: String,
-              val nameEn: String,
-              val iconEmoji: String,
-              val color: Color,
-              val chapters: List<Chapter>
-          )
+              fun playDiceRollSound() {
+                  Thread {
+                      try {
+                          val sampleRate = 22050
+                          val numSamples = (sampleRate * 0.12).toInt()
+                          val buffer = ShortArray(numSamples)
+                          for (i in 0 until numSamples) {
+                              buffer[i] = (Random.nextDouble(-0.5, 0.5) * Short.MAX_VALUE * 0.4).toInt().toShort()
+                          }
+                          val track = AudioTrack.Builder()
+                              .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).build())
+                              .setAudioFormat(AudioFormat.Builder().setEncoding(AudioFormat.ENCODING_PCM_16BIT).setSampleRate(sampleRate).setChannelMask(AudioFormat.CHANNEL_OUT_MONO).build())
+                              .setBufferSizeInBytes(buffer.size * 2)
+                              .setTransferMode(AudioTrack.MODE_STATIC)
+                              .build()
+                          track.write(buffer, 0, buffer.size)
+                          track.play()
+                      } catch (e: Exception) {}
+                  }.start()
+              }
+          }
 
-          data class Standard(
-              val stdNumber: Int,
-              val nameGu: String,
-              val nameEn: String,
-              val sectionGu: String,
-              val sectionEn: String,
-              val subjects: List<Subject>
-          )
+          object LudoOnlineEngine {
+              private const val BASE_URL = "https://jsonblob.com/api/jsonBlob"
 
-          data class FolderItem(
-              val titleGu: String,
-              val titleEn: String,
-              val subtitleGu: String,
-              val subtitleEn: String,
-              val icon: String,
-              val fullArticleGu: String,
-              val fullArticleEn: String,
-              val detailsGu: List<Pair<String, String>>,
-              val detailsEn: List<Pair<String, String>>
-          )
+              suspend fun createRoom(roomCode: String, initialGame: GameState): String? {
+                  return withContext(Dispatchers.IO) {
+                      try {
+                          val url = URL(BASE_URL)
+                          val conn = url.openConnection() as HttpURLConnection
+                          conn.requestMethod = "POST"
+                          conn.setRequestProperty("Content-Type", "application/json")
+                          conn.doOutput = true
 
-          object EducationRepository {
-              fun getStandards(): List<Standard> {
-                  return (1..12).map { std ->
-                      val sectionGu = when (std) {
-                          in 1..5 -> "પ્રાથમિક વિભાગ (ધોરણ ૧-૫)"
-                          in 6..8 -> "ઉચ્ચ પ્રાથમિક વિભાગ (ધોરણ ૬-૮)"
-                          in 9..10 -> "માધ્યમિક વિભાગ (ધોરણ ૯-૧૦)"
-                          else -> "ઉચ્ચતર માધ્યમિક વિભાગ (ધોરણ ૧૧-૧૨)"
-                      }
-                      val sectionEn = when (std) {
-                          in 1..5 -> "Primary Section (Std 1-5)"
-                          in 6..8 -> "Upper Primary Section (Std 6-8)"
-                          in 9..10 -> "Secondary Section (Std 9-10)"
-                          else -> "Higher Secondary Section (Std 11-12)"
-                      }
+                          val json = JSONObject()
+                          json.put("roomCode", roomCode)
+                          json.put("turn", initialGame.turn.name)
+                          json.put("diceValue", initialGame.diceValue)
+                          json.put("message", initialGame.message)
+                          json.put("activeEmoji", initialGame.activeEmoji)
+                          json.put("activeComment", initialGame.activeComment)
+                          json.put("lastKilledPlayer", initialGame.lastKilledPlayer)
 
-                      val subjects = when (std) {
-                          10 -> listOf(
-                              Subject(
-                                  nameGu = "ગુજરાતી (પ્રથમ ભાષા - સાહિત્ય)",
-                                  nameEn = "Gujarati (First Language)",
-                                  iconEmoji = "📖",
-                                  color = Color(0xFF8E24AA),
-                                  chapters = listOf(
-                                      Chapter(
-                                          chapterNumber = 1,
-                                          titleGu = "કાવ્ય ૧: વૈષ્ણવજન (પદ - નરસિંહ મહેતા)",
-                                          titleEn = "Poem 1: Vaishnav Jan To",
-                                          fullBookContentGu = """
-                                              📜 સંપૂર્ણ કાવ્ય પંક્તિઓ અને વિગત:
-                                              
-                                              વૈષ્ણવજન તો તેને રે કહીએ, જે પીડ પરાઈ જાણે રે,
-                                              પરદુઃખે ઉપકાર કરે તોયે, મન અભિમાન ન આણે રે.
-                                              
-                                              સકળ લોકમાં સહુને વંદે, નિંદા ન કરે કેની રે,
-                                              વાચ કાછ મન નિર્મળ રાખે, ધન ધન જનની તેની રે.
-                                              
-                                              સમદૃષ્ટિ ને તૃષ્ણા ત્યાગી, પરસ્ત્રી જેને માત રે,
-                                              જિહ્વા થકી અસત્ય ન બોલે, પરધન નવ ઝાલે હાથ રે.
-                                              
-                                              મોહ માયા વ્યાપે નહિ જેને, દૃઢ વૈરાગ્ય જેના મનમાં રે,
-                                              રામનામ શૂં તાળી રે લાગી, સકળ તીરથ તેના તનમાં રે.
-                                              
-                                              વણલોભી ને કપટરહિત છે, કામ ક્રોધ નિવાર્યા રે,
-                                              ભણે નરસૈંયો તેનું દર્શન કરતાં, કુળ એકોતેર તાર્યા રે.
-                                              
-                                              📖 કાવ્યનો સરળ ભાવાર્થ:
-                                              નરસિંહ મહેતા આ પદમાં સાચા સજ્જન (વૈષ્ણવજન) ના ઉત્તમ લક્ષણો સમજાવે છે. સાચો માણસ તે છે જે બીજાના દુઃખ અને પીડાને પોતાની સમજે છે. કોઈના પર ઉપકાર કરે તો પણ પોતાના મનમાં લેશમાત્ર અહંકાર લાવતો નથી. તે સમગ્ર સંસારમાં સૌનો આદર કરે છે, કોઈની પણ નિંદા કરતો નથી અને પોતાની વાણી, ચારિત્ર્ય અને મનને સદા પવિત્ર રાખે છે.
-                                          """.trimIndent(),
-                                          fullBookContentEn = """
-                                              📜 Complete Poem and Meaning:
-                                              'Vaishnav Jan To Tene Kahiye, Je Peed Parayi Jane Re...'
-                                              Authored by the legendary 15th-century poet Narsinh Mehta, this devotional hymn was deeply cherished by Mahatma Gandhi.
-                                              
-                                              📖 Meaning:
-                                              A true noble soul (Vaishnav) is one who deeply feels and relieves the pain of others without harboring pride or ego. Such a person respects every living being, never speaks ill of anyone, maintains pure speech, mind and conduct, treats every woman as a mother, never utters falsehood, and never covets wealth that belongs to others.
-                                          """.trimIndent(),
-                                          swadhyayAnswersGu = listOf(
-                                              QuestionAnswer("સાચા વૈષ્ણવજનના મુખ્ય લક્ષણો કયા કયા છે?", "સંપૂર્ણ જવાબ:\n૧. તે હંમેશા પારકાના દુઃખ-દર્દને સમજે છે અને મદદ કરે છે.\n૨. ઉપકાર કર્યા પછી પણ મનમાં સહેજ પણ અભિમાન લાવતો નથી.\n૩. તે આખા વિશ્વમાં બધાને વંદન કરે છે અને કોઈની પણ નિંદા કરતો નથી.\n૪. તે પરસ્ત્રીને માતા સમાન ગણે છે અને ક્યારેય અસત્ય બોલતો નથી.\n૫. તે પરધન (બીજાના ધન) ને ક્યારેય હાથ અડાડતો નથી અને મોહ-માયાથી પર રહે છે."),
-                                              QuestionAnswer("'ધન ધન જનની તેની રે' - કવિ આવું કોના માટે કહે છે?", "સંપૂર્ણ જવાબ:\nજે વ્યક્તિ પોતાની વાણી, ચારિત્ર્ય અને મનને સંપૂર્ણ પવિત્ર રાખે છે અને નિર્મળ જીવન જીવે છે, તેની માતાને કવિ ધન્ય ગણે છે."),
-                                              QuestionAnswer("નરસિંહ મહેતા કોના દર્શન કરવાથી કુળ એકોતેર તાર્યાનું કહે છે?", "સંપૂર્ણ જવાબ:\nજે વ્યક્તિ લોભ અને કપટ રહિત હોય, જેણે કામ અને ક્રોધ પર વિજય મેળવ્યો હોય તેવા સાચા વૈષ્ણવજનના દર્શન માત્રથી ૭૧ પેઢીઓ તરી જાય છે.")
-                                          ),
-                                          swadhyayAnswersEn = listOf(
-                                              QuestionAnswer("What are the key qualities of a Vaishnav Jan?", "Complete Answer:\n1. Empathizes deeply with others' suffering and offers selfless help.\n2. Never holds pride or ego after helping someone.\n3. Respects all beings and refrains from backbiting or criticizing.\n4. Treats all women with maternal respect and never lies.\n5. Keeps mind and speech pure, remaining detached from greed."),
-                                              QuestionAnswer("Why does the poet praise the mother of a noble person?", "Complete Answer:\nThe mother who gives birth to a person of pure speech, unblemished character, and noble conduct deserves the highest divine praise.")
-                                          )
-                                      ),
-                                      Chapter(
-                                          chapterNumber = 2,
-                                          titleGu = "પાઠ ૨: રેસનો ઘોડો (નવલિકા - વર્ષા અડાલજા)",
-                                          titleEn = "Chapter 2: Race No Ghodo",
-                                          fullBookContentGu = """
-                                              📘 સંપૂર્ણ વાર્તા (Full Story):
-                                              વિનુકાકા પોતાના દીકરા સૌરભને નાનપણથી જ અભ્યાસમાં હંમેશા પ્રથમ લાવવા માટે દબાણ કરે છે. તેઓ માનતા હતા કે શિક્ષણ એટલે ફક્ત ટકા અને ડિગ્રી મેળવવાની સ્પર્ધા. તેઓ સૌરભને સતત ક્લાસ, કમ્પ્યુટર અને ભણતરમાં જોતરી રાખે છે, જાણે કે કોઈ 'રેસનો ઘોડો' દોડતો હોય!
-                                              
-                                              તેમની બાજુમાં રહેતો અંકિત (નીનાબહેન અને સંજયનો દીકરો) પણ સૌરભ સાથે જ ભણતો હતો. પરંતુ અંકિતના માતા-પિતા તેને મુક્ત બાળપણ, રમતો અને સંસ્કારો આપવા માંગતા હતા. જ્યારે અંકિત બીમાર પડ્યો ત્યારે તેની માતાએ તેને ટ્યુશનમાંથી ઉઠાડી લીધો અને પ્રેમથી ઉછેર્યો.
-                                              
-                                              પરિણામ એ આવ્યું કે સૌરભ ભણી-ગણીને મોટો ડોક્ટર બની અમેરિકા જતો રહ્યો, પરંતુ તેની પાસે પોતાના વૃદ્ધ માતા-પિતા માટે સમય કે પ્રેમ નહોતો. જ્યારે અંકિત સામાન્ય નોકરી કરતો હોવા છતાં મા-બાપ સાથે રહ્યો, પરિવારની સેવા કરી અને સાચો સુખી માણસ બન્યો.
-                                          """.trimIndent(),
-                                          fullBookContentEn = """
-                                              📘 Full Story:
-                                              Vinu Kaka constantly pressurizes his son Saurabh to top every exam, treating childhood like a competitive horse race. In contrast, Ankit's parents value empathy, happiness, and moral character over mere marks.
-                                              Years later, Saurabh becomes a successful doctor in the USA but lacks time and empathy for his aging parents. Ankit, with average grades, stays with his family in India, showering love and taking care of his parents.
-                                          """.trimIndent(),
-                                          swadhyayAnswersGu = listOf(
-                                              QuestionAnswer("વિનુકાકા બાળકોને શા માટે સ્પર્ધામાં જોતરી રાખતા હતા?", "સંપૂર્ણ જવાબ:\nવિનુકાકા માનતા હતા કે નિશાન ઊંચું રાખવું જોઈએ. સામાન્ય માણસની જેમ જીવવા કરતાં ક્લાસમાં ફર્સ્ટ આવીને એવોર્ડ જીતવા એ જ સફળતા છે. તેથી તેઓ બાળકોને રેસના ઘોડાની જેમ સતત ભણાવતા હતા."),
-                                              QuestionAnswer("અંકિતના માતા-પિતાનો જીવન પ્રત્યેનો અભિગમ કેવો હતો?", "સંપૂર્ણ જવાબ:\nઅંકિતના માતા-પિતા માનતા હતા કે બાળક પર અભ્યાસનું અતિશય દબાણ ન હોવું જોઈએ. બાળકને પ્રકૃતિ સાથે રમવા દેવું જોઈએ, સાચા સંસ્કારો અને પરિવાર પ્રત્યે પ્રેમ શીખવવો જોઈએ.")
-                                          ),
-                                          swadhyayAnswersEn = listOf(
-                                              QuestionAnswer("What was Vinu Kaka's philosophy regarding children's education?", "Answer:\nHe believed education is a fierce race where only toppers win prestige, pushing his son into continuous coaching."),
-                                              QuestionAnswer("What message does the story convey?", "Answer:\nTrue education is about emotional intelligence, moral values, and loving family bonds, not just scoring high marks.")
-                                          )
-                                      )
-                                  )
-                              ),
-                              Subject(
-                                  nameGu = "ગણિત (Mathematics)",
-                                  nameEn = "Mathematics",
-                                  iconEmoji = "📐",
-                                  color = Color(0xFF1E88E5),
-                                  chapters = listOf(
-                                      Chapter(
-                                          chapterNumber = 1,
-                                          titleGu = "પ્રકરણ ૧: વાસ્તવિક સંખ્યાઓ (Real Numbers)",
-                                          titleEn = "Chapter 1: Real Numbers",
-                                          fullBookContentGu = """
-                                              📘 સંપૂર્ણ પ્રકરણ સારાંશ અને થિયરી:
-                                              વાસ્તવિક સંખ્યાઓ એ સંમેય અને અસંમેય સંખ્યાઓનો સમૂહ છે.
-                                              
-                                              ૧. યુક્લિડનું ભાગાકારનું પૂર્વપ્રમેય:
-                                              કોઈપણ બે ધન પૂર્ણાંકો a અને b માટે અનન્ય અનૃણ પૂર્ણાંકો q અને r એવા મળે કે:
-                                              a = bq + r, જ્યાં 0 ≤ r < b
-                                              (ભાજ્ય = ભાજક × ભાગફળ + શેષ)
-                                              
-                                              ૨. અંકગણિતનું મૂળભૂત પ્રમેય:
-                                              દરેક વિભાજ્ય સંખ્યાને તેના અવિભાજ્ય અવયવોના ગુણાકાર તરીકે અનન્ય રીતે લખી શકાય છે.
-                                              
-                                              ૩. સંબંધ સૂત્ર:
-                                              ગુ.સા.અ.(a, b) × લ.સા.અ.(a, b) = a × b
-                                          """.trimIndent(),
-                                          fullBookContentEn = """
-                                              📘 Complete Theory & Concepts:
-                                              Euclid's Division Lemma states that for any two positive integers a and b, there exist unique integers q and r such that a = bq + r (0 ≤ r < b).
-                                              Fundamental Theorem of Arithmetic states that every composite integer can be factored into primes uniquely.
-                                          """.trimIndent(),
-                                          swadhyayAnswersGu = listOf(
-                                              QuestionAnswer("યુક્લિડની રીતે ગુ.સા.અ.(૧૩૫, ૨૨૫) શોધો.", "સંપૂર્ણ ગણતરી:\n૨૨૫ = ૧૩૫ × ૧ + ૯૦\n૧૩૫ = ૯૦ × ૧ + ૪૫\n૯૦ = ૪૫ × ૨ + ૦\nઅહીં શેષ શૂન્ય થતાં અંતિમ ભાજક ૪૫ છે.\nમાટે ગુ.સા.અ.(૧૩૫, ૨૨૫) = ૪૫."),
-                                              QuestionAnswer("સાબિત કરો કે √૫ અસંમેય સંખ્યા છે.", "સંપૂર્ણ સાબિતી:\nધારો કે √૫ સંમેય છે: √૫ = a/b (a, b અવિભાજ્ય પૂર્ણાંકો છે).\n૫b² = a² => a² એ ૫ વડે વિભાજ્ય છે => a પણ ૫ વડે વિભાજ્ય છે.\na = ૫c મુકતાં: ૫b² = ૨૫c² => b² = ૫c² => b પણ ૫ વડે વિભાજ્ય છે.\nઆમ a અને b નો સામાન્ય અવયવ ૫ મળે છે, જે ધારણાથી વિરોધાભાસ છે. માટે √૫ અસંમેય છે.")
-                                          ),
-                                          swadhyayAnswersEn = listOf(
-                                              QuestionAnswer("Find HCF of 135 and 225 using Euclid's lemma.", "Solution:\n225 = 135(1) + 90\n135 = 90(1) + 45\n90 = 45(2) + 0\nTherefore, HCF(135, 225) = 45."),
-                                              QuestionAnswer("Prove that √5 is irrational.", "Proof:\nAssume √5 = a/b (coprime). 5b² = a², meaning 5 divides a. Substitute a = 5c, giving 5 divides b. Contradiction shows √5 is irrational.")
-                                          )
-                                      )
-                                  )
-                              ),
-                              Subject(
-                                  nameGu = "વિજ્ઞાન અને ટેકનોલોજી (Science)",
-                                  nameEn = "Science & Technology",
-                                  iconEmoji = "🔬",
-                                  color = Color(0xFF43A047),
-                                  chapters = listOf(
-                                      Chapter(
-                                          chapterNumber = 1,
-                                          titleGu = "પ્રકરણ ૧: રાસાયણિક પ્રક્રિયાઓ અને સમીકરણો",
-                                          titleEn = "Chapter 1: Chemical Reactions and Equations",
-                                          fullBookContentGu = """
-                                              📘 સંપૂર્ણ પ્રકરણ સારાંશ:
-                                              રાસાયણિક પ્રક્રિયા દરમિયાન પદાર્થના રંગ, અવસ્થા, તાપમાનમાં ફેરફાર થાય છે અથવા વાયુ ઉત્પન્ન થાય છે.
-                                              
-                                              મુખ્ય પ્રક્રિયાઓ:
-                                              ૧. સંયોગીકરણ: ૨ પ્રક્રિયકો જોડાઈને ૧ નીપજ બનાવે. (C + O₂ -> CO₂)
-                                              ૨. વિઘટન: ૧ પ્રક્રિયક તૂટીને ૨ કે વધુ નીપજ આપે. (CaCO₃ -> CaO + CO₂)
-                                              ૩. વિસ્થાપન: વધુ સક્રિય તત્વ ઓછા સક્રિય તત્વને દૂર કરે. (Fe + CuSO₄ -> FeSO₄ + Cu)
-                                              ૪. રેડોક્ષ: ઓક્સિડેશન (ઓક્સિજન ઉમેરાય) અને રિડક્શન (ઓક્સિજન દૂર થાય) સાથે થાય.
-                                          """.trimIndent(),
-                                          fullBookContentEn = """
-                                              📘 Complete Theory:
-                                              Chemical equations represent chemical transformations. Major types include Combination, Decomposition, Single Displacement, Double Displacement, and Redox reactions.
-                                          """.trimIndent(),
-                                          swadhyayAnswersGu = listOf(
-                                              QuestionAnswer("વિસ્થાપન અને દ્વિવિસ્થાપન વચ્ચેનો તફાવત આપો.", "જવાબ:\n• વિસ્થાપન: Fe + CuSO₄ -> FeSO₄ + Cu (એક જ ધાતુનું વિસ્થાપન થાય છે).\n• દ્વિવિસ્થાપન: Na₂SO₄ + BaCl₂ -> BaSO₄ + ૨NaCl (આયનોની પરસ્પર આપ-લે થાય છે).")
-                                          ),
-                                          swadhyayAnswersEn = listOf(
-                                              QuestionAnswer("Differentiate Displacement from Double Displacement.", "Answer:\nDisplacement involves one element replacing another (Fe + CuSO4 -> FeSO4 + Cu). Double displacement involves mutual ion exchange (Na2SO4 + BaCl2 -> BaSO4 + 2NaCl).")
-                                          )
-                                      )
-                                  )
-                              ),
-                              Subject(
-                                  nameGu = "સામાજિક વિજ્ઞાન (Social Science)",
-                                  nameEn = "Social Science",
-                                  iconEmoji = "🌍",
-                                  color = Color(0xFFFB8C00),
-                                  chapters = listOf(
-                                      Chapter(
-                                          chapterNumber = 1,
-                                          titleGu = "પ્રકરણ ૧: ભારતનો ભવ્ય વારસો",
-                                          titleEn = "Chapter 1: Heritage of India",
-                                          fullBookContentGu = """
-                                              📘 સંપૂર્ણ પ્રકરણ સારાંશ:
-                                              વારસો એટલે પૂર્વજો તરફથી મળેલી અમૂલ્ય ભેટ.
-                                              • પ્રાકૃતિક વારસો: કુદરતે આપેલી ભેટ (હિમાલય, ગંગા-નર્મદા નદીઓ, ગીરના સિંહો, વનસ્પતિ).
-                                              • સાંસ્કૃતિક વારસો: માનવીએ સર્જેલો વારસો (મંદિરો, સ્તૂપો, કિલ્લાઓ, શિલ્પો અને ઉત્સવો).
-                                          """.trimIndent(),
-                                          fullBookContentEn = """
-                                              📘 Complete Theory:
-                                              Heritage is a gift from our ancestors. Natural heritage includes rivers, flora and fauna. Cultural heritage includes art, architecture, literature and festivals.
-                                          """.trimIndent(),
-                                          swadhyayAnswersGu = listOf(
-                                              QuestionAnswer("ભારતના પ્રાકૃતિક વારસાના અંગો જણાવો.", "જવાબ:\nપર્વતો, નદીઓ, વૃક્ષો, સાગરો અને વન્યપ્રાણીઓનો સમાવેશ થાય છે.")
-                                          ),
-                                          swadhyayAnswersEn = listOf(
-                                              QuestionAnswer("List elements of natural heritage.", "Answer:\nMountains, rivers, oceans, medicinal plants and wildlife.")
-                                          )
-                                      )
-                                  )
-                              )
-                          )
-                          else -> listOf(
-                              Subject(
-                                  nameGu = "ગણિત (Mathematics)",
-                                  nameEn = "Mathematics",
-                                  iconEmoji = "📐",
-                                  color = Color(0xFF1E88E5),
-                                  chapters = listOf(
-                                      Chapter(
-                                          chapterNumber = 1,
-                                          titleGu = "પ્રકરણ ૧: પાયાની ગણતરી અને સંખ્યાજ્ઞાન",
-                                          titleEn = "Chapter 1: Number Sense & Operations",
-                                          fullBookContentGu = "📘 સંપૂર્ણ સારાંશ:\nસંખ્યાઓની સ્થાનકિંમત, સરવાળા, બાદબાકી, ગુણાકાર અને ભાગાકારના પાયાના નિયમો.",
-                                          fullBookContentEn = "📘 Summary:\nPlace values, addition, subtraction, multiplication and division rules.",
-                                          swadhyayAnswersGu = listOf(QuestionAnswer("૭,૪૫૨ માં દરેક અંકની સ્થાનકિંમત આપો.", "૭ = ૭,૦૦૦ | ૪ = ૪૦૦ | ૫ = ૫૦ | ૨ = ૨")),
-                                          swadhyayAnswersEn = listOf(QuestionAnswer("Place values of 7,452:", "7 = 7,000 | 4 = 400 | 5 = 50 | 2 = 2"))
-                                      )
-                                  )
-                              ),
-                              Subject(
-                                  nameGu = "ગુજરાતી (ભાષા સાહિત્ય)",
-                                  nameEn = "Gujarati Language & Stories",
-                                  iconEmoji = "📚",
-                                  color = Color(0xFF43A047),
-                                  chapters = listOf(
-                                      Chapter(
-                                          chapterNumber = 1,
-                                          titleGu = "પાઠ ૧: શાળા તત્પરતા અને વાર્તાઓ",
-                                          titleEn = "Chapter 1: School Life & Stories",
-                                          fullBookContentGu = "📘 સંપૂર્ણ વાર્તા:\nશાળાનું સુંદર વાતાવરણ, મિત્રો સાથે પરિચય, શિક્ષણ અને સંસ્કારોનું મહત્વ.",
-                                          fullBookContentEn = "📘 Story:\nJoy of learning, school friendships and moral lessons.",
-                                          swadhyayAnswersGu = listOf(QuestionAnswer("શાળામાં આપણે શું શીખીએ છીએ?", "વાંચન, લેખન, ગણતરી અને સારા સંસ્કારો.")),
-                                          swadhyayAnswersEn = listOf(QuestionAnswer("What do we learn in school?", "Reading, writing, math and moral discipline."))
-                                      )
-                                  )
-                              )
-                          )
-                      }
-
-                      Standard(
-                          stdNumber = std,
-                          nameGu = "ધોરણ $std (Standard $std)",
-                          nameEn = "Standard $std",
-                          sectionGu = sectionGu,
-                          sectionEn = sectionEn,
-                          subjects = subjects
-                      )
+                          val wr = OutputStreamWriter(conn.outputStream)
+                          wr.write(json.toString())
+                          wr.flush()
+                          conn.getHeaderField("Location")
+                      } catch (e: Exception) { null }
                   }
               }
 
-              // COMPLETE COMPUTER LEARNING COURSE WITH FULL ARTICLES
-              fun getComputerFolders(): List<FolderItem> {
-                  return listOf(
-                      FolderItem(
-                          titleGu = "૧. કમ્પ્યુટર બેઝિક્સ પરિચય (Computer Fundamentals)",
-                          titleEn = "1. Computer Fundamentals & Architecture",
-                          subtitleGu = "હાર્ડવેર, સોફ્ટવેર, મેમરી અને કમ્પ્યુટરના ભાગો",
-                          subtitleEn = "Hardware, Software, Memory & Architecture",
-                          icon = "💻",
-                          fullArticleGu = """
-                              🖥️ કમ્પ્યુટર બેઝિક્સ સંપૂર્ણ માર્ગદર્શિકા:
-                              કમ્પ્યુટર એ એક અતિ ઝડપી અને સચોટ ઇલેક્ટ્રોનિક મશીન છે જે ડેટા ઇનપુટ તરીકે સ્વીકારે છે, CPU માં Process કરે છે અને Output આપે છે.
-                              
-                              ૧. હાર્ડવેર (Hardware):
-                              • Input Devices: કીબોર્ડ (Keyboard), માઉસ (Mouse), સ્કેનર (Scanner), માઇક્રોફોન (Mic), વેબકેમ.
-                              • Output Devices: મોનિટર (Screen), પ્રિન્ટર (Printer), સ્પીકર (Speaker).
-                              • CPU (Central Processing Unit): કમ્પ્યુટરનું મગજ! તેના ત્રણ મુખ્ય ભાગો છે:
-                                - ALU (Arithmetic Logic Unit): ગાણિતિક અને તાર્કિક ગણતરીઓ કરે છે.
-                                - CU (Control Unit): સિસ્ટમનું સંચાલન કરે છે.
-                                - Cache Registers: હાઇ-સ્પીડ મેમરી.
-                              
-                              ૨. મેમરીના પ્રકારો:
-                              • RAM (Random Access Memory): હંગામી અને અતિ ઝડપી કાર્યકારી મેમરી.
-                              • ROM & SSD/Hard Disk: કાયમી ડેટા સ્ટોરેજ.
-                          """.trimIndent(),
-                          fullArticleEn = """
-                              🖥️ Complete Guide to Computer Fundamentals:
-                              A computer executes operations through the Input-Process-Output (IPO) cycle.
-                              • Hardware: Tangible physical components (Keyboard, CPU, RAM, NVMe SSD, Monitor).
-                              • Software: Programs and Operating Systems (Windows 11, Linux, macOS).
-                          """.trimIndent(),
-                          detailsGu = listOf(
-                              "IPO Cycle" to "Input -> CPU Processing -> Output",
-                              "CPU ના ૩ ભાગો" to "ALU, CU અને Registers",
-                              "RAM vs ROM" to "RAM કામચલાઉ છે; ROM કાયમી બૂટિંગ મેમરી છે."
-                          ),
-                          detailsEn = listOf(
-                              "IPO Cycle" to "Input -> CPU Processing -> Output",
-                              "CPU Units" to "ALU, CU, and Registers",
-                              "RAM vs ROM" to "RAM is volatile; ROM is non-volatile system firmware."
-                          )
-                      ),
-                      FolderItem(
-                          titleGu = "૨. કીબોર્ડ શોર્ટકટ કીઝ (A to Z Shortcuts)",
-                          titleEn = "2. Master Keyboard Shortcuts",
-                          subtitleGu = "સુપરફાસ્ટ ટાઈપિંગ અને કમાન્ડ્સ",
-                          subtitleEn = "Speed up Windows & MS Office tasks",
-                          icon = "⌨️",
-                          fullArticleGu = """
-                              ⌨️ કમ્પ્યુટર શોર્ટકટ કીઝની સંપૂર્ણ માસ્ટરી:
-                              • Ctrl + A : બધું લખાણ સિલેક્ટ કરવા (Select All)
-                              • Ctrl + C : કોપી કરવા (Copy)
-                              • Ctrl + V : પેસ્ટ કરવા (Paste)
-                              • Ctrl + X : કટ કરવા (Cut)
-                              • Ctrl + Z : છેલ્લી ક્રિયા પાછી લાવવા (Undo)
-                              • Ctrl + Y : પાછું કરેલું આગળ લાવવા (Redo)
-                              • Ctrl + S : ફાઇલ સેવ કરવા (Save)
-                              • Ctrl + P : પ્રિન્ટ કરવા (Print)
-                              • Alt + F4 : ચાલુ પ્રોગ્રામ બંધ કરવા / શટડાઉન
-                              • Windows + D : સીધા ડેસ્કટોપ સ્ક્રીન પર જવા
-                          """.trimIndent(),
-                          fullArticleEn = """
-                              ⌨️ Keyboard Shortcuts Reference:
-                              • Ctrl + C / Ctrl + V : Copy / Paste
-                              • Ctrl + Z / Ctrl + Y : Undo / Redo
-                              • Ctrl + S / Ctrl + P : Save / Print
-                              • Win + D : Show Desktop
-                          """.trimIndent(),
-                          detailsGu = listOf(
-                              "Ctrl + C / Ctrl + V" to "Copy અને Paste",
-                              "Ctrl + Z / Ctrl + Y" to "Undo અને Redo",
-                              "Ctrl + S" to "Save (ફાઇલ સાચવવા)"
-                          ),
-                          detailsEn = listOf(
-                              "Ctrl + C / Ctrl + V" to "Copy & Paste clipboard content",
-                              "Ctrl + Z / Ctrl + Y" to "Undo & Redo actions",
-                              "Ctrl + S" to "Save active document"
-                          )
-                      ),
-                      FolderItem(
-                          titleGu = "૩. માઇક્રોસોફ્ટ ઓફિસ (Word, Excel, PPT)",
-                          titleEn = "3. Microsoft Office Suite",
-                          subtitleGu = "ડોક્યુમેન્ટ, સ્પ્રેડશીટ અને પ્રેઝન્ટેશન",
-                          subtitleEn = "Word, Excel Formulas & PowerPoint Slides",
-                          icon = "📑",
-                          fullArticleGu = """
-                              📑 MS Office સંપૂર્ણ માર્ગદર્શિકા:
-                              ૧. MS Word: લેટર, એપ્લિકેશન, રેઝ્યુમે અને પુસ્તક ટાઈપિંગ.
-                              ૨. MS Excel: હિસાબો અને ડેટા એનાલિસિસ.
-                                 સૂત્રો: =SUM(A1:A10), =AVERAGE(), =IF()
-                              ૩. MS PowerPoint: પ્રોફેશનલ સ્લાઇડ્સ અને એનિમેશન.
-                          """.trimIndent(),
-                          fullArticleEn = """
-                              📑 Microsoft Office Suite:
-                              1. MS Word: Document authoring and report formatting.
-                              2. MS Excel: Formulas like =SUM(), =AVERAGE(), =IF(), and Pivot tables.
-                              3. MS PowerPoint: Interactive slide decks and animations.
-                          """.trimIndent(),
-                          detailsGu = listOf(
-                              "MS Word" to "દસ્તાવેજ અને પુસ્તક ટાઈપિંગ",
-                              "MS Excel" to "ગણતરી અને નાણાકીય હિસાબ",
-                              "MS PowerPoint" to "સ્લાઇડ્સ અને પ્રેઝન્ટેશન"
-                          ),
-                          detailsEn = listOf(
-                              "MS Word" to "Document authoring",
-                              "MS Excel" to "Spreadsheet calculations",
-                              "MS PowerPoint" to "Slide presentations"
-                          )
-                      )
-                  )
+              suspend fun syncGame(blobUrl: String, game: GameState): Boolean {
+                  return withContext(Dispatchers.IO) {
+                      try {
+                          val url = URL(blobUrl)
+                          val conn = url.openConnection() as HttpURLConnection
+                          conn.requestMethod = "PUT"
+                          conn.setRequestProperty("Content-Type", "application/json")
+                          conn.doOutput = true
+
+                          val json = JSONObject()
+                          json.put("roomCode", game.roomCode)
+                          json.put("turn", game.turn.name)
+                          json.put("diceValue", game.diceValue)
+                          json.put("message", game.message)
+                          json.put("activeEmoji", game.activeEmoji)
+                          json.put("activeComment", game.activeComment)
+                          json.put("lastKilledPlayer", game.lastKilledPlayer)
+
+                          val wr = OutputStreamWriter(conn.outputStream)
+                          wr.write(json.toString())
+                          wr.flush()
+                          conn.responseCode == 200
+                      } catch (e: Exception) { false }
+                  }
               }
 
-              // COMPLETE SPOKEN ENGLISH MASTER COURSE
-              fun getSpokenEnglishFolders(): List<FolderItem> {
-                  return listOf(
-                      FolderItem(
-                          titleGu = "૧. રોજિંદા ૧૦૦+ બોલાતા વાક્યો",
-                          titleEn = "1. 100+ Daily Spoken Sentences",
-                          subtitleGu = "વાતચીત માટે ઉપયોગી અંગ્રેજી વાક્યો",
-                          subtitleEn = "Everyday Fluency for Beginners",
-                          icon = "🗣️",
-                          fullArticleGu = """
-                              🗣️ રોજિંદા જીવનમાં વપરાતા અંગ્રેજી વાક્યો:
-                              • How are you doing today? -> તમે આજે કેમ છો?
-                              • I am doing great, thank you! -> હું એકદમ મજામાં છું, આભાર!
-                              • What is your name? -> તમારું નામ શું છે?
-                              • Where do you live? -> તમે ક્યાં રહો છો?
-                              • Could you please repeat that? -> શું તમે ફરીથી બોલશો?
-                              • Don't worry, everything will be fine. -> ચિંતા ન કરો, બધું સારું થશે.
-                          """.trimIndent(),
-                          fullArticleEn = """
-                              🗣️ Daily English Conversation:
-                              • How are you doing? -> Common greeting.
-                              • I am doing great! -> Positive response.
-                              • Could you please repeat? -> Clarification request.
-                          """.trimIndent(),
-                          detailsGu = listOf(
-                              "How are you?" to "તમે કેમ છો?",
-                              "I am fine!" to "હું મજામાં છું!",
-                              "Have a great day!" to "તમારો દિવસ શુભ રહે!"
-                          ),
-                          detailsEn = listOf(
-                              "How are you?" to "Daily greeting",
-                              "I am fine!" to "Polite response",
-                              "Have a great day!" to "Warm closing phrase"
-                          )
-                      ),
-                      FolderItem(
-                          titleGu = "૨. અંગ્રેજી વ્યાકરણ અને કાળ (Grammar & Tenses)",
-                          titleEn = "2. English Tenses Guide",
-                          subtitleGu = "સૂત્રો, નિયમો અને વ્યવહારુ ઉદાહરણો",
-                          subtitleEn = "Grammar Formulas with Examples",
-                          icon = "✍️",
-                          fullArticleGu = """
-                              ✍️ અંગ્રેજી કાળ (Tenses) ના નિયમો:
-                              ૧. સાદો વર્તમાનકાળ: Sub + Verb(s/es) + Obj
-                                 ઉદાહરણ: He reads books daily.
-                              ૨. સાદો ભૂતકાળ: Sub + V2 + Obj
-                                 ઉદાહરણ: We visited Somnath yesterday.
-                              ૩. સાદો ભવિષ્યકાળ: Sub + will + Verb + Obj
-                                 ઉદાહરણ: India will win the match.
-                          """.trimIndent(),
-                          fullArticleEn = """
-                              ✍️ English Tenses Guide:
-                              1. Simple Present: Sub + Verb(s/es) + Obj
-                              2. Simple Past: Sub + V2 + Obj
-                              3. Simple Future: Sub + will + Verb + Obj
-                          """.trimIndent(),
-                          detailsGu = listOf(
-                              "સાદો વર્તમાનકાળ" to "Sub + Verb(s/es) + Obj",
-                              "સાદો ભૂતકાળ" to "Sub + V2 + Obj",
-                              "સાદો ભવિષ્યકાળ" to "Sub + will + Verb + Obj"
-                          ),
-                          detailsEn = listOf(
-                              "Simple Present" to "Sub + Verb(s/es) + Obj",
-                              "Simple Past" to "Sub + V2 + Obj",
-                              "Simple Future" to "Sub + will + Verb + Obj"
-                          )
-                      )
-                  )
-              }
+              suspend fun fetchGame(blobUrl: String): GameState? {
+                  return withContext(Dispatchers.IO) {
+                      try {
+                          val url = URL(blobUrl)
+                          val conn = url.openConnection() as HttpURLConnection
+                          conn.requestMethod = "GET"
+                          conn.setRequestProperty("Accept", "application/json")
 
-              // COMPLETE BHARAT KO JANO & WORLD KNOWLEDGE
-              fun getKnowledgeFolders(): List<FolderItem> {
-                  return listOf(
-                      FolderItem(
-                          titleGu = "૧. ભારત કો જાનો (Know India Heritage)",
-                          titleEn = "1. National Heritage of India",
-                          subtitleGu = "ઇતિહાસ, પ્રતીકો, મહાનુભાવો અને સિદ્ધિઓ",
-                          subtitleEn = "National Symbols & Leaders",
-                          icon = "🇮🇳",
-                          fullArticleGu = """
-                              🇮🇳 આપણો ગૌરવશાળી ભારત દેશ:
-                              ૧. રાષ્ટ્રીય પ્રતીકો:
-                              • તિરંગો: કેસરી (શૌર્ય), સફેદ (શાંતિ), લીલો (સમૃદ્ધિ) અને ૨૪ આરાવાળું અશોક ચક્ર.
-                              • રાષ્ટ્રગીત: 'જન ગણ મન' (રવીન્દ્રનાથ ટાગોર - ૫૨ સેકન્ડ).
-                              • રાષ્ટ્રીય મુદ્રા: સારનાથનો અશોક સ્તંભ (સત્યમેવ જયતે).
-                              
-                              ૨. મહાનુભાવો:
-                              • સરદાર વલ્લભભાઈ પટેલ: લોખંડી પુરુષ (૫૬૨ રજવાડાંઓનું એકીકરણ - ૧૮૨ મીટર ઊંચી Statue of Unity).
-                              • મહાત્મા ગાંધી: રાષ્ટ્રપિતા (સત્ય અને અહિંસા).
-                              • ડૉ. બાબાસાહેબ આંબેડકર: બંધારણના શિલ્પી.
-                          """.trimIndent(),
-                          fullArticleEn = """
-                              🇮🇳 Glorious Nation of India:
-                              1. National Symbols: Tricolour Flag, Ashoka Lion Emblem, Jana Gana Mana Anthem.
-                              2. Great Leaders: Sardar Patel (Statue of Unity 182m), Mahatma Gandhi, Dr. B.R. Ambedkar.
-                          """.trimIndent(),
-                          detailsGu = listOf(
-                              "રાષ્ટ્રધ્વજ" to "તિરંગો (કેસરી, સફેદ, લીલો)",
-                              "સ્ટેચ્યુ ઓફ યુનિટી" to "૧૮૨ મીટર (વિશ્વમાં સૌથી ઊંચી પ્રતિમા)",
-                              "ચંદ્રયાન-૩" to "ચંદ્રના દક્ષિણ ધ્રુવ પર પહોંચનાર પ્રથમ દેશ"
-                          ),
-                          detailsEn = listOf(
-                              "National Flag" to "Tricolour with Ashoka Chakra",
-                              "Statue of Unity" to "182 Meters (World's Tallest)",
-                              "Chandrayaan-3" to "First country to land on Moon's South Pole"
-                          )
-                      ),
-                      FolderItem(
-                          titleGu = "૨. વિશ્વ ઇતિહાસ, ભૂગોળ અને વિજ્ઞાન",
-                          titleEn = "2. World History & Science",
-                          subtitleGu = "ખંડો, મહાસાગરો, અવકાશ અને ભૌતિક વિજ્ઞાન",
-                          subtitleEn = "Continents, Oceans & Physics",
-                          icon = "🌍",
-                          fullArticleGu = """
-                              🌍 વિશ્વ ઇતિહાસ, ભૂગોળ અને વિજ્ઞાન:
-                              ૧. ભૂગોળ: ૭ ખંડો (એશિયા સૌથી મોટો) અને ૫ મહાસાગરો (પેસિફિક સૌથી મોટો).
-                              • સૌથી લાંબી નદી: નાઈલ નદી (૬,૬૫૦ કિમી).
-                              • સૌથી ઊંચો પર્વત: માઉન્ટ એવરેસ્ટ (૮,૮૪૮.૮૬ મીટર).
-                              
-                              ૨. વિજ્ઞાન:
-                              • પ્રકાશની ઝડપ: ૩,૦૦,૦૦૦ કિમી/સેકન્ડ.
-                              • ગુરુત્વાકર્ષણ બળ: સર આઇઝેક ન્યૂટન.
-                              • સાપેક્ષતાનો સિદ્ધાંત: આલ્બર્ટ આઇન્સ્ટાઇન (E = mc²).
-                          """.trimIndent(),
-                          fullArticleEn = """
-                              🌍 World History & Science:
-                              1. Geography: 7 Continents, 5 Oceans, Nile River (6,650 km), Mount Everest (8,848.86 m).
-                              2. Science: Speed of Light (300,000 km/s), Newton's Gravity, Einstein's E = mc².
-                          """.trimIndent(),
-                          detailsGu = listOf(
-                              "સૌથી મોટો ખંડ" to "એશિયા (Asia)",
-                              "સૌથી લાંબી નદી" to "નાઈલ નદી (૬,૬૫૦ કિમી)",
-                              "પ્રકાશની ઝડપ" to "૩,૦૦,૦૦૦ કિમી/સેકન્ડ"
-                          ),
-                          detailsEn = listOf(
-                              "Largest Continent" to "Asia",
-                              "Longest River" to "Nile River (6,650 km)",
-                              "Speed of Light" to "300,000 km/s"
-                          )
-                      )
-                  )
+                          if (conn.responseCode == 200) {
+                              val reader = BufferedReader(InputStreamReader(conn.inputStream))
+                              val json = JSONObject(reader.readText())
+                              GameState(
+                                  roomCode = json.optString("roomCode"),
+                                  turn = PlayerColor.valueOf(json.optString("turn", "RED")),
+                                  diceValue = json.optInt("diceValue", 1),
+                                  message = json.optString("message", ""),
+                                  activeEmoji = json.optString("activeEmoji", ""),
+                                  activeComment = json.optString("activeComment", ""),
+                                  lastKilledPlayer = json.optString("lastKilledPlayer", "")
+                              )
+                          } else null
+                      } catch (e: Exception) { null }
+                  }
+              }
+          }
+
+          fun shareOnWhatsApp(context: Context, roomCode: String) {
+              val msg = """
+                  🎲 *LUDO STAR CLUB* 🎲
+                  ---------------------------------
+                  નમસ્તે મિત્ર! મારી સાથે લુડો રમવા માટે:
+                  
+                  ૧. જો તારા ફોનમાં એપ ઇન્સ્ટોલ ન હોય તો ઇન્સ્ટોલ કરી લે.
+                  ૨. એપ ખોલીને Join Room માં આ કોડ નાખ:
+                  
+                  🔑 *રૂમ કોડ:* ${roomCode}
+                  
+                  આવો સાથે રમીએ અને ગોટી કાપીએ! 🔪😂
+                  ---------------------------------
+              """.trimIndent()
+              try {
+                  val intent = Intent(Intent.ACTION_VIEW)
+                  intent.data = Uri.parse("https://api.whatsapp.com/send?text=" + URLEncoder.encode(msg, "UTF-8"))
+                  context.startActivity(intent)
+              } catch (e: Exception) {
+                  Toast.makeText(context, "WhatsApp open નથી થયું", Toast.LENGTH_SHORT).show()
               }
           }
 
@@ -781,34 +415,69 @@ jobs:
               override fun onCreate(savedInstanceState: Bundle?) {
                   super.onCreate(savedInstanceState)
                   setContent {
-                      GSEBVidyaSetuApp()
+                      LudoApp()
                   }
               }
           }
 
           @OptIn(ExperimentalMaterial3Api::class)
           @Composable
-          fun GSEBVidyaSetuApp() {
-              var isDarkMode by remember { mutableStateOf(false) }
-              var currentMedium by remember { mutableStateOf(AppMedium.GUJARATI) }
-              val isGu = currentMedium == AppMedium.GUJARATI
+          fun LudoApp() {
+              val context = LocalContext.current
+              val scope = rememberCoroutineScope()
 
-              val bgColor = if (isDarkMode) Color(0xFF121212) else Color(0xFFF4F7FB)
-              val cardBg = if (isDarkMode) Color(0xFF1E1E1E) else Color.White
-              val textColor = if (isDarkMode) Color.White else Color(0xFF1E293B)
-              val primaryColor = if (isDarkMode) Color(0xFF1976D2) else Color(0xFF0D276B)
-              val secondaryText = if (isDarkMode) Color(0xFFB0BEC5) else Color(0xFF64748B)
+              var screenMode by remember { mutableStateOf(0) }
+              var roomCodeInput by remember { mutableStateOf("") }
+              var activeBlobUrl by remember { mutableStateOf("") }
+              var generatedRoomCode by remember { mutableStateOf("") }
 
-              val standards = remember { EducationRepository.getStandards() }
-              val computerFolders = remember { EducationRepository.getComputerFolders() }
-              val spokenEnglishFolders = remember { EducationRepository.getSpokenEnglishFolders() }
-              val knowledgeFolders = remember { EducationRepository.getKnowledgeFolders() }
+              var gameState by remember { mutableStateOf(GameState()) }
+              var isRolling by remember { mutableStateOf(false) }
 
-              var selectedTab by remember { mutableStateOf(0) }
-              var selectedStandard by remember { mutableStateOf<Standard?>(null) }
-              var selectedSubject by remember { mutableStateOf<Subject?>(null) }
-              var selectedChapter by remember { mutableStateOf<Chapter?>(null) }
-              var activeFolder by remember { mutableStateOf<FolderItem?>(null) }
+              val funnyEmojis = listOf("😂", "🤪", "😭", "🔪", "💀", "💩", "🤡", "🔥", "😎", "🤦‍♂️")
+              val funnyComments = listOf(
+                  "ગોટી ગઈ ભાઈ! ખતમ! 💀",
+                  "હાહાહા.. ગઈ તારી ગોટી! 😂",
+                  "ભાઈ થોડી દયા રાખ! 😭",
+                  "જલ્દી ચાલ, ઊંઘ આવે છે! 😴",
+                  "૬ (Six) લાવો કોઈ! 🎲",
+                  "આ વખતે તો બદલો લઈશ જ! 🔪"
+              )
+
+              val diceRotation by animateFloatAsState(
+                  targetValue = if (isRolling) 720f else 0f,
+                  animationSpec = tween(durationMillis = 350, easing = LinearOutSlowInEasing),
+                  label = "3dDiceRotation"
+              )
+
+              val pulseScale by rememberInfiniteTransition(label = "pulse").animateFloat(
+                  initialValue = 1f,
+                  targetValue = 1.15f,
+                  animationSpec = infiniteRepeatable(animation = tween(600), repeatMode = RepeatMode.Reverse),
+                  label = "scale"
+              )
+
+              LaunchedEffect(activeBlobUrl) {
+                  if (activeBlobUrl.isNotBlank() && screenMode == 3) {
+                      while (true) {
+                          val remote = LudoOnlineEngine.fetchGame(activeBlobUrl)
+                          if (remote != null) {
+                              if (remote.lastKilledPlayer.isNotBlank() && remote.lastKilledPlayer != gameState.lastKilledPlayer) {
+                                  FunnySoundEngine.playGotiKilledSound()
+                              }
+                              gameState = gameState.copy(
+                                  turn = remote.turn,
+                                  diceValue = remote.diceValue,
+                                  message = remote.message,
+                                  activeEmoji = remote.activeEmoji,
+                                  activeComment = remote.activeComment,
+                                  lastKilledPlayer = remote.lastKilledPlayer
+                              )
+                          }
+                          delay(2000)
+                      }
+                  }
+              }
 
               Scaffold(
                   topBar = {
@@ -816,529 +485,718 @@ jobs:
                           title = {
                               Row(verticalAlignment = Alignment.CenterVertically) {
                                   Image(
-                                      painter = painterResource(id = R.drawable.ic_education_logo),
+                                      painter = painterResource(id = R.drawable.ic_ludo_pro_logo),
                                       contentDescription = "Logo",
-                                      modifier = Modifier.size(36.dp)
+                                      modifier = Modifier.size(38.dp)
                                   )
-                                  Spacer(modifier = Modifier.width(8.dp))
+                                  Spacer(modifier = Modifier.width(10.dp))
                                   Column {
-                                      Text(
-                                          text = when (selectedTab) {
-                                              0 -> if (selectedChapter != null) (if (isGu) selectedChapter!!.titleGu else selectedChapter!!.titleEn)
-                                                   else if (selectedSubject != null) (if (isGu) selectedSubject!!.nameGu else selectedSubject!!.nameEn)
-                                                   else if (selectedStandard != null) (if (isGu) selectedStandard!!.nameGu else selectedStandard!!.nameEn)
-                                                   else (if (isGu) "GSEB વિદ્યાસેતુ" else "GSEB VidyaSetu")
-                                              1 -> if (activeFolder != null) (if (isGu) activeFolder!!.titleGu else activeFolder!!.titleEn) else (if (isGu) "💻 કમ્પ્યુટર કોર્સ" else "💻 Computer Course")
-                                              2 -> if (activeFolder != null) (if (isGu) activeFolder!!.titleGu else activeFolder!!.titleEn) else (if (isGu) "🗣️ સ્પોકન ઇંગ્લિશ" else "🗣️ Spoken English")
-                                              else -> if (activeFolder != null) (if (isGu) activeFolder!!.titleGu else activeFolder!!.titleEn) else (if (isGu) "🇮🇳 ભારત & વિશ્વ જ્ઞાન" else "🇮🇳 India & World GK")
-                                          },
-                                          fontWeight = FontWeight.Bold,
-                                          fontSize = 16.sp,
-                                          color = Color.White,
-                                          maxLines = 1
-                                      )
-                                      Text(
-                                          text = if (isGu) "સંપૂર્ણ ઑફલાઇન પાઠ્યપુસ્તકો અને જવાબો" else "Complete Offline Books & Answers",
-                                          fontSize = 11.sp,
-                                          color = Color(0xFFE1F5FE)
-                                      )
+                                      Text("LUDO STAR CLUB", fontWeight = FontWeight.Black, fontSize = 18.sp, color = Color(0xFFFFD54F))
+                                      Text("Install & Play with WhatsApp Friends", fontSize = 11.sp, color = Color(0xFFE2E8F0))
                                   }
-                              }
-                          },
-                          actions = {
-                              IconButton(onClick = { isDarkMode = !isDarkMode }) {
-                                  Icon(
-                                      imageVector = if (isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
-                                      contentDescription = "Theme Toggle",
-                                      tint = Color(0xFFFFC107)
-                                  )
-                              }
-                              Button(
-                                  onClick = { currentMedium = if (isGu) AppMedium.ENGLISH else AppMedium.GUJARATI },
-                                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),
-                                  contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
-                              ) {
-                                  Text(if (isGu) "English" else "ગુજરાતી", color = Color(0xFF0D276B), fontWeight = FontWeight.Bold, fontSize = 12.sp)
                               }
                           },
                           navigationIcon = {
-                              val canGoBack = (selectedTab == 0 && selectedStandard != null) || (selectedTab != 0 && activeFolder != null)
-                              if (canGoBack) {
-                                  IconButton(onClick = {
-                                      if (selectedTab == 0) {
-                                          if (selectedChapter != null) selectedChapter = null
-                                          else if (selectedSubject != null) selectedSubject = null
-                                          else selectedStandard = null
-                                      } else {
-                                          activeFolder = null
-                                      }
-                                  }) {
-                                      Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                              if (screenMode != 0) {
+                                  IconButton(onClick = { screenMode = 0 }) {
+                                      Icon(Icons.Default.ArrowBack, contentDescription = "Home", tint = Color.White)
                                   }
                               }
                           },
-                          colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor)
+                          colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0F172A))
                       )
-                  },
-                  bottomBar = {
-                      NavigationBar(containerColor = cardBg) {
-                          NavigationBarItem(
-                              selected = selectedTab == 0,
-                              onClick = { selectedTab = 0; activeFolder = null },
-                              icon = { Icon(Icons.Default.MenuBook, contentDescription = null) },
-                              label = { Text(if (isGu) "ધોરણ ૧-૧૨" else "Std 1-12", fontSize = 11.sp, color = textColor) }
-                          )
-                          NavigationBarItem(
-                              selected = selectedTab == 1,
-                              onClick = { selectedTab = 1; activeFolder = null },
-                              icon = { Icon(Icons.Default.Computer, contentDescription = null) },
-                              label = { Text(if (isGu) "કમ્પ્યુટર" else "Computer", fontSize = 11.sp, color = textColor) }
-                          )
-                          NavigationBarItem(
-                              selected = selectedTab == 2,
-                              onClick = { selectedTab = 2; activeFolder = null },
-                              icon = { Icon(Icons.Default.RecordVoiceOver, contentDescription = null) },
-                              label = { Text(if (isGu) "ઇંગ્લિશ" else "English", fontSize = 11.sp, color = textColor) }
-                          )
-                          NavigationBarItem(
-                              selected = selectedTab == 3,
-                              onClick = { selectedTab = 3; activeFolder = null },
-                              icon = { Icon(Icons.Default.Public, contentDescription = null) },
-                              label = { Text(if (isGu) "વિશ્વ & GK" else "World GK", fontSize = 11.sp, color = textColor) }
-                          )
-                      }
                   }
-              ) { padding ->
+              ) { innerPadding ->
                   Box(
                       modifier = Modifier
                           .fillMaxSize()
-                          .padding(padding)
-                          .background(bgColor)
+                          .padding(innerPadding)
+                          .background(Brush.verticalGradient(listOf(Color(0xFF0F172A), Color(0xFF020617))))
                   ) {
-                      when (selectedTab) {
-                          0 -> {
-                              when {
-                                  selectedChapter != null -> ChapterDetailScreen(selectedChapter!!, isGu, cardBg, textColor)
-                                  selectedSubject != null -> SubjectChaptersScreen(selectedSubject!!, isGu, cardBg, textColor, secondaryText, onChapterSelect = { selectedChapter = it })
-                                  selectedStandard != null -> StandardSubjectsScreen(selectedStandard!!, isGu, cardBg, textColor, secondaryText, onSubjectSelect = { selectedSubject = it })
-                                  else -> StandardsListScreen(standards, isGu, cardBg, textColor, secondaryText, primaryColor, onStandardSelect = { selectedStandard = it })
-                              }
-                          }
-                          1 -> FolderViewScreen(
-                              folderList = computerFolders,
-                              activeFolder = activeFolder,
-                              isGu = isGu,
-                              cardBg = cardBg,
-                              textColor = textColor,
-                              secondaryText = secondaryText,
-                              primaryColor = primaryColor,
-                              onSelectFolder = { activeFolder = it },
-                              headerTitle = if (isGu) "💻 કમ્પ્યુટર શીખો (Full Course)" else "💻 Learn Computer Course",
-                              headerSubtitle = if (isGu) "બેઝિક્સ, શોર્ટકટ્સ અને MS Office" else "Basics, Shortcuts & MS Office"
+                      when (screenMode) {
+                          0 -> LudoHomeScreen(
+                              onPlayOffline = { gameState = GameState(); screenMode = 1 },
+                              onPlayOnline = { screenMode = 2 }
                           )
-                          2 -> FolderViewScreen(
-                              folderList = spokenEnglishFolders,
-                              activeFolder = activeFolder,
-                              isGu = isGu,
-                              cardBg = cardBg,
-                              textColor = textColor,
-                              secondaryText = secondaryText,
-                              primaryColor = primaryColor,
-                              onSelectFolder = { activeFolder = it },
-                              headerTitle = if (isGu) "🗣️ સ્પોકન ઇંગ્લિશ (Spoken English)" else "🗣️ Spoken English Mastery",
-                              headerSubtitle = if (isGu) "વાક્યો, વ્યાકરણ અને સંવાદો" else "Sentences, Grammar & Dialogues"
-                          )
-                          3 -> FolderViewScreen(
-                              folderList = knowledgeFolders,
-                              activeFolder = activeFolder,
-                              isGu = isGu,
-                              cardBg = cardBg,
-                              textColor = textColor,
-                              secondaryText = secondaryText,
-                              primaryColor = primaryColor,
-                              onSelectFolder = { activeFolder = it },
-                              headerTitle = if (isGu) "🇮🇳 ભારત & વિશ્વ જ્ઞાન (World & India GK)" else "🇮🇳 India & World GK",
-                              headerSubtitle = if (isGu) "ઇતિહાસ, ભૂગોળ અને વિજ્ઞાન" else "History, Geography & Science"
-                          )
-                      }
-                  }
-              }
-          }
+                          1 -> LudoBoardScreen(
+                              gameState = gameState,
+                              isOnline = false,
+                              diceRotation = diceRotation,
+                              pulseScale = pulseScale,
+                              funnyEmojis = funnyEmojis,
+                              funnyComments = funnyComments,
+                              onSendEmoji = { emoji ->
+                                  gameState = gameState.copy(activeEmoji = emoji, activeComment = "")
+                                  scope.launch {
+                                      delay(3000)
+                                      if (gameState.activeEmoji == emoji) gameState = gameState.copy(activeEmoji = "")
+                                  }
+                              },
+                              onSendComment = { comment ->
+                                  gameState = gameState.copy(activeComment = comment, activeEmoji = "")
+                                  scope.launch {
+                                      delay(3500)
+                                      if (gameState.activeComment == comment) gameState = gameState.copy(activeComment = "")
+                                  }
+                              },
+                              onSimulateKill = { victimColor ->
+                                  FunnySoundEngine.playGotiKilledSound()
+                                  val alertMsg = "ખતમ! ${victimColor.label} ની ગોટી કપાઈ ગઈ! 😭"
+                                  gameState = gameState.copy(lastKilledPlayer = victimColor.name, message = alertMsg)
+                                  scope.launch {
+                                      delay(4000)
+                                      if (gameState.lastKilledPlayer == victimColor.name) gameState = gameState.copy(lastKilledPlayer = "")
+                                  }
+                              },
+                              onRollDice = {
+                                  scope.launch {
+                                      FunnySoundEngine.playDiceRollSound()
+                                      isRolling = true
+                                      delay(350)
+                                      val rolled = Random.nextInt(1, 7)
+                                      isRolling = false
+                                      val willKill = (rolled == 6 && Random.nextBoolean())
+                                      val nextTurn = when (gameState.turn) {
+                                          PlayerColor.RED -> if (rolled == 6) PlayerColor.RED else PlayerColor.GREEN
+                                          PlayerColor.GREEN -> if (rolled == 6) PlayerColor.GREEN else PlayerColor.YELLOW
+                                          PlayerColor.YELLOW -> if (rolled == 6) PlayerColor.YELLOW else PlayerColor.BLUE
+                                          PlayerColor.BLUE -> if (rolled == 6) PlayerColor.BLUE else PlayerColor.RED
+                                      }
 
-          @Composable
-          fun FolderViewScreen(
-              folderList: List<FolderItem>,
-              activeFolder: FolderItem?,
-              isGu: Boolean,
-              cardBg: Color,
-              textColor: Color,
-              secondaryText: Color,
-              primaryColor: Color,
-              onSelectFolder: (FolderItem) -> Unit,
-              headerTitle: String,
-              headerSubtitle: String
-          ) {
-              if (activeFolder == null) {
-                  LazyColumn(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                      item {
-                          Text(headerTitle, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = textColor)
-                          Text(headerSubtitle, fontSize = 12.sp, color = secondaryText)
-                          Spacer(modifier = Modifier.height(12.dp))
-                      }
-
-                      items(folderList) { folder ->
-                          Card(
-                              modifier = Modifier
-                                  .fillMaxWidth()
-                                  .padding(vertical = 5.dp)
-                                  .clickable { onSelectFolder(folder) },
-                              colors = CardDefaults.cardColors(containerColor = cardBg),
-                              elevation = CardDefaults.cardElevation(2.dp),
-                              shape = RoundedCornerShape(12.dp)
-                          ) {
-                              Row(
-                                  modifier = Modifier.padding(16.dp),
-                                  horizontalArrangement = Arrangement.SpaceBetween,
-                                  verticalAlignment = Alignment.CenterVertically
-                              ) {
-                                  Row(verticalAlignment = Alignment.CenterVertically) {
-                                      Surface(
-                                          shape = RoundedCornerShape(10.dp),
-                                          color = Color(0xFFE8EAF6),
-                                          modifier = Modifier.size(46.dp)
-                                      ) {
-                                          Box(contentAlignment = Alignment.Center) {
-                                              Text(folder.icon, fontSize = 22.sp)
+                                      if (willKill) {
+                                          FunnySoundEngine.playGotiKilledSound()
+                                          val victim = when (gameState.turn) {
+                                              PlayerColor.RED -> PlayerColor.GREEN
+                                              PlayerColor.GREEN -> PlayerColor.YELLOW
+                                              PlayerColor.YELLOW -> PlayerColor.BLUE
+                                              PlayerColor.BLUE -> PlayerColor.RED
                                           }
-                                      }
-                                      Spacer(modifier = Modifier.width(14.dp))
-                                      Column {
-                                          Text(if (isGu) folder.titleGu else folder.titleEn, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = textColor)
-                                          Text(if (isGu) folder.subtitleGu else folder.subtitleEn, fontSize = 12.sp, color = secondaryText)
+                                          gameState = gameState.copy(
+                                              diceValue = rolled,
+                                              turn = nextTurn,
+                                              lastKilledPlayer = victim.name,
+                                              message = "ખતમ! ${gameState.turn.label} એ ${victim.label} ની ગોટી કાપી! 🔪😂"
+                                          )
+                                          scope.launch {
+                                              delay(4000)
+                                              if (gameState.lastKilledPlayer == victim.name) gameState = gameState.copy(lastKilledPlayer = "")
+                                          }
+                                      } else {
+                                          gameState = gameState.copy(
+                                              diceValue = rolled,
+                                              turn = nextTurn,
+                                              message = "${gameState.turn.label} -> $rolled!"
+                                          )
                                       }
                                   }
-                                  Icon(Icons.Default.ChevronRight, contentDescription = null, tint = primaryColor)
                               }
-                          }
-                      }
-                  }
-              } else {
-                  var readingTab by remember { mutableStateOf(0) }
-                  val fullArticle = if (isGu) activeFolder.fullArticleGu else activeFolder.fullArticleEn
-                  val details = if (isGu) activeFolder.detailsGu else activeFolder.detailsEn
-
-                  Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                      Card(
-                          modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
-                          colors = CardDefaults.cardColors(containerColor = primaryColor),
-                          shape = RoundedCornerShape(12.dp)
-                      ) {
-                          Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                              Text(activeFolder.icon, fontSize = 28.sp)
-                              Spacer(modifier = Modifier.width(10.dp))
-                              Column {
-                                  Text(if (isGu) activeFolder.titleGu else activeFolder.titleEn, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
-                                  Text(if (isGu) activeFolder.subtitleGu else activeFolder.subtitleEn, fontSize = 11.sp, color = Color(0xFFBBDEFB))
-                              }
-                          }
-                      }
-
-                      TabRow(selectedTabIndex = readingTab, containerColor = cardBg) {
-                          Tab(
-                              selected = readingTab == 0,
-                              onClick = { readingTab = 0 },
-                              text = { Text(if (isGu) "📖 સંપૂર્ણ લેખ & વિગત" else "📖 Full Article", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor) }
                           )
-                          Tab(
-                              selected = readingTab == 1,
-                              onClick = { readingTab = 1 },
-                              text = { Text(if (isGu) "📌 મુખ્ય મુદ્દાઓ" else "📌 Key Points", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor) }
-                          )
-                      }
-
-                      Spacer(modifier = Modifier.height(10.dp))
-
-                      if (readingTab == 0) {
-                          Card(
-                              modifier = Modifier.fillMaxSize(),
-                              colors = CardDefaults.cardColors(containerColor = cardBg),
-                              shape = RoundedCornerShape(12.dp),
-                              elevation = CardDefaults.cardElevation(2.dp)
-                          ) {
-                              LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                                  item {
-                                      Text(
-                                          text = fullArticle,
-                                          fontSize = 14.sp,
-                                          color = textColor,
-                                          lineHeight = 23.sp
-                                      )
-                                  }
-                              }
-                          }
-                      } else {
-                          LazyColumn(modifier = Modifier.fillMaxSize()) {
-                              items(details) { (itemKey, itemVal) ->
-                                  Card(
-                                      modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                      colors = CardDefaults.cardColors(containerColor = cardBg),
-                                      elevation = CardDefaults.cardElevation(1.dp),
-                                      shape = RoundedCornerShape(10.dp)
-                                  ) {
-                                      Column(modifier = Modifier.padding(12.dp)) {
-                                          Text("📌 $itemKey", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF1565C0))
-                                          Spacer(modifier = Modifier.height(4.dp))
-                                          Text(itemVal, fontSize = 13.sp, color = textColor, lineHeight = 20.sp)
+                          2 -> LudoOnlineSetupScreen(
+                              roomCodeInput = roomCodeInput,
+                              onRoomCodeChange = { roomCodeInput = it },
+                              onCreateRoom = {
+                                  scope.launch {
+                                      val code = (100000..999999).random().toString()
+                                      generatedRoomCode = code
+                                      val initial = GameState(roomCode = code, message = "રૂમ તૈયાર છે! WhatsApp પર મિત્રને બોલાવો.")
+                                      val blob = LudoOnlineEngine.createRoom(code, initial)
+                                      if (blob != null) {
+                                          activeBlobUrl = blob
+                                          gameState = initial
+                                          shareOnWhatsApp(context, code)
+                                          screenMode = 3
                                       }
                                   }
+                              },
+                              onJoinRoom = {
+                                  if (roomCodeInput.isNotBlank()) {
+                                      activeBlobUrl = "https://jsonblob.com/api/jsonBlob/1341050011854495744"
+                                      gameState = GameState(roomCode = roomCodeInput, message = "રૂમમાં જોડાયા!")
+                                      screenMode = 3
+                                  }
                               }
-                          }
+                          )
+                          3 -> LudoBoardScreen(
+                              gameState = gameState,
+                              isOnline = true,
+                              diceRotation = diceRotation,
+                              pulseScale = pulseScale,
+                              funnyEmojis = funnyEmojis,
+                              funnyComments = funnyComments,
+                              onSendEmoji = { emoji ->
+                                  val updated = gameState.copy(activeEmoji = emoji, activeComment = "")
+                                  gameState = updated
+                                  scope.launch {
+                                      if (activeBlobUrl.isNotBlank()) LudoOnlineEngine.syncGame(activeBlobUrl, updated)
+                                      delay(3000)
+                                      if (gameState.activeEmoji == emoji) {
+                                          gameState = gameState.copy(activeEmoji = "")
+                                          if (activeBlobUrl.isNotBlank()) LudoOnlineEngine.syncGame(activeBlobUrl, gameState)
+                                      }
+                                  }
+                              },
+                              onSendComment = { comment ->
+                                  val updated = gameState.copy(activeComment = comment, activeEmoji = "")
+                                  gameState = updated
+                                  scope.launch {
+                                      if (activeBlobUrl.isNotBlank()) LudoOnlineEngine.syncGame(activeBlobUrl, updated)
+                                      delay(3500)
+                                      if (gameState.activeComment == comment) {
+                                          gameState = gameState.copy(activeComment = "")
+                                          if (activeBlobUrl.isNotBlank()) LudoOnlineEngine.syncGame(activeBlobUrl, gameState)
+                                      }
+                                  }
+                              },
+                              onSimulateKill = { victimColor ->
+                                  FunnySoundEngine.playGotiKilledSound()
+                                  val alertMsg = "ખતમ! ${victimColor.label} ની ગોટી કપાઈ ગઈ! 😭"
+                                  val updated = gameState.copy(lastKilledPlayer = victimColor.name, message = alertMsg)
+                                  gameState = updated
+                                  scope.launch {
+                                      if (activeBlobUrl.isNotBlank()) LudoOnlineEngine.syncGame(activeBlobUrl, updated)
+                                      delay(4000)
+                                      if (gameState.lastKilledPlayer == victimColor.name) {
+                                          gameState = gameState.copy(lastKilledPlayer = "")
+                                          if (activeBlobUrl.isNotBlank()) LudoOnlineEngine.syncGame(activeBlobUrl, gameState)
+                                      }
+                                  }
+                              },
+                              onRollDice = {
+                                  scope.launch {
+                                      FunnySoundEngine.playDiceRollSound()
+                                      isRolling = true
+                                      delay(350)
+                                      val rolled = Random.nextInt(1, 7)
+                                      isRolling = false
+                                      val willKill = (rolled == 6 && Random.nextBoolean())
+                                      val nextTurn = if (gameState.turn == PlayerColor.RED) {
+                                          if (rolled == 6) PlayerColor.RED else PlayerColor.GREEN
+                                      } else {
+                                          if (rolled == 6) PlayerColor.GREEN else PlayerColor.RED
+                                      }
+
+                                      val updated = if (willKill) {
+                                          FunnySoundEngine.playGotiKilledSound()
+                                          val victim = if (gameState.turn == PlayerColor.RED) PlayerColor.GREEN else PlayerColor.RED
+                                          gameState.copy(
+                                              diceValue = rolled,
+                                              turn = nextTurn,
+                                              lastKilledPlayer = victim.name,
+                                              message = "ખતમ! ${gameState.turn.label} એ ${victim.label} ની ગોટી કાપી! 🔪😂"
+                                          )
+                                      } else {
+                                          gameState.copy(diceValue = rolled, turn = nextTurn, message = "${gameState.turn.label} -> $rolled!")
+                                      }
+
+                                      gameState = updated
+                                      if (activeBlobUrl.isNotBlank()) {
+                                          LudoOnlineEngine.syncGame(activeBlobUrl, updated)
+                                      }
+                                  }
+                              },
+                              onShareRoom = { shareOnWhatsApp(context, gameState.roomCode.ifBlank { generatedRoomCode }) }
+                          )
                       }
                   }
               }
           }
 
           @Composable
-          fun StandardsListScreen(
-              standards: List<Standard>,
-              isGu: Boolean,
-              cardBg: Color,
-              textColor: Color,
-              secondaryText: Color,
-              primaryColor: Color,
-              onStandardSelect: (Standard) -> Unit
-          ) {
-              LazyColumn(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  item {
-                      Card(
-                          modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp),
-                          colors = CardDefaults.cardColors(containerColor = primaryColor),
-                          shape = RoundedCornerShape(14.dp)
-                      ) {
-                          Row(
-                              modifier = Modifier.padding(16.dp),
-                              verticalAlignment = Alignment.CenterVertically
-                          ) {
-                              Image(
-                                  painter = painterResource(id = R.drawable.ic_education_logo),
-                                  contentDescription = "Education Logo",
-                                  modifier = Modifier.size(54.dp)
-                              )
-                              Spacer(modifier = Modifier.width(14.dp))
-                              Column {
-                                  Text(if (isGu) "તમારું ધોરણ પસંદ કરો" else "Select Your Standard", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
-                                  Text(if (isGu) "ધોરણ ૧ થી ૧૨ ના તમામ પુસ્તકો અને જવાબો" else "Standard 1 to 12 Books & Solutions", fontSize = 12.sp, color = Color(0xFFBBDEFB))
-                              }
-                          }
-                      }
-                  }
-
-                  items(standards) { std ->
-                      Card(
-                          modifier = Modifier
-                              .fillMaxWidth()
-                              .padding(vertical = 5.dp)
-                              .clickable { onStandardSelect(std) },
-                          colors = CardDefaults.cardColors(containerColor = cardBg),
-                          elevation = CardDefaults.cardElevation(2.dp),
-                          shape = RoundedCornerShape(12.dp)
-                      ) {
-                          Row(
-                              modifier = Modifier.padding(16.dp),
-                              horizontalArrangement = Arrangement.SpaceBetween,
-                              verticalAlignment = Alignment.CenterVertically
-                          ) {
-                              Row(verticalAlignment = Alignment.CenterVertically) {
-                                  Surface(
-                                      shape = RoundedCornerShape(10.dp),
-                                      color = Color(0xFFE8EAF6),
-                                      modifier = Modifier.size(46.dp)
-                                  ) {
-                                      Box(contentAlignment = Alignment.Center) {
-                                          Text("${std.stdNumber}", fontWeight = FontWeight.Black, fontSize = 20.sp, color = Color(0xFF0D276B))
-                                      }
-                                  }
-                                  Spacer(modifier = Modifier.width(14.dp))
-                                  Column {
-                                      Text(if (isGu) std.nameGu else std.nameEn, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = textColor)
-                                      Text(if (isGu) std.sectionGu else std.sectionEn, fontSize = 12.sp, color = secondaryText)
-                                  }
-                              }
-                              Icon(Icons.Default.ChevronRight, contentDescription = null, tint = primaryColor)
-                          }
-                      }
-                  }
-              }
-          }
-
-          @Composable
-          fun StandardSubjectsScreen(
-              standard: Standard,
-              isGu: Boolean,
-              cardBg: Color,
-              textColor: Color,
-              secondaryText: Color,
-              onSubjectSelect: (Subject) -> Unit
-          ) {
-              Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  Text(if (isGu) "વિષય પસંદ કરો (Select Subject)" else "Select Subject", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = textColor)
-                  Text(if (isGu) standard.nameGu else standard.nameEn, fontSize = 13.sp, color = secondaryText)
-                  Spacer(modifier = Modifier.height(12.dp))
-
-                  LazyVerticalGrid(
-                      columns = GridCells.Fixed(2),
-                      horizontalArrangement = Arrangement.spacedBy(10.dp),
-                      verticalArrangement = Arrangement.spacedBy(10.dp),
-                      modifier = Modifier.fillMaxSize()
+          fun LudoHomeScreen(onPlayOffline: () -> Unit, onPlayOnline: () -> Unit) {
+              Column(
+                  modifier = Modifier.fillMaxSize().padding(24.dp),
+                  verticalArrangement = Arrangement.Center,
+                  horizontalAlignment = Alignment.CenterHorizontally
+              ) {
+                  Surface(
+                      shape = RoundedCornerShape(28.dp),
+                      shadowElevation = 16.dp,
+                      border = BorderStroke(3.dp, Brush.linearGradient(listOf(Color(0xFFFFD54F), Color(0xFFFF8F00)))),
+                      modifier = Modifier.size(130.dp)
                   ) {
-                      items(standard.subjects) { subject ->
-                          Card(
-                              modifier = Modifier
-                                  .fillMaxWidth()
-                                  .height(130.dp)
-                                  .clickable { onSubjectSelect(subject) },
-                              colors = CardDefaults.cardColors(containerColor = cardBg),
-                              elevation = CardDefaults.cardElevation(3.dp),
-                              shape = RoundedCornerShape(14.dp)
+                      Box(
+                          modifier = Modifier.background(Brush.radialGradient(listOf(Color(0xFF1E293B), Color(0xFF0F172A)))),
+                          contentAlignment = Alignment.Center
+                      ) {
+                          Image(
+                              painter = painterResource(id = R.drawable.ic_ludo_pro_logo),
+                              contentDescription = "Emblem",
+                              modifier = Modifier.size(100.dp)
+                          )
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(20.dp))
+                  Text("LUDO STAR CLUB", fontWeight = FontWeight.Black, fontSize = 28.sp, color = Color(0xFFFFD54F), letterSpacing = 2.sp)
+                  Text("Install & Play with WhatsApp Friends", fontSize = 13.sp, color = Color(0xFF94A3B8))
+
+                  Spacer(modifier = Modifier.height(40.dp))
+
+                  Card(
+                      modifier = Modifier
+                          .fillMaxWidth()
+                          .shadow(10.dp, RoundedCornerShape(18.dp))
+                          .clickable { onPlayOffline() },
+                      shape = RoundedCornerShape(18.dp),
+                      colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                  ) {
+                      Box(
+                          modifier = Modifier
+                              .background(Brush.horizontalGradient(listOf(Color(0xFF1565C0), Color(0xFF1E88E5))))
+                              .padding(18.dp)
+                      ) {
+                          Row(verticalAlignment = Alignment.CenterVertically) {
+                              Text("👑", fontSize = 36.sp)
+                              Spacer(modifier = Modifier.width(16.dp))
+                              Column {
+                                  Text("Pass & Play (ઑફલાઇન)", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color.White)
+                                  Text("૨ થી ૪ પ્લેયર્સ • ફની સાઉન્ડ & ઈમોજી", fontSize = 12.sp, color = Color(0xFFBBDEFB))
+                              }
+                          }
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(16.dp))
+
+                  Card(
+                      modifier = Modifier
+                          .fillMaxWidth()
+                          .shadow(10.dp, RoundedCornerShape(18.dp))
+                          .clickable { onPlayOnline() },
+                      shape = RoundedCornerShape(18.dp),
+                      colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                  ) {
+                      Box(
+                          modifier = Modifier
+                              .background(Brush.horizontalGradient(listOf(Color(0xFF2E7D32), Color(0xFF43A047))))
+                              .padding(18.dp)
+                      ) {
+                          Row(verticalAlignment = Alignment.CenterVertically) {
+                              Text("💬", fontSize = 36.sp)
+                              Spacer(modifier = Modifier.width(16.dp))
+                              Column {
+                                  Text("WhatsApp Online Room", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color.White)
+                                  Text("રૂમ લિંક શેર કરી મિત્રો સાથે રમો", fontSize = 12.sp, color = Color(0xFFC8E6C9))
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun LudoOnlineSetupScreen(
+              roomCodeInput: String,
+              onRoomCodeChange: (String) -> Unit,
+              onCreateRoom: () -> Unit,
+              onJoinRoom: () -> Unit
+          ) {
+              Column(
+                  modifier = Modifier.fillMaxSize().padding(24.dp),
+                  verticalArrangement = Arrangement.Center,
+                  horizontalAlignment = Alignment.CenterHorizontally
+              ) {
+                  Text("🌐 WhatsApp લાઈવ ચેટ રૂમ", fontWeight = FontWeight.Bold, fontSize = 24.sp, color = Color(0xFFFFD54F))
+                  Text("પ્રાઇવેટ રૂમ બનાવી WhatsApp પર લિંક મોકલો", fontSize = 13.sp, color = Color(0xFF94A3B8))
+
+                  Spacer(modifier = Modifier.height(30.dp))
+
+                  Button(
+                      onClick = onCreateRoom,
+                      modifier = Modifier.fillMaxWidth().height(54.dp).shadow(8.dp, RoundedCornerShape(14.dp)),
+                      shape = RoundedCornerShape(14.dp),
+                      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366))
+                  ) {
+                      Row(verticalAlignment = Alignment.CenterVertically) {
+                          Text("💬", fontSize = 22.sp)
+                          Spacer(modifier = Modifier.width(8.dp))
+                          Text("નવો રૂમ બનાવો & WhatsApp શેર કરો", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color.White)
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(24.dp))
+                  Text("--- અથવા કોડ દાખલ કરો ---", fontSize = 12.sp, color = Color.Gray)
+                  Spacer(modifier = Modifier.height(16.dp))
+
+                  OutlinedTextField(
+                      value = roomCodeInput,
+                      onValueChange = onRoomCodeChange,
+                      label = { Text("૬ આંકડાનો રૂમ કોડ", color = Color.LightGray) },
+                      modifier = Modifier.fillMaxWidth(),
+                      shape = RoundedCornerShape(14.dp),
+                      colors = OutlinedTextFieldDefaults.colors(
+                          focusedTextColor = Color.White,
+                          unfocusedTextColor = Color.White,
+                          focusedBorderColor = Color(0xFFFFD54F),
+                          unfocusedBorderColor = Color.Gray
+                      )
+                  )
+
+                  Spacer(modifier = Modifier.height(16.dp))
+
+                  Button(
+                      onClick = onJoinRoom,
+                      modifier = Modifier.fillMaxWidth().height(50.dp),
+                      shape = RoundedCornerShape(14.dp),
+                      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1565C0))
+                  ) {
+                      Text("રૂમમાં જોડાવો 🚀", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                  }
+              }
+          }
+
+          @Composable
+          fun LudoBoardScreen(
+              gameState: GameState,
+              isOnline: Boolean,
+              diceRotation: Float,
+              pulseScale: Float,
+              funnyEmojis: List<String>,
+              funnyComments: List<String>,
+              onSendEmoji: (String) -> Unit,
+              onSendComment: (String) -> Unit,
+              onSimulateKill: (PlayerColor) -> Unit,
+              onRollDice: () -> Unit,
+              onShareRoom: (() -> Unit)? = null
+          ) {
+              Column(
+                  modifier = Modifier.fillMaxSize().padding(10.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.SpaceBetween
+              ) {
+                  // Turn Status Card
+                  Card(
+                      modifier = Modifier.fillMaxWidth().shadow(6.dp, RoundedCornerShape(14.dp)),
+                      colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+                      shape = RoundedCornerShape(14.dp),
+                      border = BorderStroke(1.5.dp, gameState.turn.primary)
+                  ) {
+                      Row(
+                          modifier = Modifier.padding(10.dp),
+                          horizontalArrangement = Arrangement.SpaceBetween,
+                          verticalAlignment = Alignment.CenterVertically
+                      ) {
+                          Row(verticalAlignment = Alignment.CenterVertically) {
+                              Surface(
+                                  shape = CircleShape,
+                                  color = gameState.turn.primary,
+                                  modifier = Modifier.size(22.dp).scale(pulseScale)
+                              ) {}
+                              Spacer(modifier = Modifier.width(8.dp))
+                              Column {
+                                  Text("ચાલ: ${gameState.turn.label}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = gameState.turn.primary)
+                                  Text(gameState.message, fontSize = 11.sp, color = Color.LightGray)
+                              }
+                          }
+                          if (isOnline && onShareRoom != null) {
+                              Button(
+                                  onClick = onShareRoom,
+                                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)),
+                                  contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                              ) {
+                                  Text("Share 💬", fontSize = 11.sp)
+                              }
+                          }
+                      }
+                  }
+
+                  // 3D Ludo Board with Goti-Kill Sound Overlay
+                  Box(
+                      modifier = Modifier
+                          .size(310.dp)
+                          .shadow(16.dp, RoundedCornerShape(12.dp))
+                          .border(4.dp, Brush.linearGradient(listOf(Color(0xFF8D6E63), Color(0xFF4E342E))), RoundedCornerShape(12.dp))
+                          .background(Color(0xFFFFF8E1), RoundedCornerShape(12.dp))
+                  ) {
+                      LudoBoard3DCanvas(activeTurn = gameState.turn, pulseScale = pulseScale, onPawnClick = onSimulateKill)
+
+                      AnimatedVisibility(
+                          visible = gameState.lastKilledPlayer.isNotBlank(),
+                          enter = scaleIn() + fadeIn(),
+                          exit = scaleOut() + fadeOut(),
+                          modifier = Modifier.align(Alignment.Center)
+                      ) {
+                          Surface(
+                              shape = RoundedCornerShape(18.dp),
+                              color = Color(0xF20F172A),
+                              border = BorderStroke(2.dp, Color(0xFFE53935)),
+                              shadowElevation = 16.dp,
+                              modifier = Modifier.padding(14.dp)
                           ) {
                               Column(
-                                  modifier = Modifier
-                                      .fillMaxSize()
-                                      .padding(12.dp),
-                                  verticalArrangement = Arrangement.SpaceBetween
-                              ) {
-                                  Text(subject.iconEmoji, fontSize = 28.sp)
-                                  Column {
-                                      Text(if (isGu) subject.nameGu else subject.nameEn, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = textColor)
-                                      Text("${subject.chapters.size} ${if (isGu) "પ્રકરણો" else "Chapters"}", fontSize = 11.sp, color = secondaryText)
-                                  }
-                              }
-                          }
-                      }
-                  }
-              }
-          }
-
-          @Composable
-          fun SubjectChaptersScreen(
-              subject: Subject,
-              isGu: Boolean,
-              cardBg: Color,
-              textColor: Color,
-              secondaryText: Color,
-              onChapterSelect: (Chapter) -> Unit
-          ) {
-              Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  Text(if (isGu) "પ્રકરણોની યાદી (Chapters List)" else "Chapters List", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = textColor)
-                  Text(if (isGu) subject.nameGu else subject.nameEn, fontSize = 13.sp, color = secondaryText)
-                  Spacer(modifier = Modifier.height(12.dp))
-
-                  LazyColumn(modifier = Modifier.fillMaxSize()) {
-                      items(subject.chapters) { chapter ->
-                          Card(
-                              modifier = Modifier
-                                  .fillMaxWidth()
-                                  .padding(vertical = 5.dp)
-                                  .clickable { onChapterSelect(chapter) },
-                              colors = CardDefaults.cardColors(containerColor = cardBg),
-                              elevation = CardDefaults.cardElevation(2.dp),
-                              shape = RoundedCornerShape(12.dp)
-                          ) {
-                              Row(
                                   modifier = Modifier.padding(16.dp),
-                                  horizontalArrangement = Arrangement.SpaceBetween,
-                                  verticalAlignment = Alignment.CenterVertically
+                                  horizontalAlignment = Alignment.CenterHorizontally
                               ) {
-                                  Column(modifier = Modifier.weight(1f)) {
-                                      Text(if (isGu) chapter.titleGu else chapter.titleEn, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = textColor)
-                                      Text(if (isGu) "📖 સંપૂર્ણ વાર્તા/સારાંશ + ✍️ સ્વાધ્યાય જવાબો" else "📖 Full Text + ✍️ Solutions", fontSize = 12.sp, color = Color(0xFF0D276B))
-                                  }
-                                  Icon(Icons.Default.ArrowForwardIos, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                                  Text("🎺 😭 💀", fontSize = 34.sp)
+                                  Spacer(modifier = Modifier.height(6.dp))
+                                  Text("ગોટી કપાઈ ગઈ!", fontWeight = FontWeight.Black, fontSize = 18.sp, color = Color(0xFFFFD54F))
+                                  Text("${gameState.lastKilledPlayer} પ્લેયરની ગોટી ઘરે ગઈ!", fontSize = 12.sp, color = Color.White)
                               }
                           }
                       }
-                  }
-              }
-          }
 
-          @Composable
-          fun ChapterDetailScreen(
-              chapter: Chapter,
-              isGu: Boolean,
-              cardBg: Color,
-              textColor: Color
-          ) {
-              var selectedViewTab by remember { mutableStateOf(0) }
-
-              Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  TabRow(selectedTabIndex = selectedViewTab, containerColor = cardBg) {
-                      Tab(
-                          selected = selectedViewTab == 0,
-                          onClick = { selectedViewTab = 0 },
-                          text = { Text(if (isGu) "📖 સંપૂર્ણ પાઠ્યપુસ્તક વાંચન" else "📖 Full Textbook Reading", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor) }
-                      )
-                      Tab(
-                          selected = selectedViewTab == 1,
-                          onClick = { selectedViewTab = 1 },
-                          text = { Text(if (isGu) "✍️ સ્વાધ્યાયપોથી સોલ્યુશન્સ" else "✍️ Workbook Solutions", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor) }
-                      )
-                  }
-
-                  Spacer(modifier = Modifier.height(10.dp))
-
-                  if (selectedViewTab == 0) {
-                      Card(
-                          modifier = Modifier.fillMaxSize(),
-                          colors = CardDefaults.cardColors(containerColor = cardBg),
-                          shape = RoundedCornerShape(12.dp),
-                          elevation = CardDefaults.cardElevation(2.dp)
+                      AnimatedVisibility(
+                          visible = gameState.activeEmoji.isNotBlank() && gameState.lastKilledPlayer.isBlank(),
+                          enter = scaleIn() + fadeIn(),
+                          exit = scaleOut() + fadeOut(),
+                          modifier = Modifier.align(Alignment.Center)
                       ) {
-                          LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                              item {
-                                  Text(if (isGu) chapter.titleGu else chapter.titleEn, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color(0xFF0D276B))
-                                  Spacer(modifier = Modifier.height(10.dp))
+                          Surface(
+                              shape = CircleShape,
+                              color = Color(0xCC0F172A),
+                              border = BorderStroke(2.dp, Color(0xFFFFD54F)),
+                              modifier = Modifier.size(74.dp)
+                          ) {
+                              Box(contentAlignment = Alignment.Center) {
+                                  Text(gameState.activeEmoji, fontSize = 42.sp)
+                              }
+                          }
+                      }
+
+                      AnimatedVisibility(
+                          visible = gameState.activeComment.isNotBlank() && gameState.lastKilledPlayer.isBlank(),
+                          enter = slideInVertically() + fadeIn(),
+                          exit = slideOutVertically() + fadeOut(),
+                          modifier = Modifier.align(Alignment.TopCenter).padding(top = 10.dp)
+                      ) {
+                          Surface(
+                              shape = RoundedCornerShape(16.dp),
+                              color = Color(0xEE1E293B),
+                              border = BorderStroke(1.5.dp, Color(0xFF25D366)),
+                              shadowElevation = 8.dp
+                          ) {
+                              Text(
+                                  text = "💬 ${gameState.activeComment}",
+                                  color = Color.White,
+                                  fontWeight = FontWeight.Bold,
+                                  fontSize = 13.sp,
+                                  modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                              )
+                          }
+                      }
+                  }
+
+                  // Funny Emojis & Comments Panel
+                  Column(modifier = Modifier.fillMaxWidth()) {
+                      LazyRow(
+                          modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                          horizontalArrangement = Arrangement.spacedBy(8.dp)
+                      ) {
+                          items(funnyEmojis) { emoji ->
+                              Surface(
+                                  shape = CircleShape,
+                                  color = Color(0xFF1E293B),
+                                  border = BorderStroke(1.dp, Color(0xFF334155)),
+                                  modifier = Modifier.size(38.dp).clickable { onSendEmoji(emoji) }
+                              ) {
+                                  Box(contentAlignment = Alignment.Center) {
+                                      Text(emoji, fontSize = 20.sp)
+                                  }
+                              }
+                          }
+                      }
+
+                      LazyRow(
+                          modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
+                          horizontalArrangement = Arrangement.spacedBy(6.dp)
+                      ) {
+                          items(funnyComments) { comment ->
+                              Surface(
+                                  shape = RoundedCornerShape(12.dp),
+                                  color = Color(0xFF1E293B),
+                                  border = BorderStroke(1.dp, Color(0xFF475569)),
+                                  modifier = Modifier.clickable { onSendComment(comment) }
+                              ) {
                                   Text(
-                                      text = if (isGu) chapter.fullBookContentGu else chapter.fullBookContentEn,
-                                      fontSize = 14.sp,
-                                      color = textColor,
-                                      lineHeight = 24.sp
+                                      text = comment,
+                                      color = Color(0xFFE2E8F0),
+                                      fontSize = 11.sp,
+                                      fontWeight = FontWeight.SemiBold,
+                                      modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                                   )
                               }
                           }
                       }
-                  } else {
-                      val qaList = if (isGu) chapter.swadhyayAnswersGu else chapter.swadhyayAnswersEn
-                      LazyColumn(modifier = Modifier.fillMaxSize()) {
-                          items(qaList) { qa ->
-                              Card(
+                  }
+
+                  // 3D Dice Panel
+                  Card(
+                      modifier = Modifier.fillMaxWidth().shadow(8.dp, RoundedCornerShape(16.dp)),
+                      colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+                      shape = RoundedCornerShape(16.dp),
+                      border = BorderStroke(2.dp, Brush.linearGradient(listOf(Color(0xFFFFD54F), Color(0xFFFF8F00))))
+                  ) {
+                      Row(
+                          modifier = Modifier.padding(10.dp).fillMaxWidth(),
+                          horizontalArrangement = Arrangement.SpaceAround,
+                          verticalAlignment = Alignment.CenterVertically
+                      ) {
+                          Surface(
+                              shape = RoundedCornerShape(14.dp),
+                              color = Color.White,
+                              shadowElevation = 12.dp,
+                              border = BorderStroke(3.dp, gameState.turn.primary),
+                              modifier = Modifier
+                                  .size(62.dp)
+                                  .rotate(diceRotation)
+                                  .clickable { onRollDice() }
+                          ) {
+                              Box(
                                   modifier = Modifier
-                                      .fillMaxWidth()
-                                      .padding(vertical = 6.dp),
-                                  colors = CardDefaults.cardColors(containerColor = cardBg),
-                                  elevation = CardDefaults.cardElevation(2.dp),
-                                  shape = RoundedCornerShape(12.dp)
+                                      .background(Brush.radialGradient(listOf(Color.White, Color(0xFFE2E8F0))))
+                                      .fillMaxSize(),
+                                  contentAlignment = Alignment.Center
                               ) {
-                                  Column(modifier = Modifier.padding(14.dp)) {
-                                      Surface(
-                                          color = Color(0xFFFFF3E0),
-                                          shape = RoundedCornerShape(6.dp)
-                                      ) {
-                                          Text(
-                                              text = qa.type,
-                                              modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                              fontSize = 11.sp,
-                                              fontWeight = FontWeight.Bold,
-                                              color = Color(0xFFE65100)
-                                          )
+                                  Text(
+                                      text = when (gameState.diceValue) {
+                                          1 -> "⚀"
+                                          2 -> "⚁"
+                                          3 -> "⚂"
+                                          4 -> "⚃"
+                                          5 -> "⚄"
+                                          else -> "⚅"
+                                      },
+                                      fontSize = 42.sp,
+                                      color = if (gameState.diceValue == 6) Color(0xFFE53935) else Color(0xFF0F172A)
+                                  )
+                              }
+                          }
+
+                          Button(
+                              onClick = onRollDice,
+                              modifier = Modifier.height(46.dp).shadow(8.dp, RoundedCornerShape(12.dp)),
+                              colors = ButtonDefaults.buttonColors(containerColor = gameState.turn.primary),
+                              shape = RoundedCornerShape(12.dp)
+                          ) {
+                              Text("ડાઈસ ફેંકો 🎲", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White)
+                          }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun LudoBoard3DCanvas(activeTurn: PlayerColor, pulseScale: Float, onPawnClick: (PlayerColor) -> Unit) {
+              Column(modifier = Modifier.fillMaxSize()) {
+                  Row(modifier = Modifier.weight(6f)) {
+                      Box(modifier = Modifier.weight(6f).fillMaxHeight().background(Brush.radialGradient(listOf(PlayerColor.RED.light, PlayerColor.RED.primary)))) {
+                          BaseWith3DPawns(PlayerColor.RED, activeTurn == PlayerColor.RED, pulseScale, onPawnClick)
+                      }
+                      Column(modifier = Modifier.weight(3f).fillMaxHeight()) {
+                          for (i in 0 until 6) {
+                              Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                  Box(modifier = Modifier.weight(1f).fillMaxHeight().border(0.5.dp, Color(0xFFBCAAA4))) {
+                                      if (i == 1) Text("★", color = Color(0xFF43A047), modifier = Modifier.align(Alignment.Center), fontSize = 11.sp)
+                                  }
+                                  Box(modifier = Modifier.weight(1f).fillMaxHeight().background(if (i > 0) PlayerColor.GREEN.primary else Color.White).border(0.5.dp, Color(0xFFBCAAA4)))
+                                  Box(modifier = Modifier.weight(1f).fillMaxHeight().border(0.5.dp, Color(0xFFBCAAA4)))
+                              }
+                          }
+                      }
+                      Box(modifier = Modifier.weight(6f).fillMaxHeight().background(Brush.radialGradient(listOf(PlayerColor.GREEN.light, PlayerColor.GREEN.primary)))) {
+                          BaseWith3DPawns(PlayerColor.GREEN, activeTurn == PlayerColor.GREEN, pulseScale, onPawnClick)
+                      }
+                  }
+
+                  Row(modifier = Modifier.weight(3f)) {
+                      Column(modifier = Modifier.weight(6f).fillMaxHeight()) {
+                          for (i in 0 until 3) {
+                              Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                  for (j in 0 until 6) {
+                                      Box(modifier = Modifier.weight(1f).fillMaxHeight().background(if (i == 1 && j > 0) PlayerColor.RED.primary else Color.White).border(0.5.dp, Color(0xFFBCAAA4))) {
+                                          if (i == 2 && j == 1) Text("★", color = Color(0xFFE53935), modifier = Modifier.align(Alignment.Center), fontSize = 11.sp)
                                       }
-                                      Spacer(modifier = Modifier.height(6.dp))
-                                      Text("${if (isGu) "પ્રશ્ન" else "Question"}: ${qa.question}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = textColor)
-                                      Spacer(modifier = Modifier.height(6.dp))
-                                      Text(qa.answer, fontSize = 13.sp, color = textColor, lineHeight = 21.sp)
                                   }
                               }
                           }
                       }
+                      Box(
+                          modifier = Modifier.weight(3f).fillMaxHeight().background(Brush.radialGradient(listOf(Color(0xFFFFD54F), Color(0xFF0F172A)))),
+                          contentAlignment = Alignment.Center
+                      ) {
+                          Text("🏆", fontSize = 22.sp)
+                      }
+                      Column(modifier = Modifier.weight(6f).fillMaxHeight()) {
+                          for (i in 0 until 3) {
+                              Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                  for (j in 0 until 6) {
+                                      Box(modifier = Modifier.weight(1f).fillMaxHeight().background(if (i == 1 && j < 5) PlayerColor.YELLOW.primary else Color.White).border(0.5.dp, Color(0xFFBCAAA4))) {
+                                          if (i == 0 && j == 4) Text("★", color = Color(0xFFF57F17), modifier = Modifier.align(Alignment.Center), fontSize = 11.sp)
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+
+                  Row(modifier = Modifier.weight(6f)) {
+                      Box(modifier = Modifier.weight(6f).fillMaxHeight().background(Brush.radialGradient(listOf(PlayerColor.BLUE.light, PlayerColor.BLUE.primary)))) {
+                          BaseWith3DPawns(PlayerColor.BLUE, activeTurn == PlayerColor.BLUE, pulseScale, onPawnClick)
+                      }
+                      Column(modifier = Modifier.weight(3f).fillMaxHeight()) {
+                          for (i in 0 until 6) {
+                              Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                  Box(modifier = Modifier.weight(1f).fillMaxHeight().border(0.5.dp, Color(0xFFBCAAA4)))
+                                  Box(modifier = Modifier.weight(1f).fillMaxHeight().background(if (i < 5) PlayerColor.BLUE.primary else Color.White).border(0.5.dp, Color(0xFFBCAAA4)))
+                                  Box(modifier = Modifier.weight(1f).fillMaxHeight().border(0.5.dp, Color(0xFFBCAAA4))) {
+                                      if (i == 4) Text("★", color = Color(0xFF1E88E5), modifier = Modifier.align(Alignment.Center), fontSize = 11.sp)
+                                  }
+                              }
+                          }
+                      }
+                      Box(modifier = Modifier.weight(6f).fillMaxHeight().background(Brush.radialGradient(listOf(PlayerColor.YELLOW.light, PlayerColor.YELLOW.primary)))) {
+                          BaseWith3DPawns(PlayerColor.YELLOW, activeTurn == PlayerColor.YELLOW, pulseScale, onPawnClick)
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun BaseWith3DPawns(color: PlayerColor, isActive: Boolean, pulseScale: Float, onPawnClick: (PlayerColor) -> Unit) {
+              Box(
+                  modifier = Modifier
+                      .fillMaxSize()
+                      .padding(10.dp)
+                      .background(Color.White, RoundedCornerShape(10.dp))
+                      .border(2.dp, color.dark, RoundedCornerShape(10.dp)),
+                  contentAlignment = Alignment.Center
+              ) {
+                  Row(
+                      modifier = Modifier.fillMaxSize().padding(2.dp),
+                      horizontalArrangement = Arrangement.SpaceEvenly,
+                      verticalAlignment = Alignment.CenterVertically
+                  ) {
+                      Column(verticalArrangement = Arrangement.SpaceEvenly) {
+                          Pawn3DToken(color, isActive, pulseScale) { onPawnClick(color) }
+                          Spacer(modifier = Modifier.height(8.dp))
+                          Pawn3DToken(color, isActive, pulseScale) { onPawnClick(color) }
+                      }
+                      Column(verticalArrangement = Arrangement.SpaceEvenly) {
+                          Pawn3DToken(color, isActive, pulseScale) { onPawnClick(color) }
+                          Spacer(modifier = Modifier.height(8.dp))
+                          Pawn3DToken(color, isActive, pulseScale) { onPawnClick(color) }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun Pawn3DToken(color: PlayerColor, isActive: Boolean, pulseScale: Float, onClick: () -> Unit) {
+              Surface(
+                  shape = CircleShape,
+                  color = color.primary,
+                  shadowElevation = 6.dp,
+                  border = BorderStroke(2.dp, if (isActive) Color(0xFFFFD54F) else Color.White),
+                  modifier = Modifier
+                      .size(20.dp)
+                      .scale(if (isActive) pulseScale else 1f)
+                      .clickable { onClick() }
+              ) {
+                  Box(
+                      modifier = Modifier.background(Brush.radialGradient(listOf(Color.White, color.primary))),
+                      contentAlignment = Alignment.Center
+                  ) {
+                      Text("👑", fontSize = 9.sp)
                   }
               }
           }
@@ -1353,5 +1211,5 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GSEB-VidyaSetu-Edu-APK
+          name: Ludo-Star-Club-Final-Installable-APK
           path: app/build/outputs/apk/debug/app-debug.apk
