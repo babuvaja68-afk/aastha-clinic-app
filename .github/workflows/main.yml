@@ -1,4 +1,4 @@
-name: Build Ludo Star Club Final Installable Edition APK
+name: Build Ludo Star Club APK
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Final Installable Ludo Multiplayer App
+      - name: Setup Project Files
         run: |
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
@@ -29,14 +29,14 @@ jobs:
           mkdir -p app/src/main/java/com/ludo/starclub
           mkdir -p gradle/wrapper
 
-          # 0. Gradle Properties
+          # 1. Gradle Properties
           cat << 'EOF' > gradle.properties
           android.useAndroidX=true
           android.enableJetifier=true
           org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
           EOF
 
-          # Root build.gradle
+          # 2. Root build.gradle
           cat << 'EOF' > build.gradle
           buildscript {
               repositories {
@@ -56,13 +56,13 @@ jobs:
           }
           EOF
 
-          # settings.gradle
+          # 3. settings.gradle
           cat << 'EOF' > settings.gradle
           rootProject.name = "LudoStarClub"
           include ':app'
           EOF
 
-          # app/build.gradle
+          # 4. app/build.gradle
           cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
@@ -77,8 +77,8 @@ jobs:
                   applicationId "com.ludo.starclub"
                   minSdk 24
                   targetSdk 34
-                  versionCode 6
-                  versionName "6.0"
+                  versionCode 7
+                  versionName "7.0"
               }
 
               buildTypes {
@@ -115,7 +115,7 @@ jobs:
           }
           EOF
 
-          # AndroidManifest.xml
+          # 5. AndroidManifest.xml
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -141,7 +141,7 @@ jobs:
           </manifest>
           EOF
 
-          # PRO GAMING LOGO
+          # 6. Icons
           cat << 'EOF' > app/src/main/res/drawable/ic_ludo_pro_logo.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="108dp"
@@ -156,7 +156,6 @@ jobs:
               <path android:fillColor="#FDD835" android:pathData="M84,50 C84,68 70,80 54,80 L54,50 Z"/>
               <path android:fillColor="#FFFFFF" android:pathData="M38,36 h32 v32 h-32 z"/>
               <path android:fillColor="#E53935" android:pathData="M54,52 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
-              <path android:fillColor="#E53935" android:pathData="M44,42 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 M64,42 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 M44,62 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 M64,62 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0"/>
               <path android:fillColor="#FFD54F" android:pathData="M40,18 L46,26 L54,16 L62,26 L68,18 L66,28 L42,28 Z"/>
           </vector>
           EOF
@@ -179,7 +178,7 @@ jobs:
           </adaptive-icon>
           EOF
 
-          # Main Application Source Code with Direct APK & Room Sharing
+          # 7. MainActivity.kt
           cat << 'EOF' > app/src/main/java/com/ludo/starclub/MainActivity.kt
           package com.ludo.starclub
 
@@ -260,7 +259,9 @@ jobs:
                           val sampleRate = 44100
                           val notes = doubleArrayOf(466.16, 440.0, 415.30, 311.13)
                           val durations = doubleArrayOf(0.28, 0.28, 0.28, 0.75)
-                          val totalSamples = (sampleRate * durations.sum()).toInt()
+                          var totalTime = 0.0
+                          for (d in durations) { totalTime += d }
+                          val totalSamples = (sampleRate * totalTime).toInt()
                           val buffer = ShortArray(totalSamples)
                           var offset = 0
                           for (i in notes.indices) {
@@ -389,19 +390,7 @@ jobs:
           }
 
           fun shareOnWhatsApp(context: Context, roomCode: String) {
-              val msg = """
-                  🎲 *LUDO STAR CLUB* 🎲
-                  ---------------------------------
-                  નમસ્તે મિત્ર! મારી સાથે લુડો રમવા માટે:
-                  
-                  ૧. જો તારા ફોનમાં એપ ઇન્સ્ટોલ ન હોય તો ઇન્સ્ટોલ કરી લે.
-                  ૨. એપ ખોલીને Join Room માં આ કોડ નાખ:
-                  
-                  🔑 *રૂમ કોડ:* ${roomCode}
-                  
-                  આવો સાથે રમીએ અને ગોટી કાપીએ! 🔪😂
-                  ---------------------------------
-              """.trimIndent()
+              val msg = "🎲 *LUDO STAR CLUB* 🎲\nમારી સાથે લુડો રમો! રૂમ કોડ: *$roomCode*"
               try {
                   val intent = Intent(Intent.ACTION_VIEW)
                   intent.data = Uri.parse("https://api.whatsapp.com/send?text=" + URLEncoder.encode(msg, "UTF-8"))
@@ -492,7 +481,7 @@ jobs:
                                   Spacer(modifier = Modifier.width(10.dp))
                                   Column {
                                       Text("LUDO STAR CLUB", fontWeight = FontWeight.Black, fontSize = 18.sp, color = Color(0xFFFFD54F))
-                                      Text("Install & Play with WhatsApp Friends", fontSize = 11.sp, color = Color(0xFFE2E8F0))
+                                      Text("Multiplayer & WhatsApp Online", fontSize = 11.sp, color = Color(0xFFE2E8F0))
                                   }
                               }
                           },
@@ -864,7 +853,6 @@ jobs:
                   horizontalAlignment = Alignment.CenterHorizontally,
                   verticalArrangement = Arrangement.SpaceBetween
               ) {
-                  // Turn Status Card
                   Card(
                       modifier = Modifier.fillMaxWidth().shadow(6.dp, RoundedCornerShape(14.dp)),
                       colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
@@ -900,7 +888,6 @@ jobs:
                       }
                   }
 
-                  // 3D Ludo Board with Goti-Kill Sound Overlay
                   Box(
                       modifier = Modifier
                           .size(310.dp)
@@ -976,7 +963,6 @@ jobs:
                       }
                   }
 
-                  // Funny Emojis & Comments Panel
                   Column(modifier = Modifier.fillMaxWidth()) {
                       LazyRow(
                           modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -1019,7 +1005,6 @@ jobs:
                       }
                   }
 
-                  // 3D Dice Panel
                   Card(
                       modifier = Modifier.fillMaxWidth().shadow(8.dp, RoundedCornerShape(16.dp)),
                       colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
@@ -1136,11 +1121,11 @@ jobs:
                       Column(modifier = Modifier.weight(3f).fillMaxHeight()) {
                           for (i in 0 until 6) {
                               Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                                  Box(modifier = Modifier.weight(1f).fillMaxHeight().border(0.5.dp, Color(0xFFBCAAA4)))
-                                  Box(modifier = Modifier.weight(1f).fillMaxHeight().background(if (i < 5) PlayerColor.BLUE.primary else Color.White).border(0.5.dp, Color(0xFFBCAAA4)))
                                   Box(modifier = Modifier.weight(1f).fillMaxHeight().border(0.5.dp, Color(0xFFBCAAA4))) {
                                       if (i == 4) Text("★", color = Color(0xFF1E88E5), modifier = Modifier.align(Alignment.Center), fontSize = 11.sp)
                                   }
+                                  Box(modifier = Modifier.weight(1f).fillMaxHeight().background(if (i < 5) PlayerColor.BLUE.primary else Color.White).border(0.5.dp, Color(0xFFBCAAA4)))
+                                  Box(modifier = Modifier.weight(1f).fillMaxHeight().border(0.5.dp, Color(0xFFBCAAA4)))
                               }
                           }
                       }
@@ -1204,12 +1189,12 @@ jobs:
 
       - name: Build Android APK
         run: |
-          chmod +x gradlew || gradle wrapper --gradle-version 8.4
+          gradle wrapper --gradle-version 8.4
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Ludo-Star-Club-Final-Installable-APK
+          name: Ludo-Star-Club-Final-Edition-APK
           path: app/build/outputs/apk/debug/app-debug.apk
