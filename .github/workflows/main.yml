@@ -401,4 +401,1221 @@ jobs:
                                   color = Color(0xFFFB8C00),
                                   chapters = listOf(
                                       Chapter(
-                                      
+                                          1, "પાઠ ૧: ચાલો, ઇતિહાસ જાણીએ!", "Chapter 1: Let Us Know History",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ સારાંશ:\nતાળપત્ર, ભોજપત્ર, શિલાલેખ, તામ્રપત્ર અને સિક્કાઓ દ્વારા ઇતિહાસ સંશોધન.",
+                                          "📘 Summary:\nHistorical sources: Inscriptions, manuscripts, copper plates, and archaeology.",
+                                          listOf(QuestionAnswer("અભિલેખ એટલે શું?", "જવાબ:\nધાતુ કે પથ્થર પર કોતરેલા ઐતિહાસિક લખાણને અભિલેખ કહે છે.")),
+                                          listOf(QuestionAnswer("What is an inscription?", "Answer:\nEngraved writings on solid stone or metal surfaces."))
+                                      )
+                                  )
+                              )
+                          )
+                          in 9..10 -> listOf(
+                              Subject(
+                                  nameGu = "ગણિત (Mathematics)",
+                                  nameEn = "Mathematics",
+                                  iconEmoji = "📐",
+                                  color = Color(0xFF1E88E5),
+                                  chapters = listOf(
+                                      Chapter(
+                                          1, "પ્રકરણ ૧: વાસ્તવિક સંખ્યાઓ (Real Numbers)", "Chapter 1: Real Numbers",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ સારાંશ:\nયુક્લિડની ભાગપ્રવિધિ: a = bq + r (0 ≤ r < b), અંકગણિતનું મૂળભૂત પ્રમેય અને √૫ ની અસંમેયતાની સાબિતી.",
+                                          "📘 Summary:\nEuclid's division lemma, Fundamental Theorem of Arithmetic and irrationality proofs.",
+                                          listOf(QuestionAnswer("યુક્લિડની રીતે ગુ.સા.અ.(૧૩૫, ૨૨૫) શોધો.", "જવાબ:\n૨૨૫ = ૧૩૫ × ૧ + ૯૦\n૧૩૫ = ૯૦ × ૧ + ૪૫\n૯૦ = ૪૫ × ૨ + ૦\nમાટે ગુ.સા.અ. = ૪૫.")),
+                                          listOf(QuestionAnswer("Find HCF of 135 and 225 using Euclid's lemma.", "Answer:\n225 = 135(1) + 90\n135 = 90(1) + 45\n90 = 45(2) + 0\nTherefore, HCF = 45."))
+                                      ),
+                                      Chapter(
+                                          2, "પ્રકરણ ૨: બહુપદીઓ (Polynomials)", "Chapter 2: Polynomials",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ સારાંશ:\nદ્વિઘાત બહુપદી ax² + bx + c. શૂન્યોનો સરવાળો α + β = -b/a અને ગુણાકાર α·β = c/a.",
+                                          "📘 Summary:\nQuadratic zeroes relation: Sum = -b/a, Product = c/a.",
+                                          listOf(QuestionAnswer("x² - ૨x - ૮ નાં શૂન્યો શોધો.", "જવાબ:\n(x - ૪)(x + ૨) = ૦ => શૂન્યો ૪ અને -૨ છે.")),
+                                          listOf(QuestionAnswer("Find zeroes of x² - 2x - 8.", "Answer:\n(x - 4)(x + 2) = 0 => Zeroes are 4 and -2."))
+                                      )
+                                  )
+                              ),
+                              Subject(
+                                  nameGu = "વિજ્ઞાન અને ટેકનોલોજી (Science)",
+                                  nameEn = "Science & Technology",
+                                  iconEmoji = "🔬",
+                                  color = Color(0xFF43A047),
+                                  chapters = listOf(
+                                      Chapter(
+                                          1, "પ્રકરણ ૧: રાસાયણિક પ્રક્રિયાઓ અને સમીકરણો", "Chapter 1: Chemical Reactions",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ સારાંશ:\nસંયોગીકરણ, વિઘટન, વિસ્થાપન, દ્વિવિસ્થાપન અને રેડોક્ષ પ્રક્રિયાઓ.",
+                                          "📘 Summary:\nCombination, Decomposition, Displacement, Double Displacement and Redox reactions.",
+                                          listOf(QuestionAnswer("વિસ્થાપન પ્રક્રિયાનું ઉદાહરણ આપો.", "જવાબ:\nFe + CuSO₄ -> FeSO₄ + Cu")),
+                                          listOf(QuestionAnswer("Give example of Displacement reaction.", "Answer:\nFe + CuSO4 -> FeSO4 + Cu"))
+                                      )
+                                  )
+                              ),
+                              Subject(
+                                  nameGu = "સામાજિક વિજ્ઞાન",
+                                  nameEn = "Social Science",
+                                  iconEmoji = "🌍",
+                                  color = Color(0xFFFB8C00),
+                                  chapters = listOf(
+                                      Chapter(
+                                          1, "પ્રકરણ ૧: ભારતનો ભવ્ય વારસો", "Chapter 1: Heritage of India",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ સારાંશ:\nપ્રાકૃતિક અને સાંસ્કૃતિક વારસાનો પરિચય.",
+                                          "📘 Summary:\nNatural and Cultural Heritage of India.",
+                                          listOf(QuestionAnswer("પ્રાકૃતિક વારસામાં શું આવે?", "જવાબ:\nનદીઓ, પર્વતો, જંગલો અને વન્યજીવો.")),
+                                          listOf(QuestionAnswer("What comprises natural heritage?", "Answer:\nRivers, mountains, forests and biodiversity."))
+                                      )
+                                  )
+                              ),
+                              Subject(
+                                  nameGu = "અંગ્રેજી (First Flight)",
+                                  nameEn = "English Literature",
+                                  iconEmoji = "🔤",
+                                  color = Color(0xFF8E24AA),
+                                  chapters = listOf(
+                                      Chapter(
+                                          1, "Chapter 1: A Letter to God (લેન્ચોની વાર્તા)", "Chapter 1: A Letter to God",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ વાર્તા:\nલેન્ચો નામના ખેડૂતે પાક નાશ પામતા ભગવાનને ૧૦૦ પેસો માટે પત્ર લખ્યો.",
+                                          "📘 Full Story:\nStory of faith where postmaster helps Lencho with 70 pesos.",
+                                          listOf(QuestionAnswer("લેન્ચોએ કેમ પત્ર લખ્યો?", "જવાબ:\nકરાથી પાક નષ્ટ થતાં પરિવારના ભરણપોષણ માટે.")),
+                                          listOf(QuestionAnswer("Why did Lencho write the letter?", "Answer:\nTo request 100 pesos from God to feed his family."))
+                                      )
+                                  )
+                              )
+                          )
+                          else -> listOf(
+                              Subject(
+                                  nameGu = "નામાના મૂળતત્ત્વો (Account)",
+                                  nameEn = "Elements of Accounts",
+                                  iconEmoji = "📊",
+                                  color = Color(0xFF1E88E5),
+                                  chapters = listOf(
+                                      Chapter(
+                                          1, "પ્રકરણ ૧: ભાગીદારી વિષય-પ્રવેશ", "Chapter 1: Introduction to Partnership",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ સારાંશ:\nભાગીદારી કરારનામું, ૧૯૩૨ નો કાયદો અને નફા-નુકસાન ફાળવણી ખાતું.",
+                                          "📘 Summary:\nPartnership deed regulations, appropriation accounts and capital methods.",
+                                          listOf(QuestionAnswer("કરારનામું ન હોય તો લોન પર કેટલું વ્યાજ અપાય?", "જવાબ:\nવાર્ષિક 6% વ્યાજ ચૂકવાય.")),
+                                          listOf(QuestionAnswer("Interest rate on partner loan without deed?", "Answer:\nMandatory 6% per annum."))
+                                      )
+                                  )
+                              ),
+                              Subject(
+                                  nameGu = "આંકડાશાસ્ત્ર (Statistics)",
+                                  nameEn = "Statistics",
+                                  iconEmoji = "📈",
+                                  color = Color(0xFF00897B),
+                                  chapters = listOf(
+                                      Chapter(
+                                          1, "પ્રકરણ ૧: સૂચક આંક (Index Number)", "Chapter 1: Index Numbers",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ સારાંશ:\nલાસ્પેર, પાશે અને ફિશરના આદર્શ સૂચક આંકના સૂત્રો: IF = √(IL × IP).",
+                                          "📘 Summary:\nFisher's ideal index, Laspeyres, Paasche and reversal tests.",
+                                          listOf(QuestionAnswer("ફિશરનો સૂચક આંક કેમ આદર્શ છે?", "જવાબ:\nતે આધાર અને ચાલુ બંને વર્ષને ધ્યાને લે છે.")),
+                                          listOf(QuestionAnswer("Why is Fisher index ideal?", "Answer:\nIt satisfies both time and factor reversal tests."))
+                                      )
+                                  )
+                              ),
+                              Subject(
+                                  nameGu = "ભૌતિક વિજ્ઞાન / જીવવિજ્ઞાન (Science)",
+                                  nameEn = "Physics / Biology Science",
+                                  iconEmoji = "⚡",
+                                  color = Color(0xFF0288D1),
+                                  chapters = listOf(
+                                      Chapter(
+                                          1, "પ્રકરણ ૧: વિદ્યુતભાર અને ક્ષેત્રો", "Chapter 1: Electric Charges & Fields",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "https://gujarat-education.gov.in/Textbook", "https://ncert.nic.in/textbook.php",
+                                          "📘 સંપૂર્ણ સારાંશ:\nકુલંબનો નિયમ: F = k(q1·q2)/r² અને વિદ્યુતક્ષેત્ર રેખાઓ.",
+                                          "📘 Summary:\nCoulomb's Law, electrostatic force and Gauss Law applications.",
+                                          listOf(QuestionAnswer("કુલંબનો નિયમ લખો.", "જવાબ:\nF = (૧/૪πε₀) · (q1·q2 / r²)")),
+                                          listOf(QuestionAnswer("State Coulomb's Law.", "Answer:\nF = (1 / 4πε0) · (q1·q2 / r^2)"))
+                                      )
+                                  )
+                              )
+                          )
+                      }
+
+                      Standard(
+                          stdNumber = std,
+                          nameGu = "ધોરણ $std (Standard $std)",
+                          nameEn = "Standard $std",
+                          sectionGu = sectionGu,
+                          sectionEn = sectionEn,
+                          subjects = subjects
+                      )
+                  }
+              }
+
+              // COMPLETE COMPUTER LEARNING COURSE WITH FULL ARTICLES
+              fun getComputerFolders(): List<FolderItem> {
+                  return listOf(
+                      FolderItem(
+                          titleGu = "૧. કમ્પ્યુટર બેઝિક્સ અને પરિચય (Computer Fundamentals)",
+                          titleEn = "1. Computer Fundamentals & Architecture",
+                          subtitleGu = "હાર્ડવેર, સોફ્ટવેર, મેમરી અને કમ્પ્યુટરના ભાગો",
+                          subtitleEn = "Hardware, Software, Memory & Architecture",
+                          icon = "💻",
+                          fullArticleGu = """
+                              🖥️ કમ્પ્યુટર બેઝિક્સ સંપૂર્ણ માર્ગદર્શિકા:
+                              કમ્પ્યુટર એ એક અતિ ઝડપી અને સચોટ ઇલેક્ટ્રોનિક ઉપકરણ છે જે ડેટાને ઇનપુટ તરીકે સ્વીકારે છે, તેનું પ્રોસેસિંગ કરે છે અને પરિણામ સ્વરૂપે ઉપયોગી આઉટપુટ આપે છે.
+                              
+                              ૧. હાર્ડવેર (Hardware):
+                              કમ્પ્યુટરના ભૌતિક ભાગો જેને સ્પર્શી શકાય છે:
+                              • ઇનપુટ ડિવાઇસ: કીબોર્ડ (Keyboard), માઉસ (Mouse), સ્કેનર (Scanner), માઇક્રોફોન (Mic), વેબકેમ (Webcam).
+                              • આઉટપુટ ડિવાઇસ: મોનિટર (Monitor/Screen), પ્રિન્ટર (Printer), સ્પીકર્સ (Speakers).
+                              • સી.પી.યુ. (CPU - Central Processing Unit): કમ્પ્યુટરનું મગજ! તેના ત્રણ મુખ્ય ઘટકો છે:
+                                - ALU (Arithmetic Logic Unit): ગાણિતિક અને તાર્કિક ગણતરીઓ કરે છે.
+                                - CU (Control Unit): સમગ્ર સિસ્ટમનું નિયંત્રણ કરે છે.
+                                - Memory/Registers: હાઇ-સ્પીડ કેશ મેમરી.
+                              
+                              ૨. મેમરીના પ્રકારો (Memory Types):
+                              • પ્રાથમિક મેમરી (RAM): Random Access Memory - કામચલાઉ અને ઝડપી મેમરી.
+                              • કાયમી મેમરી (ROM & SSD/HDD): Read Only Memory અને સ્ટોરેજ ડ્રાઇવ જે કમ્પ્યુટર બંધ થયા પછી પણ ડેટા સાચવી રાખે છે.
+                              
+                              ૩. સોફ્ટવેર (Software):
+                              પ્રોગ્રામ્સ અને કોડિંગનો સમૂહ:
+                              • સિસ્ટમ સોફ્ટવેર: Operating System (Windows 11, macOS, Linux, Android).
+                              • એપ્લિકેશન સોફ્ટવેર: MS Office, Google Chrome, Photoshop વગેરે.
+                          """.trimIndent(),
+                          fullArticleEn = """
+                              🖥️ Complete Guide to Computer Fundamentals:
+                              A computer is a high-speed electronic data-processing machine that executes instructions via the Input-Process-Output (IPO) cycle.
+                              
+                              1. Hardware Architecture:
+                              Physical tangible components of a computing device:
+                              • Input Devices: Keyboard, Mouse, Scanner, Microphone, Web Camera, Barcode Readers.
+                              • Output Devices: Monitor (OLED/IPS Display), Laser/Inkjet Printer, Audio Speakers, Projector.
+                              • CPU (Central Processing Unit): The engine and brain of the computer containing:
+                                - ALU (Arithmetic Logic Unit): Performs binary math and logical comparisons.
+                                - CU (Control Unit): Directs the flow of signals and data synchronization.
+                                - Cache Registers: Ultra-low latency volatile registers.
+                              
+                              2. Primary & Secondary Storage:
+                              • RAM (Random Access Memory): Volatile primary workspace memory for active apps.
+                              • ROM & NVMe SSD / Hard Disk: Non-volatile persistent storage storing OS and user data.
+                              
+                              3. Software Classification:
+                              • System Software: Operating systems like Microsoft Windows, Apple macOS, Linux Kernel.
+                              • Application Software: Productivity tools like MS Office 365, Web Browsers, IDEs.
+                          """.trimIndent(),
+                          detailsGu = listOf(
+                              "કમ્પ્યુટરનો આઈ.પી.ઓ. સાયકલ" to "Input -> Processing -> Output",
+                              "CPU ના ૩ મુખ્ય ભાગો" to "ALU (ગણતરી), CU (નિયંત્રણ) અને Registers (મેમરી)",
+                              "RAM અને ROM નો તફાવત" to "RAM અસ્થિર (હંગામી) છે; ROM કાયમી (બાયોસ) મેમરી છે.",
+                              "સૌથી ઝડપી સ્ટોરેજ" to "NVMe M.2 Solid State Drive (SSD)"
+                          ),
+                          detailsEn = listOf(
+                              "IPO Cycle" to "Input -> CPU Processing -> Output",
+                              "CPU Core Units" to "ALU (Math/Logic), CU (Control), and Cache Memory",
+                              "RAM vs ROM" to "RAM is volatile fast RAM; ROM is non-volatile system firmware.",
+                              "Fastest Storage" to "NVMe M.2 Solid State Drive (SSD)"
+                          )
+                      ),
+                      FolderItem(
+                          titleGu = "૨. કીબોર્ડ શોર્ટકટ કીઝ અને ઝડપી કમાન્ડ્સ (A to Z Shortcuts)",
+                          titleEn = "2. Master Keyboard Shortcuts (A to Z)",
+                          subtitleGu = "સુપરફાસ્ટ પ્રોફેશનલ ટાઈપિંગ અને કમાન્ડ્સ",
+                          subtitleEn = "Boost your speed in Windows & Office",
+                          icon = "⌨️",
+                          fullArticleGu = """
+                              ⌨️ કમ્પ્યુટર શોર્ટકટ કીઝની સંપૂર્ણ માસ્ટરી:
+                              કીબોર્ડ શોર્ટકટ્સથી તમારું કમ્પ્યુટર કામ કરવાની ઝડપ ૫ ગણી વધી જાય છે.
+                              
+                              • Ctrl + A : બધું લખાણ એકસાથે સિલેક્ટ કરવા (Select All)
+                              • Ctrl + C : પસંદ કરેલ લખાણ કે ફાઇલની કોપી કરવી (Copy)
+                              • Ctrl + V : કોપી કરેલ ડેટાને પેસ્ટ કરવો (Paste)
+                              • Ctrl + X : કટ કરવો (Cut)
+                              • Ctrl + Z : છેલ્લી ભૂલ સુધારી પાછું લાવવું (Undo)
+                              • Ctrl + Y : પાછું કરેલું આગળ લાવવું (Redo)
+                              • Ctrl + S : ફાઇલ તાત્કાલિક સેવ / સાચવવી (Save)
+                              • Ctrl + P : પ્રિન્ટ કાઢવા માટે (Print)
+                              • Ctrl + F : પેજમાં શબ્દ શોધવા માટે (Find)
+                              • Ctrl + Shift + Esc : ટાસ્ક મેનેજર ખોલવા (Task Manager)
+                              • Alt + F4 : ચાલુ સોફ્ટવેર બંધ કરવા અથવા કમ્પ્યુટર શટડાઉન કરવા
+                              • Windows + D : સીધા ડેસ્કટોપ સ્ક્રીન પર પહોંચવા
+                              • Windows + L : કમ્પ્યુટર તરત લોક કરવા માટે
+                          """.trimIndent(),
+                          fullArticleEn = """
+                              ⌨️ Complete Keyboard Shortcuts Reference:
+                              Mastering keyboard shortcuts accelerates productivity across Windows, Mac, and Office tools.
+                              
+                              • Ctrl + A : Select All contents in current window
+                              • Ctrl + C : Copy selected text, image or file to clipboard
+                              • Ctrl + V : Paste clipboard content to destination
+                              • Ctrl + X : Cut selected item
+                              • Ctrl + Z : Undo last action
+                              • Ctrl + Y : Redo undone action
+                              • Ctrl + S : Save current file/document
+                              • Ctrl + P : Open Print dialog box
+                              • Ctrl + F : Open Find search bar
+                              • Ctrl + Shift + Esc : Open Windows Task Manager directly
+                              • Alt + F4 : Close active application or prompt Shutdown
+                              • Win + D : Minimize all windows and show Desktop
+                              • Win + L : Instantly Lock computer workstation
+                          """.trimIndent(),
+                          detailsGu = listOf(
+                              "Ctrl + C / Ctrl + V" to "Copy (કોપી) અને Paste (પેસ્ટ)",
+                              "Ctrl + Z / Ctrl + Y" to "Undo (પાછું) અને Redo (આગળ)",
+                              "Ctrl + S" to "Save (ફાઇલ સેવ કરવા)",
+                              "Alt + F4" to "એપ બંધ કરવા અથવા શટડાઉન",
+                              "Windows + L" to "કમ્પ્યુટર તાત્કાલિક લોક કરવા"
+                          ),
+                          detailsEn = listOf(
+                              "Ctrl + C / Ctrl + V" to "Copy & Paste clipboard content",
+                              "Ctrl + Z / Ctrl + Y" to "Undo & Redo operations",
+                              "Ctrl + S" to "Save active document",
+                              "Alt + F4" to "Close app or Shutdown prompt",
+                              "Win + L" to "Instantly Lock system"
+                          )
+                      ),
+                      FolderItem(
+                          titleGu = "૩. માઇક્રોસોફ્ટ ઓફિસ સંપૂર્ણ કોર્સ (Word, Excel, PowerPoint)",
+                          titleEn = "3. Microsoft Office Suite Complete Guide",
+                          subtitleGu = "ડોક્યુમેન્ટેશન, સ્પ્રેડશીટ ગણતરી અને પ્રેઝન્ટેશન",
+                          subtitleEn = "Word, Excel Spreadsheets & PowerPoint Slides",
+                          icon = "📑",
+                          fullArticleGu = """
+                              📑 MS Office સંપૂર્ણ વ્યવહારુ જ્ઞાન:
+                              
+                              ૧. Microsoft Word (વર્ડ પ્રોસેસિંગ):
+                              ઓફિસ લેટર, એપ્લિકેશન, રેઝ્યુમે (બાયોડેટા), પુસ્તક ટાઈપિંગ, ટેબલ બનાવવું, પેજ લેઆઉટ સેટ કરવું અને PDF માં એક્સપોર્ટ કરવા માટેનું બેસ્ટ સોફ્ટવેર.
+                              
+                              ૨. Microsoft Excel (સ્પ્રેડશીટ & હિસાબ):
+                              ડેટા વિશ્લેષણ, માર્કશીટ અને નાણાકીય હિસાબો માટે વપરાય છે.
+                              મહત્વના સૂત્રો (Formulas):
+                              • =SUM(A1:A10) : તમામ સંખ્યાઓનો સરવાળો કરે છે.
+                              • =AVERAGE(B1:B10) : સરેરાશ (એવરેજ) શોધે છે.
+                              • =IF(C1>=35, "Pass", "Fail") : શરતી પરિણામ આપે છે.
+                              • =VLOOKUP() : મોટા ડેટાબેઝમાંથી ચોક્કસ માહિતી શોધે છે.
+                              
+                              ૩. Microsoft PowerPoint (પ્રેઝન્ટેશન):
+                              સ્લાઇડ્સ, એનિમેશન, સ્માર્ટ-આર્ટ અને વિઝ્યુઅલ ટ્રાન્ઝિશન દ્વારા સ્કૂલ પ્રોજેક્ટ અને બિઝનેસ પ્રેઝન્ટેશન તૈયાર કરવાનું ઉત્તમ માધ્યમ.
+                          """.trimIndent(),
+                          fullArticleEn = """
+                              📑 Microsoft Office Productivity Suite:
+                              
+                              1. Microsoft Word (Document Authoring):
+                              Standard word processor used for professional documentation, formatting, resumes, table insertion, headers/footers, and PDF exporting.
+                              
+                              2. Microsoft Excel (Spreadsheet Engine):
+                              Tabular grid calculation software for financial analytics and database management.
+                              Essential Excel Formulas:
+                              • =SUM(Range) : Calculates total summation.
+                              • =AVERAGE(Range) : Computes statistical arithmetic mean.
+                              • =IF(Condition, TrueVal, FalseVal) : Executes conditional branch logic.
+                              • =VLOOKUP() / =XLOOKUP() : Retrieves matching record values across tables.
+                              • Pivot Tables : Summarizes complex large multidimensional datasets.
+                              
+                              3. Microsoft PowerPoint (Visual Presentations):
+                              Slide deck software featuring custom animations, transitions, charts, and slide show delivery tools.
+                          """.trimIndent(),
+                          detailsGu = listOf(
+                              "MS Word મુખ્ય ઉપયોગ" to "ડોક્યુમેન્ટ, પત્ર અને બુક ટાઈપિંગ",
+                              "Excel સરવાળાનું સૂત્ર" to "=SUM(A1:A10)",
+                              "Excel શરતી સૂત્ર" to "=IF(Score>=35, 'Pass', 'Fail')",
+                              "PowerPoint ઉપયોગ" to "સ્લાઇડ્સ અને એનિમેટેડ પ્રેઝન્ટેશન"
+                          ),
+                          detailsEn = listOf(
+                              "MS Word Purpose" to "Document writing, formatting and report authoring",
+                              "Excel Sum Formula" to "=SUM(A1:A10)",
+                              "Excel Conditional Logic" to "=IF(Score>=35, 'Pass', 'Fail')",
+                              "PowerPoint Purpose" to "Interactive slide presentations and animated deck"
+                          )
+                      )
+                  )
+              }
+
+              // COMPLETE SPOKEN ENGLISH MASTER COURSE
+              fun getSpokenEnglishFolders(): List<FolderItem> {
+                  return listOf(
+                      FolderItem(
+                          titleGu = "૧. ૧૦૦+ રોજિંદા ઉપયોગી વાક્યો (Daily Use Sentences)",
+                          titleEn = "1. 100+ Essential Daily Conversation Sentences",
+                          subtitleGu = "અસ્ખલિત અંગ્રેજી બોલવા માટે દરરોજ વપરાતા વાક્યો",
+                          subtitleEn = "High-frequency spoken sentences with meanings",
+                          icon = "🗣️",
+                          fullArticleGu = """
+                              🗣️ રોજિંદા જીવનમાં વપરાતા અગત્યના અંગ્રેજી વાક્યો:
+                              
+                              • How are you doing today? -> તમે આજે કેમ છો?
+                              • I am doing great, thank you! -> હું એકદમ મજામાં છું, આભાર!
+                              • What is your good name? -> તમારું શુભ નામ શું છે?
+                              • My name is Hardik. -> મારું નામ હાર્દિક છે.
+                              • Where are you coming from? -> તમે ક્યાંથી આવી રહ્યા છો?
+                              • I am coming from Ahmedabad. -> હું અમદાવાદથી આવી રહ્યો છું.
+                              • Could you please repeat that? -> શું તમે મહેરબાની કરીને ફરીથી બોલી શકો?
+                              • I didn't catch that. -> મને બરાબર સંભળાયું નહીં.
+                              • Don't worry, everything will be alright. -> ચિંતા ન કરો, બધું સારું થઈ જશે.
+                              • It was wonderful talking to you! -> તમારી સાથે વાત કરીને ખૂબ આનંદ થયો!
+                              • Have a wonderful and productive day! -> તમારો દિવસ ખૂબ જ શુભ રહે!
+                          """.trimIndent(),
+                          fullArticleEn = """
+                              🗣️ Essential Daily Conversational English Sentences:
+                              
+                              • How are you doing today? -> Friendly everyday greeting.
+                              • I am doing great, thank you! -> Polite affirmative response.
+                              • What is your good name? -> Asking someone's name respectfully.
+                              • My name is Hardik. -> Introducing oneself clearly.
+                              • Where are you coming from? -> Asking about origin or travel.
+                              • I am coming from Ahmedabad. -> Answering geographical origin.
+                              • Could you please repeat that? -> Polite clarification request.
+                              • I didn't catch that. -> Informal phrase meaning you didn't hear.
+                              • Don't worry, everything will be alright. -> Reassurance statement.
+                              • It was wonderful talking to you! -> Polite closing phrase after conversation.
+                          """.trimIndent(),
+                          detailsGu = listOf(
+                              "How are you doing?" to "તમે કેમ છો?",
+                              "I am fine, thank you!" to "હું મજામાં છું, આભાર!",
+                              "Could you please repeat?" to "શું તમે ફરીથી બોલશો?",
+                              "Have a great day!" to "તમારો દિવસ શુભ રહે!"
+                          ),
+                          detailsEn = listOf(
+                              "How are you doing?" to "Common daily greeting",
+                              "I am fine, thank you!" to "Polite greeting response",
+                              "Could you please repeat?" to "Clarification request",
+                              "Have a great day!" to "Warm conversation closing"
+                          )
+                      ),
+                      FolderItem(
+                          titleGu = "૨. અંગ્રેજી વ્યાકરણ અને કાળ (English Grammar & Tenses)",
+                          titleEn = "2. Complete English Tenses Masterclass",
+                          subtitleGu = "સૂત્રો, નિયમો અને વ્યવહારુ ઉદાહરણો",
+                          subtitleEn = "Grammar Formulas with Real-Life Sentences",
+                          icon = "✍️",
+                          fullArticleGu = """
+                              ✍️ અંગ્રેજી કાળ (Tenses) ની સંપૂર્ણ સમજ:
+                              
+                              ૧. સાદો વર્તમાનકાળ (Simple Present Tense):
+                              રોજિંદી ટેવો, સનાતન સત્યો અને નિયમિત ક્રિયાઓ માટે વપરાય છે.
+                              • રચના: Subject + Verb (s/es) + Object
+                              • ઉદાહરણ: He reads books daily. (તે દરરોજ પુસ્તકો વાંચે છે.)
+                              • સનાતન સત્ય: The Sun rises in the East. (સૂર્ય પૂર્વમાં ઉગે છે.)
+                              
+                              ૨. સાદો ભૂતકાળ (Simple Past Tense):
+                              ભૂતકાળમાં પૂરી થઈ ગયેલી ક્રિયા દર્શાવવા માટે વપરાય છે.
+                              • રચના: Subject + V2 (ભૂતકાળનું રૂપ) + Object
+                              • ઉદાહરણ: We visited the Statue of Unity yesterday. (અમે ગઈકાલે સ્ટેચ્યુ ઓફ યુનિટી ગયા હતા.)
+                              
+                              ૩. સાદો ભવિષ્યકાળ (Simple Future Tense):
+                              ભવિષ્યમાં થનારી ક્રિયા દર્શાવવા માટે વપરાય છે.
+                              • રચના: Subject + will/shall + Verb + Object
+                              • ઉદાહરણ: India will win the cricket world cup. (ભારત ક્રિકેટ વિશ્વકપ જીતશે.)
+                              
+                              ૪. ચાલુ વર્તમાનકાળ (Present Continuous Tense):
+                              હાલમાં બોલતી વખતે ચાલુ ક્રિયા દર્શાવવા.
+                              • રચના: Subject + is/am/are + Verb-ing + Object
+                              • ઉદાહરણ: Students are learning computer skills now. (વિદ્યાર્થીઓ અત્યારે કમ્પ્યુટર શીખી રહ્યા છે.)
+                          """.trimIndent(),
+                          fullArticleEn = """
+                              ✍️ English Tenses Comprehensive Mastery:
+                              
+                              1. Simple Present Tense:
+                              Used for habitual actions, universal truths, and daily routines.
+                              • Formula: Subject + Base Verb (s/es for 3rd person singular) + Object
+                              • Example: He reads literature daily.
+                              • Universal Truth: The Sun rises in the east.
+                              
+                              2. Simple Past Tense:
+                              Used for completed actions that happened at a specific past time.
+                              • Formula: Subject + Past Form of Verb (V2) + Object
+                              • Example: We visited the Statue of Unity yesterday.
+                              
+                              3. Simple Future Tense:
+                              Used for planned actions or predictions in the future.
+                              • Formula: Subject + will/shall + Base Verb + Object
+                              • Example: India will lead global technology innovations.
+                              
+                              4. Present Continuous Tense:
+                              Used for ongoing actions happening at the moment of speech.
+                              • Formula: Subject + is/am/are + Verb-ing + Object
+                              • Example: The students are studying science diligently.
+                          """.trimIndent(),
+                          detailsGu = listOf(
+                              "સાદો વર્તમાનકાળ રચના" to "Sub + Verb(s/es) + Obj",
+                              "સાદો ભૂતકાળ રચના" to "Sub + V2 + Obj",
+                              "સાદો ભવિષ્યકાળ રચના" to "Sub + will + Verb + Obj",
+                              "ચાલુ વર્તમાનકાળ રચના" to "Sub + is/am/are + Verb-ing"
+                          ),
+                          detailsEn = listOf(
+                              "Simple Present Formula" to "Sub + Verb(s/es) + Obj",
+                              "Simple Past Formula" to "Sub + V2 + Obj",
+                              "Simple Future Formula" to "Sub + will + Base Verb + Obj",
+                              "Present Continuous Formula" to "Sub + is/am/are + Verb-ing"
+                          )
+                      )
+                  )
+              }
+
+              // COMPLETE BHARAT KO JANO & WORLD KNOWLEDGE
+              fun getKnowledgeFolders(): List<FolderItem> {
+                  return listOf(
+                      FolderItem(
+                          titleGu = "૧. ભારત કો જાનો (Know India Heritage)",
+                          titleEn = "1. National Heritage & Pride of India",
+                          subtitleGu = "ઇતિહાસ, પ્રતીકો, મહાનુભાવો અને ઐતિહાસિક સિદ્ધિઓ",
+                          subtitleEn = "National Symbols, Great Leaders & Heritage",
+                          icon = "🇮🇳",
+                          fullArticleGu = """
+                              🇮🇳 ભારત કો જાનો - આપણો ગૌરવશાળી ભારત દેશ:
+                              ભારત એ વિશ્વની સૌથી પ્રાચીન અને સમૃદ્ધ સંસ્કૃતિઓ ધરાવતો દેશ છે.
+                              
+                              ૧. રાષ્ટ્રીય પ્રતીકો (National Symbols):
+                              • રાષ્ટ્રધ્વજ: ત્રિરંગો (કેસરી: શૌર્ય અને ત્યાગ, સફેદ: સત્ય અને શાંતિ, લીલો: સમૃદ્ધિ, અને મધ્યમાં ૨૪ આરાવાળું અશોક ચક્ર જે સતત પ્રગતિ દર્શાવે છે).
+                              • રાષ્ટ્રીય મુદ્રા: સારનાથનો અશોક સ્તંભ (ચાર સિંહોની આકૃતિ - નીચે 'સત્યમેવ જયતે' અંકિત છે).
+                              • રાષ્ટ્રગીત: 'જન ગણ મન' - ગુરુદેવ રવીન્દ્રનાથ ટાગોર દ્વારા રચિત (૫૨ સેકન્ડનો સમય).
+                              • રાષ્ટ્રીય ગાન: 'વંદે માતરમ્' - બંકિમચંદ્ર ચટ્ટોપાધ્યાય દ્વારા રચિત.
+                              • રાષ્ટ્રીય પ્રાણી: રોયલ બેંગાલ ટાઇગર (વાઘ).
+                              • રાષ્ટ્રીય પક્ષી: મોર (Indian Peacock).
+                              • રાષ્ટ્રીય નદી: ગંગા નદી (ભારતની સૌથી લાંબી ૨,૫૨૫ કિમીની પવિત્ર નદી).
+                              
+                              ૨. મહાન રાષ્ટ્રપુરુષો (Great Personalities):
+                              • સરદાર વલ્લભભાઈ પટેલ: ભારતના લોખંડી પુરુષ જેમણે ૫૬૨ દેશી રજવાડાંઓનું એકીકરણ કરીને અખંડ ભારતનું નિર્માણ કર્યું. તેમના માનમાં ગુજરાતમાં ૧૮૨ મીટર ઊંચી વિશ્વની સૌથી મોટી પ્રતિમા 'Statue of Unity' બની છે.
+                              • મહાત્મા ગાંધી: રાષ્ટ્રપિતા - સત્ય અને અહિંસા દ્વારા આઝાદી અપાવી.
+                              • ડૉ. બાબાસાહેબ આંબેડકર: ભારતીય બંધારણના મુખ્ય શિલ્પી.
+                              • ડૉ. એ. પી. જે. અબ્દુલ કલામ: ભારતના મિસાઇલ મેન અને ભૂતપૂર્વ રાષ્ટ્રપતિ.
+                              
+                              ૩. અવકાશ સિદ્ધિ (Space Power):
+                              ભારતીય અવકાશ સંશોધન સંસ્થા (ISRO) એ ૨૩ ઓગસ્ટ, ૨૦૨૩ ના રોજ ચંદ્રયાન-૩ મિશન દ્વારા ચંદ્રના દક્ષિણ ધ્રુવ પર સફળ લેન્ડિંગ કરનાર ભારતને વિશ્વનો પ્રથમ દેશ બનાવ્યો.
+                          """.trimIndent(),
+                          fullArticleEn = """
+                              🇮🇳 Know India - Our Glorious Nation:
+                              India is one of the world's oldest living civilizations, celebrating unity in cultural diversity.
+                              
+                              1. National Symbols:
+                              • National Flag (Tricolour): Saffron (Courage & Sacrifice), White (Truth & Peace), Green (Prosperity & Fertility), and 24-spoke navy blue Ashoka Chakra.
+                              • State Emblem: Lion Capital of Ashoka at Sarnath inscribed with 'Satyameva Jayate' (Truth Alone Triumphs).
+                              • National Anthem: 'Jana Gana Mana' authored by Nobel laureate Rabindranath Tagore (52 seconds performance duration).
+                              • National Song: 'Vande Mataram' composed by Bankim Chandra Chattopadhyay.
+                              • National Animal: Royal Bengal Tiger (Panthera tigris).
+                              • National Bird: Indian Peacock (Pavo cristatus).
+                              • National River: The holy Ganga River flowing 2,525 km across India.
+                              
+                              2. Visionary Leaders of India:
+                              • Sardar Vallabhbhai Patel: The Iron Man of India who unified 562 princely states into one integrated Indian Union. Honoured with the world's tallest monument 'Statue of Unity' (182 meters) in Gujarat.
+                              • Mahatma Gandhi: Father of the Nation who championed non-violence (Ahimsa) and truth (Satyagraha).
+                              • Dr. B. R. Ambedkar: Chief Architect of the Constitution of India and champion of fundamental rights.
+                              • Dr. A. P. J. Abdul Kalam: Renowned Missile Scientist and beloved 11th President of India.
+                              
+                              3. Historic Space Milestones:
+                              On August 23, 2023, ISRO's Chandrayaan-3 achieved soft lunar landing on the Moon's South Pole, making India the 1st country globally to reach this territory.
+                          """.trimIndent(),
+                          detailsGu = listOf(
+                              "રાષ્ટ્રીય ધ્વજ અર્થ" to "કેસરી (વીરતા), સફેદ (શાંતિ), લીલો (સમૃદ્ધિ)",
+                              "સ્ટેચ્યુ ઓફ યુનિટી ઊંચાઈ" to "૧૮૨ મીટર (વિશ્વમાં સૌથી ઊંચી)",
+                              "ચંદ્રયાન-૩ સિદ્ધિ" to "ચંદ્રના દક્ષિણ ધ્રુવ પર લેન્ડ કરનાર પ્રથમ દેશ",
+                              "બંધારણના ઘડવૈયા" to "ડૉ. બાબાસાહેબ આંબેડકર"
+                          ),
+                          detailsEn = listOf(
+                              "Tricolour Significance" to "Saffron (Valour), White (Peace), Green (Prosperity)",
+                              "Statue of Unity Height" to "182 Meters (Tallest monument in the world)",
+                              "Chandrayaan-3 Record" to "1st nation to soft-land on Lunar South Pole",
+                              "Constitution Architect" to "Dr. B. R. Ambedkar"
+                          )
+                      ),
+                      FolderItem(
+                          titleGu = "૨. વિશ્વ ઇતિહાસ, ભૂગોળ અને વિજ્ઞાન (World History, Geography & Space)",
+                          titleEn = "2. World History, Geography & Modern Science",
+                          subtitleGu = "ખંડો, મહાસાગરો, ઔદ્યોગિક ક્રાંતિ, અવકાશ અને ભૌતિક વિજ્ઞાન",
+                          subtitleEn = "Continents, Oceans, Industrial Era & Physics",
+                          icon = "🌍",
+                          fullArticleGu = """
+                              🌍 વિશ્વ ઇતિહાસ, ભૂગોળ અને વિજ્ઞાન સર્વસંગ્રહ:
+                              
+                              ૧. વિશ્વનો ઇતિહાસ (World History):
+                              • પ્રાચીન સંસ્કૃતિઓ: સિંધુ ખીણની સંસ્કૃતિ (હડપ્પા-મોહેં-જો-દડો), ઇજિપ્તની નાઈલ નદીની સંસ્કૃતિ (પીરામીડ), પ્રાચીન ગ્રીક અને રોમન લોકશાહી.
+                              • ઔદ્યોગિક ક્રાંતિ (૧૭૬૦): ઇંગ્લેન્ડથી સ્ટીમ એન્જિન અને યંત્રો દ્વારા ઉત્પાદન ક્ષેત્રે ક્રાંતિ.
+                              • પ્રથમ વિશ્વયુદ્ધ (૧૯૧૪-૧૯૧૮) અને દ્વિતીય વિશ્વયુદ્ધ (૧૯૩૯-૧૯૪૫).
+                              • સંયુક્ત રાષ્ટ્રસંઘ (UN): ૨૪ ઓક્ટોબર, ૧૯૪૫ ના રોજ વિશ્વશાંતિ માટે સ્થાપના (મુખ્ય મથક: ન્યુ યોર્ક, USA).
+                              
+                              ૨. વિશ્વનું ભૂગોળ (World Geography):
+                              • ૭ ખંડો: ૧. એશિયા (વિશ્વનો સૌથી મોટો ખંડ), ૨. આફ્રિકા, ૩. ઉત્તર અમેરિકા, ૪. દક્ષિણ અમેરિકા, ૫. એન્ટાર્કટિકા (બરફથી ઢંકાયેલો), ૬. યુરોપ, ૭. ઓસ્ટ્રેલિયા (સૌથી નાનો ખંડ).
+                              • ૫ મહાસાગરો: ૧. પેસિફિક (પ્રશાંત - સૌથી મોટો અને ઊંડો), ૨. એટલાન્ટિક, ૩. હિંદ મહાસાગર, ૪. આર્કટિક, ૫. દક્ષિણ મહાસાગર.
+                              • વિશ્વની સૌથી લાંબી નદી: નાઈલ નદી (આફ્રિકા - ૬,૬૫૦ કિમી).
+                              • વિશ્વનો સૌથી ઊંચો પર્વત: માઉન્ટ એવરેસ્ટ (૮,૮૪૮.૮૬ મીટર - હિમાલય).
+                              
+                              ૩. આધુનિક વિજ્ઞાન અને અવકાશ (Modern Science & Physics):
+                              • બ્રહ્માંડની ઉત્પત્તિ: બિગ બેંગ થિયરી (Big Bang) અનુસાર ૧૩.૮ અબજ વર્ષ પહેલાં મહાવિસ્ફોટ થયો.
+                              • પ્રકાશની ઝડપ: ૩,૦૦,૦૦૦ કિમી/સેકન્ડ (સૂર્યપ્રકાશ પૃથ્વી પર પહોંચતા ૮ મિનિટ ૨૦ સેકન્ડ લાગે છે).
+                              • ગુરુત્વાકર્ષણનો નિયમ: સર આઇઝેક ન્યૂટન દ્વારા સફરજન પડવાની ઘટના પરથી શોધાયો.
+                              • સાપેક્ષતાનો સિદ્ધાંત: આલ્બર્ટ આઇન્સ્ટાઇન (E = mc²).
+                          """.trimIndent(),
+                          fullArticleEn = """
+                              🌍 World History, Geography & Modern Physics:
+                              
+                              1. World History:
+                              • Ancient Civilizations: Indus Valley (Harappa/Mohenjo-daro), Mesopotamian, Egyptian (Nile Pyramids), Classical Greek and Roman Empire.
+                              • Industrial Revolution (1760): Technological leap powered by James Watt's Steam Engine and mechanization.
+                              • Global World Wars: WWI (1914-1918) and WWII (1939-1945).
+                              • United Nations (UN): Established on October 24, 1945, to promote international peace and security.
+                              
+                              2. World Geography:
+                              • 7 Continents: Asia (Largest & Most Populous), Africa, North America, South America, Antarctica, Europe, Australia (Smallest).
+                              • 5 Oceans: Pacific Ocean (Deepest & Largest - Mariana Trench), Atlantic, Indian, Arctic, and Southern Ocean.
+                              • Longest River: Nile River in Africa (6,650 km length).
+                              • Highest Mountain Peak: Mount Everest (8,848.86 meters - Himalayas, Nepal/Tibet).
+                              
+                              3. Modern Astronomy & Science:
+                              • Universe Origin: Big Bang Theory (13.8 billion years ago).
+                              • Speed of Light: 299,792 km/s in vacuum (Takes ~8 minutes 20 seconds from Sun to Earth).
+                              • Law of Universal Gravitation: Formulated by Sir Isaac Newton.
+                              • Mass-Energy Equivalence: Albert Einstein's famous formula E = mc².
+                          """.trimIndent(),
+                          detailsGu = listOf(
+                              "સૌથી મોટો ખંડ" to "એશિયા (Asia)",
+                              "સૌથી લાંબી નદી" to "નાઈલ નદી (૬,૬૫૦ કિમી)",
+                              "સૌથી ઊંચો પર્વત" to "માઉન્ટ એવરેસ્ટ (૮,૮૪૮.૮૬ મીટર)",
+                              "પ્રકાશની ઝડપ" to "૩,૦૦,૦૦૦ કિમી/સેકન્ડ"
+                          ),
+                          detailsEn = listOf(
+                              "Largest Continent" to "Asia",
+                              "Longest River" to "Nile River (6,650 km)",
+                              "Highest Mountain" to "Mount Everest (8,848.86 m)",
+                              "Speed of Light" to "300,000 km/second"
+                          )
+                      )
+                  )
+              }
+          }
+
+          class MainActivity : ComponentActivity() {
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+                  setContent {
+                      GSEBVidyaSetuApp()
+                  }
+              }
+          }
+
+          @OptIn(ExperimentalMaterial3Api::class)
+          @Composable
+          fun GSEBVidyaSetuApp() {
+              val context = LocalContext.current
+
+              var isDarkMode by remember { mutableStateOf(false) }
+              var currentMedium by remember { mutableStateOf(AppMedium.GUJARATI) }
+              val isGu = currentMedium == AppMedium.GUJARATI
+
+              // Dynamic Color Palette for Dark & Light Mode
+              val bgColor = if (isDarkMode) Color(0xFF121212) else Color(0xFFF4F7FB)
+              val cardBg = if (isDarkMode) Color(0xFF1E1E1E) else Color.White
+              val textColor = if (isDarkMode) Color.White else Color(0xFF1E293B)
+              val primaryColor = if (isDarkMode) Color(0xFF1976D2) else Color(0xFF0D276B)
+              val secondaryText = if (isDarkMode) Color(0xFFB0BEC5) else Color(0xFF64748B)
+
+              val standards = remember { EducationRepository.getStandards() }
+              val computerFolders = remember { EducationRepository.getComputerFolders() }
+              val spokenEnglishFolders = remember { EducationRepository.getSpokenEnglishFolders() }
+              val knowledgeFolders = remember { EducationRepository.getKnowledgeFolders() }
+
+              var selectedTab by remember { mutableStateOf(0) }
+              var selectedStandard by remember { mutableStateOf<Standard?>(null) }
+              var selectedSubject by remember { mutableStateOf<Subject?>(null) }
+              var selectedChapter by remember { mutableStateOf<Chapter?>(null) }
+              var activeFolder by remember { mutableStateOf<FolderItem?>(null) }
+
+              Scaffold(
+                  topBar = {
+                      TopAppBar(
+                          title = {
+                              Row(verticalAlignment = Alignment.CenterVertically) {
+                                  Image(
+                                      painter = painterResource(id = R.drawable.ic_education_logo),
+                                      contentDescription = "Logo",
+                                      modifier = Modifier.size(36.dp)
+                                  )
+                                  Spacer(modifier = Modifier.width(8.dp))
+                                  Column {
+                                      Text(
+                                          text = when (selectedTab) {
+                                              0 -> if (selectedChapter != null) (if (isGu) selectedChapter!!.titleGu else selectedChapter!!.titleEn)
+                                                   else if (selectedSubject != null) (if (isGu) selectedSubject!!.nameGu else selectedSubject!!.nameEn)
+                                                   else if (selectedStandard != null) (if (isGu) selectedStandard!!.nameGu else selectedStandard!!.nameEn)
+                                                   else (if (isGu) "GSEB વિદ્યાસેતુ" else "GSEB VidyaSetu")
+                                              1 -> if (activeFolder != null) (if (isGu) activeFolder!!.titleGu else activeFolder!!.titleEn) else (if (isGu) "💻 કમ્પ્યુટર કોર્સ" else "💻 Computer Course")
+                                              2 -> if (activeFolder != null) (if (isGu) activeFolder!!.titleGu else activeFolder!!.titleEn) else (if (isGu) "🗣️ સ્પોકન ઇંગ્લિશ" else "🗣️ Spoken English")
+                                              else -> if (activeFolder != null) (if (isGu) activeFolder!!.titleGu else activeFolder!!.titleEn) else (if (isGu) "🇮🇳 ભારત & વિશ્વ જ્ઞાન" else "🇮🇳 India & World GK")
+                                          },
+                                          fontWeight = FontWeight.Bold,
+                                          fontSize = 16.sp,
+                                          color = Color.White,
+                                          maxLines = 1
+                                      )
+                                      Text(
+                                          text = if (isGu) "ધોરણ ૧-૧૨ • કમ્પ્યુટર • ભારત & વિશ્વ" else "Std 1-12 • Computer • India & World",
+                                          fontSize = 11.sp,
+                                          color = Color(0xFFE1F5FE)
+                                      )
+                                  }
+                              }
+                          },
+                          actions = {
+                              // Dark Mode Toggle Button
+                              IconButton(onClick = { isDarkMode = !isDarkMode }) {
+                                  Icon(
+                                      imageVector = if (isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                      contentDescription = "Theme Toggle",
+                                      tint = Color(0xFFFFC107)
+                                  )
+                              }
+
+                              // Language Medium Switcher Button
+                              Button(
+                                  onClick = {
+                                      currentMedium = if (isGu) AppMedium.ENGLISH else AppMedium.GUJARATI
+                                  },
+                                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),
+                                  contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
+                              ) {
+                                  Text(
+                                      text = if (isGu) "English" else "ગુજરાતી",
+                                      color = Color(0xFF0D276B),
+                                      fontWeight = FontWeight.Bold,
+                                      fontSize = 12.sp
+                                  )
+                              }
+                          },
+                          navigationIcon = {
+                              val canGoBack = (selectedTab == 0 && selectedStandard != null) || (selectedTab != 0 && activeFolder != null)
+                              if (canGoBack) {
+                                  IconButton(onClick = {
+                                      if (selectedTab == 0) {
+                                          if (selectedChapter != null) selectedChapter = null
+                                          else if (selectedSubject != null) selectedSubject = null
+                                          else selectedStandard = null
+                                      } else {
+                                          activeFolder = null
+                                      }
+                                  }) {
+                                      Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                                  }
+                              }
+                          },
+                          colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor)
+                      )
+                  },
+                  bottomBar = {
+                      NavigationBar(containerColor = cardBg) {
+                          NavigationBarItem(
+                              selected = selectedTab == 0,
+                              onClick = { selectedTab = 0; activeFolder = null },
+                              icon = { Icon(Icons.Default.MenuBook, contentDescription = null) },
+                              label = { Text(if (isGu) "ધોરણ ૧-૧૨" else "Std 1-12", fontSize = 11.sp, color = textColor) }
+                          )
+                          NavigationBarItem(
+                              selected = selectedTab == 1,
+                              onClick = { selectedTab = 1; activeFolder = null },
+                              icon = { Icon(Icons.Default.Computer, contentDescription = null) },
+                              label = { Text(if (isGu) "કમ્પ્યુટર" else "Computer", fontSize = 11.sp, color = textColor) }
+                          )
+                          NavigationBarItem(
+                              selected = selectedTab == 2,
+                              onClick = { selectedTab = 2; activeFolder = null },
+                              icon = { Icon(Icons.Default.RecordVoiceOver, contentDescription = null) },
+                              label = { Text(if (isGu) "ઇંગ્લિશ" else "English", fontSize = 11.sp, color = textColor) }
+                          )
+                          NavigationBarItem(
+                              selected = selectedTab == 3,
+                              onClick = { selectedTab = 3; activeFolder = null },
+                              icon = { Icon(Icons.Default.Public, contentDescription = null) },
+                              label = { Text(if (isGu) "વિશ્વ & GK" else "World GK", fontSize = 11.sp, color = textColor) }
+                          )
+                      }
+                  }
+              ) { padding ->
+                  Box(
+                      modifier = Modifier
+                          .fillMaxSize()
+                          .padding(padding)
+                          .background(bgColor)
+                  ) {
+                      when (selectedTab) {
+                          0 -> {
+                              when {
+                                  selectedChapter != null -> ChapterDetailScreen(selectedChapter!!, isGu, cardBg, textColor, secondaryText, context)
+                                  selectedSubject != null -> SubjectChaptersScreen(selectedSubject!!, isGu, cardBg, textColor, secondaryText, onChapterSelect = { selectedChapter = it })
+                                  selectedStandard != null -> StandardSubjectsScreen(selectedStandard!!, isGu, cardBg, textColor, secondaryText, onSubjectSelect = { selectedSubject = it })
+                                  else -> StandardsListScreen(standards, isGu, cardBg, textColor, secondaryText, primaryColor, onStandardSelect = { selectedStandard = it })
+                              }
+                          }
+                          1 -> FolderViewScreen(
+                              folderList = computerFolders,
+                              activeFolder = activeFolder,
+                              isGu = isGu,
+                              cardBg = cardBg,
+                              textColor = textColor,
+                              secondaryText = secondaryText,
+                              primaryColor = primaryColor,
+                              onSelectFolder = { activeFolder = it },
+                              headerTitle = if (isGu) "💻 કમ્પ્યુટર શીખો (Complete Course)" else "💻 Learn Computer Course",
+                              headerSubtitle = if (isGu) "બેઝિક્સ, શોર્ટકટ્સ, MS Office, ઈન્ટરનેટ અને AI" else "Basics, Shortcuts, MS Office, Internet & AI"
+                          )
+                          2 -> FolderViewScreen(
+                              folderList = spokenEnglishFolders,
+                              activeFolder = activeFolder,
+                              isGu = isGu,
+                              cardBg = cardBg,
+                              textColor = textColor,
+                              secondaryText = secondaryText,
+                              primaryColor = primaryColor,
+                              onSelectFolder = { activeFolder = it },
+                              headerTitle = if (isGu) "🗣️ સ્પોકન ઇંગ્લિશ (Spoken English)" else "🗣️ Spoken English Mastery",
+                              headerSubtitle = if (isGu) "રોજિંદા વાક્યો, શબ્દભંડોળ અને વ્યાકરણ" else "Daily Sentences, Vocabulary & Grammar"
+                          )
+                          3 -> FolderViewScreen(
+                              folderList = knowledgeFolders,
+                              activeFolder = activeFolder,
+                              isGu = isGu,
+                              cardBg = cardBg,
+                              textColor = textColor,
+                              secondaryText = secondaryText,
+                              primaryColor = primaryColor,
+                              onSelectFolder = { activeFolder = it },
+                              headerTitle = if (isGu) "🇮🇳 ભારત & વિશ્વ જ્ઞાન (World & India GK)" else "🇮🇳 India & World General Knowledge",
+                              headerSubtitle = if (isGu) "ઇતિહાસ, ભૂગોળ, અજાયબીઓ અને વિજ્ઞાન" else "History, Geography, Space & Monuments"
+                          )
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun FolderViewScreen(
+              folderList: List<FolderItem>,
+              activeFolder: FolderItem?,
+              isGu: Boolean,
+              cardBg: Color,
+              textColor: Color,
+              secondaryText: Color,
+              primaryColor: Color,
+              onSelectFolder: (FolderItem) -> Unit,
+              headerTitle: String,
+              headerSubtitle: String
+          ) {
+              if (activeFolder == null) {
+                  LazyColumn(modifier = Modifier.fillMaxSize().padding(14.dp)) {
+                      item {
+                          Text(headerTitle, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = textColor)
+                          Text(headerSubtitle, fontSize = 12.sp, color = secondaryText)
+                          Spacer(modifier = Modifier.height(12.dp))
+                      }
+
+                      items(folderList) { folder ->
+                          Card(
+                              modifier = Modifier
+                                  .fillMaxWidth()
+                                  .padding(vertical = 5.dp)
+                                  .clickable { onSelectFolder(folder) },
+                              colors = CardDefaults.cardColors(containerColor = cardBg),
+                              elevation = CardDefaults.cardElevation(2.dp),
+                              shape = RoundedCornerShape(12.dp)
+                          ) {
+                              Row(
+                                  modifier = Modifier.padding(16.dp),
+                                  horizontalArrangement = Arrangement.SpaceBetween,
+                                  verticalAlignment = Alignment.CenterVertically
+                              ) {
+                                  Row(verticalAlignment = Alignment.CenterVertically) {
+                                      Surface(
+                                          shape = RoundedCornerShape(10.dp),
+                                          color = Color(0xFFE8EAF6),
+                                          modifier = Modifier.size(46.dp)
+                                      ) {
+                                          Box(contentAlignment = Alignment.Center) {
+                                              Text(folder.icon, fontSize = 22.sp)
+                                          }
+                                      }
+                                      Spacer(modifier = Modifier.width(14.dp))
+                                      Column {
+                                          Text(if (isGu) folder.titleGu else folder.titleEn, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = textColor)
+                                          Text(if (isGu) folder.subtitleGu else folder.subtitleEn, fontSize = 12.sp, color = secondaryText)
+                                      }
+                                  }
+                                  Icon(Icons.Default.ChevronRight, contentDescription = null, tint = primaryColor)
+                              }
+                          }
+                      }
+                  }
+              } else {
+                  var readingTab by remember { mutableStateOf(0) }
+                  val fullArticle = if (isGu) activeFolder.fullArticleGu else activeFolder.fullArticleEn
+                  val details = if (isGu) activeFolder.detailsGu else activeFolder.detailsEn
+
+                  Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
+                      Card(
+                          modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                          colors = CardDefaults.cardColors(containerColor = primaryColor),
+                          shape = RoundedCornerShape(12.dp)
+                      ) {
+                          Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                              Text(activeFolder.icon, fontSize = 28.sp)
+                              Spacer(modifier = Modifier.width(10.dp))
+                              Column {
+                                  Text(if (isGu) activeFolder.titleGu else activeFolder.titleEn, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                                  Text(if (isGu) activeFolder.subtitleGu else activeFolder.subtitleEn, fontSize = 11.sp, color = Color(0xFFBBDEFB))
+                              }
+                          }
+                      }
+
+                      TabRow(selectedTabIndex = readingTab, containerColor = cardBg) {
+                          Tab(
+                              selected = readingTab == 0,
+                              onClick = { readingTab = 0 },
+                              text = { Text(if (isGu) "📖 સંપૂર્ણ લેખ & વિગત" else "📖 Full In-Depth Article", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor) }
+                          )
+                          Tab(
+                              selected = readingTab == 1,
+                              onClick = { readingTab = 1 },
+                              text = { Text(if (isGu) "📌 મુખ્ય મુદ્દાઓ (Key Points)" else "📌 Key Summary Points", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor) }
+                          )
+                      }
+
+                      Spacer(modifier = Modifier.height(10.dp))
+
+                      if (readingTab == 0) {
+                          Card(
+                              modifier = Modifier.fillMaxSize(),
+                              colors = CardDefaults.cardColors(containerColor = cardBg),
+                              shape = RoundedCornerShape(12.dp),
+                              elevation = CardDefaults.cardElevation(2.dp)
+                          ) {
+                              LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                                  item {
+                                      Text(
+                                          text = fullArticle,
+                                          fontSize = 14.sp,
+                                          color = textColor,
+                                          lineHeight = 23.sp
+                                      )
+                                  }
+                              }
+                          }
+                      } else {
+                          LazyColumn(modifier = Modifier.fillMaxSize()) {
+                              items(details) { (itemKey, itemVal) ->
+                                  Card(
+                                      modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                      colors = CardDefaults.cardColors(containerColor = cardBg),
+                                      elevation = CardDefaults.cardElevation(1.dp),
+                                      shape = RoundedCornerShape(10.dp)
+                                  ) {
+                                      Column(modifier = Modifier.padding(12.dp)) {
+                                          Text("📌 $itemKey", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF1565C0))
+                                          Spacer(modifier = Modifier.height(4.dp))
+                                          Text(itemVal, fontSize = 13.sp, color = textColor, lineHeight = 20.sp)
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun StandardsListScreen(
+              standards: List<Standard>,
+              isGu: Boolean,
+              cardBg: Color,
+              textColor: Color,
+              secondaryText: Color,
+              primaryColor: Color,
+              onStandardSelect: (Standard) -> Unit
+          ) {
+              LazyColumn(modifier = Modifier.fillMaxSize().padding(14.dp)) {
+                  item {
+                      Card(
+                          modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp),
+                          colors = CardDefaults.cardColors(containerColor = primaryColor),
+                          shape = RoundedCornerShape(14.dp)
+                      ) {
+                          Row(
+                              modifier = Modifier.padding(16.dp),
+                              verticalAlignment = Alignment.CenterVertically
+                          ) {
+                              Image(
+                                  painter = painterResource(id = R.drawable.ic_education_logo),
+                                  contentDescription = "Education Logo",
+                                  modifier = Modifier.size(54.dp)
+                              )
+                              Spacer(modifier = Modifier.width(14.dp))
+                              Column {
+                                  Text(if (isGu) "તમારું ધોરણ પસંદ કરો" else "Select Your Standard", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
+                                  Text(if (isGu) "ધોરણ ૧ થી ૧૨ ના ડિજિટલ પુસ્તકો અને જવાબો" else "Standard 1 to 12 Digital Books & Workbooks", fontSize = 12.sp, color = Color(0xFFBBDEFB))
+                              }
+                          }
+                      }
+                  }
+
+                  items(standards) { std ->
+                      Card(
+                          modifier = Modifier
+                              .fillMaxWidth()
+                              .padding(vertical = 5.dp)
+                              .clickable { onStandardSelect(std) },
+                          colors = CardDefaults.cardColors(containerColor = cardBg),
+                          elevation = CardDefaults.cardElevation(2.dp),
+                          shape = RoundedCornerShape(12.dp)
+                      ) {
+                          Row(
+                              modifier = Modifier.padding(16.dp),
+                              horizontalArrangement = Arrangement.SpaceBetween,
+                              verticalAlignment = Alignment.CenterVertically
+                          ) {
+                              Row(verticalAlignment = Alignment.CenterVertically) {
+                                  Surface(
+                                      shape = RoundedCornerShape(10.dp),
+                                      color = Color(0xFFE8EAF6),
+                                      modifier = Modifier.size(46.dp)
+                                  ) {
+                                      Box(contentAlignment = Alignment.Center) {
+                                          Text("${std.stdNumber}", fontWeight = FontWeight.Black, fontSize = 20.sp, color = Color(0xFF0D276B))
+                                      }
+                                  }
+                                  Spacer(modifier = Modifier.width(14.dp))
+                                  Column {
+                                      Text(if (isGu) std.nameGu else std.nameEn, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = textColor)
+                                      Text(if (isGu) std.sectionGu else std.sectionEn, fontSize = 12.sp, color = secondaryText)
+                                  }
+                              }
+                              Icon(Icons.Default.ChevronRight, contentDescription = null, tint = primaryColor)
+                          }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun StandardSubjectsScreen(
+              standard: Standard,
+              isGu: Boolean,
+              cardBg: Color,
+              textColor: Color,
+              secondaryText: Color,
+              onSubjectSelect: (Subject) -> Unit
+          ) {
+              Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
+                  Text(if (isGu) "વિષય પસંદ કરો (Select Subject)" else "Select Subject", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = textColor)
+                  Text(if (isGu) standard.nameGu else standard.nameEn, fontSize = 13.sp, color = secondaryText)
+                  Spacer(modifier = Modifier.height(12.dp))
+
+                  LazyVerticalGrid(
+                      columns = GridCells.Fixed(2),
+                      horizontalArrangement = Arrangement.spacedBy(10.dp),
+                      verticalArrangement = Arrangement.spacedBy(10.dp),
+                      modifier = Modifier.fillMaxSize()
+                  ) {
+                      items(standard.subjects) { subject ->
+                          Card(
+                              modifier = Modifier
+                                  .fillMaxWidth()
+                                  .height(130.dp)
+                                  .clickable { onSubjectSelect(subject) },
+                              colors = CardDefaults.cardColors(containerColor = cardBg),
+                              elevation = CardDefaults.cardElevation(3.dp),
+                              shape = RoundedCornerShape(14.dp)
+                          ) {
+                              Column(
+                                  modifier = Modifier
+                                      .fillMaxSize()
+                                      .padding(12.dp),
+                                  verticalArrangement = Arrangement.SpaceBetween
+                              ) {
+                                  Text(subject.iconEmoji, fontSize = 28.sp)
+                                  Column {
+                                      Text(if (isGu) subject.nameGu else subject.nameEn, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = textColor)
+                                      Text("${subject.chapters.size} ${if (isGu) "પ્રકરણો" else "Chapters"}", fontSize = 11.sp, color = secondaryText)
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun SubjectChaptersScreen(
+              subject: Subject,
+              isGu: Boolean,
+              cardBg: Color,
+              textColor: Color,
+              secondaryText: Color,
+              onChapterSelect: (Chapter) -> Unit
+          ) {
+              Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
+                  Text(if (isGu) "પ્રકરણોની યાદી (Chapters List)" else "Chapters List", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = textColor)
+                  Text(if (isGu) subject.nameGu else subject.nameEn, fontSize = 13.sp, color = secondaryText)
+                  Spacer(modifier = Modifier.height(12.dp))
+
+                  LazyColumn(modifier = Modifier.fillMaxSize()) {
+                      items(subject.chapters) { chapter ->
+                          Card(
+                              modifier = Modifier
+                                  .fillMaxWidth()
+                                  .padding(vertical = 5.dp)
+                                  .clickable { onChapterSelect(chapter) },
+                              colors = CardDefaults.cardColors(containerColor = cardBg),
+                              elevation = CardDefaults.cardElevation(2.dp),
+                              shape = RoundedCornerShape(12.dp)
+                          ) {
+                              Row(
+                                  modifier = Modifier.padding(16.dp),
+                                  horizontalArrangement = Arrangement.SpaceBetween,
+                                  verticalAlignment = Alignment.CenterVertically
+                              ) {
+                                  Column(modifier = Modifier.weight(1f)) {
+                                      Text(if (isGu) chapter.titleGu else chapter.titleEn, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = textColor)
+                                      Text(if (isGu) "📖 ડિજિટલ પુસ્તક + ✍️ સ્વાધ્યાયપોથી" else "📖 Digital Book + ✍️ Workbook Solutions", fontSize = 12.sp, color = Color(0xFF0D276B))
+                                  }
+                                  Icon(Icons.Default.ArrowForwardIos, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+
+          @Composable
+          fun ChapterDetailScreen(
+              chapter: Chapter,
+              isGu: Boolean,
+              cardBg: Color,
+              textColor: Color,
+              secondaryText: Color,
+              context: Context
+          ) {
+              var selectedViewTab by remember { mutableStateOf(0) }
+              val bookUrl = if (isGu) chapter.textbookUrlGu else chapter.textbookUrlEn
+              val swadhyayUrl = if (isGu) chapter.swadhyayPothiUrlGu else chapter.swadhyayPothiUrlEn
+
+              Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
+                  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                      Button(
+                          onClick = {
+                              try {
+                                  val intent = Intent(Intent.ACTION_VIEW, Uri.parse(bookUrl))
+                                  context.startActivity(intent)
+                              } catch (e: Exception) {
+                                  Toast.makeText(context, "PDF Browser ma open thai rahi che...", Toast.LENGTH_SHORT).show()
+                              }
+                          },
+                          modifier = Modifier.weight(1f),
+                          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D276B)),
+                          shape = RoundedCornerShape(10.dp)
+                      ) {
+                          Text(if (isGu) "📥 પુસ્તક PDF" else "📥 Textbook PDF", fontSize = 12.sp)
+                      }
+
+                      Button(
+                          onClick = {
+                              try {
+                                  val intent = Intent(Intent.ACTION_VIEW, Uri.parse(swadhyayUrl))
+                                  context.startActivity(intent)
+                              } catch (e: Exception) {
+                                  Toast.makeText(context, "Swadhyay Pothi open thai rahi che...", Toast.LENGTH_SHORT).show()
+                              }
+                          },
+                          modifier = Modifier.weight(1f),
+                          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                          shape = RoundedCornerShape(10.dp)
+                      ) {
+                          Text(if (isGu) "📝 સ્વાધ્યાયપોથી" else "📝 Workbook PDF", fontSize = 12.sp)
+                      }
+                  }
+
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  TabRow(selectedTabIndex = selectedViewTab, containerColor = cardBg) {
+                      Tab(
+                          selected = selectedViewTab == 0,
+                          onClick = { selectedViewTab = 0 },
+                          text = { Text(if (isGu) "📖 સંપૂર્ણ વાર્તા & સારાંશ" else "📖 Full Story & Theory", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor) }
+                      )
+                      Tab(
+                          selected = selectedViewTab == 1,
+                          onClick = { selectedViewTab = 1 },
+                          text = { Text(if (isGu) "✍️ સ્વાધ્યાયપોથી જવાબો" else "✍️ Workbook Q&A", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor) }
+                      )
+                  }
+
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  if (selectedViewTab == 0) {
+                      Card(
+                          modifier = Modifier.fillMaxSize(),
+                          colors = CardDefaults.cardColors(containerColor = cardBg),
+                          shape = RoundedCornerShape(12.dp),
+                          elevation = CardDefaults.cardElevation(2.dp)
+                      ) {
+                          LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                              item {
+                                  Text(if (isGu) chapter.titleGu else chapter.titleEn, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color(0xFF0D276B))
+                                  Spacer(modifier = Modifier.height(8.dp))
+                                  Text(
+                                      text = if (isGu) chapter.storyAndSummaryGu else chapter.storyAndSummaryEn,
+                                      fontSize = 14.sp,
+                                      color = textColor,
+                                      lineHeight = 22.sp
+                                  )
+                              }
+                          }
+                      }
+                  } else {
+                      val qaList = if (isGu) chapter.swadhyayAnswersGu else chapter.swadhyayAnswersEn
+                      LazyColumn(modifier = Modifier.fillMaxSize()) {
+                          items(qaList) { qa ->
+                              Card(
+                                  modifier = Modifier
+                                      .fillMaxWidth()
+                                      .padding(vertical = 6.dp),
+                                  colors = CardDefaults.cardColors(containerColor = cardBg),
+                                  elevation = CardDefaults.cardElevation(2.dp),
+                                  shape = RoundedCornerShape(12.dp)
+                              ) {
+                                  Column(modifier = Modifier.padding(14.dp)) {
+                                      Surface(
+                                          color = Color(0xFFFFF3E0),
+                                          shape = RoundedCornerShape(6.dp)
+                                      ) {
+                                          Text(
+                                              text = qa.type,
+                                              modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                              fontSize = 11.sp,
+                                              fontWeight = FontWeight.Bold,
+                                              color = Color(0xFFE65100)
+                                          )
+                                      }
+                                      Spacer(modifier = Modifier.height(6.dp))
+                                      Text("${if (isGu) "પ્રશ્ન" else "Question"}: ${qa.question}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = textColor)
+                                      Spacer(modifier = Modifier.height(6.dp))
+                                      Text(qa.answer, fontSize = 13.sp, color = textColor, lineHeight = 20.sp)
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
+      - name: Build Android APK
+        run: |
+          chmod +x gradlew || gradle wrapper --gradle-version 8.4
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GSEB-VidyaSetu-Edu-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
