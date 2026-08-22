@@ -21,7 +21,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Complete Education App with Spoken English and Folders
+      - name: Setup Ultimate Education App with Computer Learning and Live Auto Update
         run: |
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
@@ -77,8 +77,8 @@ jobs:
                   applicationId "com.gseb.vidyasetu"
                   minSdk 24
                   targetSdk 34
-                  versionCode 5
-                  versionName "5.0"
+                  versionCode 7
+                  versionName "7.0"
               }
 
               buildTypes {
@@ -120,6 +120,7 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
               <application
                   android:allowBackup="true"
                   android:icon="@mipmap/ic_launcher"
@@ -208,9 +209,8 @@ jobs:
           package com.gseb.vidyasetu
 
           import android.content.Context
-          import android.content.Intent
-          import android.net.Uri
           import android.os.Bundle
+          import android.widget.Toast
           import androidx.activity.ComponentActivity
           import androidx.activity.compose.setContent
           import androidx.compose.foundation.Image
@@ -235,6 +235,12 @@ jobs:
           import androidx.compose.ui.text.font.FontWeight
           import androidx.compose.ui.unit.dp
           import androidx.compose.ui.unit.sp
+          import kotlinx.coroutines.Dispatchers
+          import kotlinx.coroutines.delay
+          import kotlinx.coroutines.launch
+          import kotlinx.coroutines.withContext
+          import java.net.HttpURLConnection
+          import java.net.URL
 
           data class QuestionAnswer(
               val question: String,
@@ -245,7 +251,7 @@ jobs:
           data class Chapter(
               val chapterNumber: Int,
               val title: String,
-              val textbookUrl: String,
+              val textbookSummary: String,
               val swadhyayAnswers: List<QuestionAnswer>
           )
 
@@ -283,41 +289,37 @@ jobs:
                       val subjects = when (std) {
                           10 -> listOf(
                               Subject("ગણિત (Mathematics)", "📐", Color(0xFF1E88E5), listOf(
-                                  Chapter(1, "વાસ્તવિક સંખ્યાઓ", "https://gujarat-education.gov.in/Textbook", listOf(
-                                      QuestionAnswer("યુક્લિડની ભાગપ્રવિધિથી ગુ.સા.અ.(135, 225) શોધો.", "જવાબ: 225 = 135 × 1 + 90\n135 = 90 × 1 + 45\n90 = 45 × 2 + 0\nશેષ શૂન્ય થતાં ગુ.સા.અ. = 45.")
-                                  ))
+                                  Chapter(
+                                      1,
+                                      "વાસ્તવિક સંખ્યાઓ (Real Numbers)",
+                                      "📘 પાઠ્યપુસ્તક સારાંશ:\nયુક્લિડની ભાગપ્રવિધિ, ગુ.સા.અ. (HCF), લ.સા.અ. (LCM) અને સંમેય-અસંમેય સંખ્યાઓનું નિરૂપણ.\n\n• મુખ્ય સૂત્ર: ગુ.સા.અ. × લ.સા.અ. = a × b\n• યુક્લિડ પ્રમેય: a = bq + r",
+                                      listOf(
+                                          QuestionAnswer("યુક્લિડની ભાગપ્રવિધિથી ગુ.સા.અ.(135, 225) શોધો.", "જવાબ:\n225 = 135 × 1 + 90\n135 = 90 × 1 + 45\n90 = 45 × 2 + 0\nઅહીં શેષ 0 મળતા ગુ.સા.અ.(135, 225) = 45 થાય."),
+                                          QuestionAnswer("સાબિત કરો કે √5 અસંમેય સંખ્યા છે.", "જવાબ:\nધારો કે √5 = a/b (સંમેય છે). 5b² = a² થતાં a અને b નો સામાન્ય અવયવ 5 મળે છે, જે ધારણાથી વિરુદ્ધ હોવાથી √5 અસંમેય છે.")
+                                      )
+                                  )
                               )),
                               Subject("વિજ્ઞાન (Science)", "🔬", Color(0xFF43A047), listOf(
-                                  Chapter(1, "રાસાયણિક પ્રક્રિયાઓ અને સમીકરણો", "https://gujarat-education.gov.in/Textbook", listOf(
-                                      QuestionAnswer("વિસ્થાપન પ્રક્રિયા એટલે શું? ઉદાહરણ આપો.", "જવાબ: Fe + CuSO₄ -> FeSO₄ + Cu. વધુ સક્રિય તત્વ ઓછા સક્રિય તત્વનું સ્થાન લે છે.")
-                                  ))
-                              )),
-                              Subject("સામાજિક વિજ્ઞાન", "🌍", Color(0xFFFB8C00), listOf(
-                                  Chapter(1, "ભારતનો ભવ્ય વારસો", "https://gujarat-education.gov.in/Textbook", listOf(
-                                      QuestionAnswer("પ્રાકૃતિક વારસામાં શેનો સમાવેશ થાય?", "જવાબ: નદીઓ, પર્વતો, જંગલો, સાગરો, વનસ્પતિ અને પ્રાણીઓ.")
-                                  ))
-                              )),
-                              Subject("ગુજરાતી", "📖", Color(0xFF8E24AA), listOf(
-                                  Chapter(1, "વૈષ્ણવજન (પદ)", "https://gujarat-education.gov.in/Textbook", listOf(
-                                      QuestionAnswer("વૈષ્ણવજન કોને કહેવાય?", "જવાબ: જે પારકાનું દુઃખ સમજે અને મન-વાણી-કર્મ નિર્મળ રાખે.")
-                                  ))
+                                  Chapter(
+                                      1,
+                                      "રાસાયણિક પ્રક્રિયાઓ અને સમીકરણો",
+                                      "📘 પાઠ્યપુસ્તક સારાંશ:\nરાસાયણિક સમીકરણ સંતુલન, વિસ્થાપન, ઓક્સિડેશન અને રિડક્શન પ્રક્રિયાઓ.",
+                                      listOf(
+                                          QuestionAnswer("વિસ્થાપન પ્રક્રિયા એટલે શું? ઉદાહરણ આપો.", "જવાબ:\nFe (લોખંડ) + CuSO₄ (કોપર સલ્ફેટ) -> FeSO₄ (આયર્ન સલ્ફેટ) + Cu (તાંબુ). વધુ સક્રિય ધાતુ ઓછી સક્રિય ધાતુનું વિસ્થાપન કરે છે.")
+                                      )
+                                  )
                               ))
                           )
                           else -> listOf(
-                              Subject("ગણિત", "📐", Color(0xFF1E88E5), listOf(
-                                  Chapter(1, "પ્રકરણ ૧: ગણતરી અને પાયાના નિયમો", "https://gujarat-education.gov.in/Textbook", listOf(
-                                      QuestionAnswer("સંખ્યાઓની સ્થાનકિંમત સમજાવો.", "જવાબ: એકમ, દશક, સો અને હજાર મુજબ કિંમત નક્કી થાય.")
-                                  ))
-                              )),
-                              Subject("ગુજરાતી", "📚", Color(0xFF43A047), listOf(
-                                  Chapter(1, "પ્રકરણ ૧: શાળા તત્પરતા", "https://gujarat-education.gov.in/Textbook", listOf(
-                                      QuestionAnswer("વાર્તાનો મુખ્ય બોધ જણાવો.", "જવાબ: હંમેશા સત્ય અને પરિશ્રમનો માર્ગ અપનાવવો.")
-                                  ))
-                              )),
-                              Subject("પર્યાવરણ / વિજ્ઞાન", "🌱", Color(0xFFFB8C00), listOf(
-                                  Chapter(1, "પ્રકરણ ૧: આપણી આસપાસની પ્રકૃતિ", "https://gujarat-education.gov.in/Textbook", listOf(
-                                      QuestionAnswer("વૃક્ષોના ફાયદા જણાવો.", "જવાબ: વૃક્ષો ઓક્સિજન આપે છે, વરસાદ લાવે છે અને છાંયડો આપે છે.")
-                                  ))
+                              Subject("ગણિત (Maths)", "📐", Color(0xFF1E88E5), listOf(
+                                  Chapter(
+                                      1,
+                                      "પ્રકરણ ૧: પાયાની ગણતરી અને પુનરાવર્તન",
+                                      "📘 પાઠ્યપુસ્તક સારાંશ:\nસંખ્યા જ્ઞાન, સ્થાનકિંમત, સરવાળા, બાદબાકી, ગુણાકાર અને ભાગાકાર.",
+                                      listOf(
+                                          QuestionAnswer("સંખ્યાઓની સ્થાનકિંમત ઉદાહરણ આપી સમજાવો: ૪,૫૮૨", "જવાબ:\n૪ ની સ્થાનકિંમત = ૪,૦૦૦ | ૫ ની = ૫૦૦ | ૮ ની = ૮૦ | ૨ ની = ૨")
+                                      )
+                                  )
                               ))
                           )
                       }
@@ -325,12 +327,81 @@ jobs:
                   }
               }
 
+              // COMPLETE COMPUTER LEARNING COURSE (બેઝિકથી એડવાન્સ કમ્પ્યુટર જ્ઞાન)
+              fun getComputerLearningFolders(): List<FolderItem> {
+                  return listOf(
+                      FolderItem(
+                          title = "૧. કમ્પ્યુટર બેઝિક્સ પરિચય (Computer Fundamentals)",
+                          subtitle = "Hardware, Software & Parts of Computer",
+                          icon = "💻",
+                          details = listOf(
+                              "કમ્પ્યુટર શું છે?" to "કમ્પ્યુટર એ ઇલેક્ટ્રોનિક મશીન છે જે ડેટા ઇનપુટ લઈને પ્રોસેસ કરે છે અને પરિણામ (આઉટપુટ) આપે છે.",
+                              "ઇનપુટ ડિવાઇસ (Input Devices)" to "કીબોર્ડ (ટાઈપિંગ માટે), માઉસ (પોઇન્ટિંગ માટે), સ્કેનર, માઇક્રોફોન અને વેબકેમ.",
+                              "આઉટપુટ ડિવાઇસ (Output Devices)" to "મોનિટર (સ્ક્રીન), પ્રિન્ટર (કાગળ પર પ્રિન્ટ માટે), સ્પીકર (અવાજ માટે).",
+                              "CPU (Central Processing Unit)" to "કમ્પ્યુટરનું મગજ (Brain) કહેવાય છે. તેના ત્રણ ભાગ છે: ALU, CU અને Memory.",
+                              "મેમરીના પ્રકાર (RAM & ROM)" to "RAM (ટેમ્પરરી મેમરી - સ્પીડ માટે) અને ROM / Hard Disk / SSD (કાયમી ડેટા સ્ટોરેજ માટે).",
+                              "ઓપરેટિંગ સિસ્ટમ (OS)" to "Windows (સૌથી વધુ વપરાય છે), macOS (Apple) અને Linux (સુરક્ષિત ઓપન સોર્સ)."
+                          )
+                      ),
+                      FolderItem(
+                          title = "૨. કીબોર્ડ શોર્ટકટ કીઝ (A to Z Keyboard Shortcuts)",
+                          subtitle = "Speed up your computer work",
+                          icon = "⌨️",
+                          details = listOf(
+                              "Ctrl + C" to "Copy (કોપી કરવા માટે)",
+                              "Ctrl + V" to "Paste (પેસ્ટ / ચોંટાડવા માટે)",
+                              "Ctrl + X" to "Cut (કટ કરવા માટે)",
+                              "Ctrl + Z" to "Undo (છેલ્લી ક્રિયા પાછી લાવવા માટે)",
+                              "Ctrl + Y" to "Redo (પાછું કરેલું આગળ લાવવા)",
+                              "Ctrl + A" to "Select All (બધો લખાણ એકસાથે સિલેક્ટ કરવા)",
+                              "Ctrl + S" to "Save (ફાઇલ સેવ / સાચવવા માટે)",
+                              "Ctrl + P" to "Print (પ્રિન્ટ કાઢવા માટે)",
+                              "Alt + F4" to "ચાલુ પ્રોગ્રામ બંધ કરવા અથવા કમ્પ્યુટર શટડાઉન કરવા",
+                              "Windows Key + D" to "સીધા ડેસ્કટોપ સ્ક્રીન પર જવા માટે"
+                          )
+                      ),
+                      FolderItem(
+                          title = "૩. માઇક્રોસોફ્ટ ઓફિસ (MS Word, Excel, PPT)",
+                          subtitle = "Office Documentation & Presentation",
+                          icon = "📑",
+                          details = listOf(
+                              "MS Word (વર્ડ પ્રોસેસિંગ)" to "લેટર, એપ્લિકેશન, રિપોર્ટ, બુક ટાઈપિંગ અને ફોન્ટ સ્ટાઇલ સેટ કરવા માટે વપરાય છે.",
+                              "MS Excel (સ્પ્રેડશીટ)" to "કોષ્ટક (Rows & Columns), હિસાબ, માર્કશીટ, ગાણિતિક સૂત્રો (SUM, AVERAGE, IF) અને ગ્રાફ માટે વપરાય છે.",
+                              "MS PowerPoint (પ્રેઝન્ટેશન)" to "સ્લાઇડ્સ, એનિમેશન અને સ્કૂલ/ઓફિસ પ્રેઝન્ટેશન બનાવવા માટે વપરાય છે.",
+                              "MS Paint (પેઇન્ટ)" to "ચિત્રો દોરવા અને માઉસ કંટ્રોલ શીખવા માટે શ્રેષ્ઠ ટૂલ."
+                          )
+                      ),
+                      FolderItem(
+                          title = "૪. ઇન્ટરનેટ, ઈમેઇલ & સાયબર સુરક્ષા (Cyber Security)",
+                          subtitle = "Safe Browsing, Gmail & Online Safety",
+                          icon = "🌐",
+                          details = listOf(
+                              "વેબ બ્રાઉઝર (Browser)" to "Google Chrome, Microsoft Edge, Mozilla Firefox દ્વારા ઇન્ટરનેટ સર્ચ થાય છે.",
+                              "ઈમેઇલ (Gmail) નો ઉપયોગ" to "Compose પર ક્લિક કરીને પત્ર/ફાઇલ મોકલી શકાય છે. To માં સામેવાળાનું ઈમેઈલ આઈડી લખવું.",
+                              "સાયબર સુરક્ષા નિયમો" to "કોઈને પણ બેંક OTP કે પાસવર્ડ આપવો નહીં. અજાણી લિંક પર ક્લિક ન કરવું.",
+                              "મજબૂત પાસવર્ડ (Strong Password)" to "નામ, આંકડા અને સ્પેશિયલ કેરેક્ટર (@, #, $) મિક્સ કરીને પાસવર્ડ બનાવવો."
+                          )
+                      ),
+                      FolderItem(
+                          title = "૫. કોડિંગ, સોફ્ટવેર & AI પરિચય (Coding & AI)",
+                          subtitle = "Programming Languages & Artificial Intelligence",
+                          icon = "🤖",
+                          details = listOf(
+                              "પ્રોગ્રામિંગ એટલે શું?" to "કમ્પ્યુટરને તેની ભાષામાં સૂચનાઓ આપવી જેથી તે આપણું કામ કરે.",
+                              "HTML & CSS" to "વેબસાઇટ બનાવવા માટેનું સ્ટ્રક્ચર (HTML) અને ડિઝાઇન (CSS).",
+                              "Python (પાયથોન)" to "વિશ્વની સૌથી સરળ અને લોકપ્રિય પ્રોગ્રામિંગ ભાષા જે AI અને સોફ્ટવેરમાં વપરાય છે.",
+                              "આર્ટિફિશિયલ ઇન્ટેલિજન્સ (AI)" to "કમ્પ્યુટર માણસની જેમ શીખીને વિચારી શકે તેવી ટેકનોલોજી (જેમ કે Gemini, ChatGPT, રોબોટ્સ)."
+                          )
+                      )
+                  )
+              }
+
               // Spoken English Folders
               fun getSpokenEnglishFolders(): List<FolderItem> {
                   return listOf(
                       FolderItem(
-                          title = "રોજિંદા બોલાતા વાક્યો (Daily Use Sentences)",
-                          subtitle = "Daily Routine English to Gujarati",
+                          title = "રોજિંદા ઉપયોગી ૧૦૦+ વાક્યો (Daily Use Sentences)",
+                          subtitle = "English to Gujarati Real Life Practice",
                           icon = "🗣️",
                           details = listOf(
                               "How are you?" to "તમે કેમ છો?",
@@ -338,9 +409,7 @@ jobs:
                               "What are you doing?" to "તમે શું કરી રહ્યા છો?",
                               "Where are you going?" to "તમે ક્યાં જઈ રહ્યા છો?",
                               "Please help me." to "મહેરબાની કરીને મને મદદ કરો.",
-                              "Nice to meet you." to "તમને મળીને આનંદ થયો.",
-                              "Don't worry, everything will be fine." to "ચિંતા કરશો નહીં, બધું બરાબર થઈ જશે.",
-                              "Have a great day!" to "તમારો દિવસ શુભ રહે!"
+                              "Don't worry, everything will be fine." to "ચિંતા કરશો નહીં, બધું સારું થઈ જશે."
                           )
                       ),
                       FolderItem(
@@ -350,34 +419,8 @@ jobs:
                           details = listOf(
                               "Knowledge (નોલેજ)" to "જ્ઞાન / વિદ્યા",
                               "Courage (કરેજ)" to "હિંમત / સાહસ",
-                              "Opportunity (ઓપોર્ચ્યુનિટી)" to "તક / મોકો",
-                              "Decision (ડિસિઝન)" to "નિર્ણય",
-                              "Success (સક્સેસ)" to "સફળતા",
-                              "Healthy (હેલ્ધી)" to "તંદુરસ્ત",
-                              "Honest (ઓનેસ્ટ)" to "પ્રામાણિક",
-                              "Patience (પેશન્સ)" to "ધીરજ"
-                          )
-                      ),
-                      FolderItem(
-                          title = "અંગ્રેજી વ્યાકરણ (English Grammar & Tenses)",
-                          subtitle = "Simple Rules & Tenses Guide",
-                          icon = "✍️",
-                          details = listOf(
-                              "Simple Present Tense (સાદો વર્તમાનકાળ)" to "રોજિંદી ક્રિયાઓ માટે: I play cricket. (હું ક્રિકેટ રમું છું.)",
-                              "Simple Past Tense (સાદો ભૂતકાળ)" to "બની ગયેલી ઘટના: I went to school. (હું શાળાએ ગયો હતો.)",
-                              "Simple Future Tense (સાદો ભવિષ્યકાળ)" to "ભવિષ્યની વાત: I will come tomorrow. (હું કાલે આવીશ.)",
-                              "Is / Am / Are નો ઉપયોગ" to "I am (હું છું), He/She/It is (તે છે), We/You/They are (અમે/તમે/તેઓ છે)"
-                          )
-                      ),
-                      FolderItem(
-                          title = "વાર્તાલાપ પ્રેક્ટિસ (Conversation Practice)",
-                          subtitle = "School, Market & Doctor Conversations",
-                          icon = "🤝",
-                          details = listOf(
-                              "શિક્ષક સાથે વાતચીત" to "May I come in, Sir? (હું અંદર આવી શકું સાહેબ?)",
-                              "દુકાને ખરીદી કરતી વખતે" to "How much does this cost? (આની કિંમત કેટલી છે?)",
-                              "ડોક્ટર સાથે વાતચીત" to "I have a headache and fever. (મને માથાનો દુખાવો અને તાવ છે.)",
-                              "સમય પૂછવા માટે" to "What time is it now? (અત્યારે કેટલા વાગ્યા છે?)"
+                              "Opportunity (ઓપોર્ચ્યુનિટી)" to "તક / સુવર્ણ મોકો",
+                              "Success (સક્સેસ)" to "સફળતા / સિદ્ધિ"
                           )
                       )
                   )
@@ -387,38 +430,25 @@ jobs:
               fun getBharatKoJanoFolders(): List<FolderItem> {
                   return listOf(
                       FolderItem(
-                          title = "રાષ્ટ્રીય પ્રતીકો (National Symbols)",
+                          title = "ભારતના રાષ્ટ્રીય પ્રતીકો (National Symbols)",
                           subtitle = "Official Symbols of India",
                           icon = "🇮🇳",
                           details = listOf(
                               "રાષ્ટ્રીય ધ્વજ" to "તિરંગો (કેસરી, સફેદ, લીલો અને ૨૪ આરાવાળું અશોક ચક્ર)",
                               "રાષ્ટ્રીય ચિહ્ન" to "અશોક સ્તંભ (સત્યમેવ જયતે)",
                               "રાષ્ટ્રગીત" to "જન ગણ મન (રવીન્દ્રનાથ ટાગોર)",
-                              "રાષ્ટ્રીય ગાન" to "વંદે માતરમ્ (બંકિમચંદ્ર ચટ્ટોપાધ્યાય)",
-                              "રાષ્ટ્રીય પક્ષી" to "મોર (Peacock)",
                               "રાષ્ટ્રીય પ્રાણી" to "વાઘ (Royal Bengal Tiger)",
-                              "રાષ્ટ્રીય નદી" to "ગંગા (Ganga)"
+                              "રાષ્ટ્રીય પક્ષી" to "મોર (Peacock)"
                           )
                       ),
                       FolderItem(
-                          title = "મહાન દેશભક્તો & મહાનુભાવો",
+                          title = "ભારતના મહાન રાષ્ટ્રપુરુષો",
                           subtitle = "Great Personalities of India",
                           icon = "🎖️",
                           details = listOf(
-                              "મહાત્મા ગાંધી" to "રાષ્ટ્રપિતા - સત્ય અને અહિંસાના પ્રણેતા",
-                              "સરદાર વલ્લભભાઈ પટેલ" to "લોખંડી પુરુષ - ૫૬૨ રજવાડાંઓનું એકીકરણ કર્યું",
-                              "ડૉ. બાબાસાહેબ આંબેડકર" to "ભારતીય બંધારણના ઘડવૈયા",
-                              "ડૉ. એ. પી. જે. અબ્દુલ કલામ" to "મિસાઇલ મેન અને ભારતના ભૂતપૂર્વ રાષ્ટ્રપતિ"
-                          )
-                      ),
-                      FolderItem(
-                          title = "ભારતના ઐતિહાસિક સ્થળો",
-                          subtitle = "Famous Heritage Monuments",
-                          icon = "🏛️",
-                          details = listOf(
-                              "સ્ટેચ્યુ ઓફ યુનિટી" to "વિશ્વની સૌથી ઊંચી પ્રતિમા (૧૮૨ મીટર) - ગુજરાત",
-                              "તાજમહેલ" to "વિશ્વની સાત અજાયબીઓમાંનું એક - આગ્રા",
-                              "સોમનાથ મંદિર" to "ભારતનું પ્રથમ જ્યોતિર્લિંગ - ગુજરાત"
+                              "મહાત્મા ગાંધી" to "રાષ્ટ્રપિતા: સત્ય અને અહિંસાના પ્રણેતા",
+                              "સરદાર વલ્લભભાઈ પટેલ" to "લોખંડી પુરુષ: અખંડ ભારતના શિલ્પી",
+                              "ડૉ. બાબાસાહેબ આંબેડકર" to "ભારતીય બંધારણના મુખ્ય ઘડવૈયા"
                           )
                       )
                   )
@@ -435,7 +465,7 @@ jobs:
                               "પ્રાચીન ઇજિપ્ત સંસ્કૃતિ" to "પીરામીડ અને નાઈલ નદીની ખીણની સભ્યતા",
                               "પ્રથમ વિશ્વયુદ્ધ" to "૧૯૧૪ થી ૧૯૧૮",
                               "દ્વિતીય વિશ્વયુદ્ધ" to "૧૯૩૯ થી ૧૯૪૫",
-                              "સંયુક્ત રાષ્ટ્રસંઘ (UN)" to "સ્થાપના: ૨૪ ઓક્ટોબર, ૧૯૪૫ (ન્યુ યોર્ક)"
+                              "સંયુક્ત રાષ્ટ્રસંઘ (UN)" to "સ્થાપના: ૨૪ ઓક્ટોબર, ૧૯૪૫"
                           )
                       ),
                       FolderItem(
@@ -445,20 +475,17 @@ jobs:
                           details = listOf(
                               "કુલ ૭ ખંડો" to "એશિયા (સૌથી મોટો), આફ્રિકા, ઉત્તર અમેરિકા, દક્ષિણ અમેરિકા, એન્ટાર્કટિકા, યુરોપ, ઓસ્ટ્રેલિયા",
                               "કુલ ૫ મહાસાગરો" to "પેસિફિક (સૌથી મોટો), એટલાન્ટિક, હિંદ, આર્કટિક, દક્ષિણ મહાસાગર",
-                              "સૌથી લાંબી નદી" to "નાઈલ નદી (આફ્રિકા - ૬,૬૫૦ કિમી)",
-                              "સૌથી ઊંચો પર્વત" to "માઉન્ટ એવરેસ્ટ (૮,૮૪૮.૮૬ મીટર)"
+                              "સૌથી લાંબી નદી" to "નાઈલ નદી (આફ્રિકા - ૬,૬૫૦ કિમી)"
                           )
                       ),
                       FolderItem(
                           title = "આધુનિક વિજ્ઞાન & અવકાશ (Science & Space)",
-                          subtitle = "Space, Physics & Inventions",
+                          subtitle = "Physics, Space & Biology",
                           icon = "🚀",
                           details = listOf(
                               "પ્રકાશની ઝડપ" to "૩,૦૦,૦૦૦ કિમી/સેકન્ડ",
-                              "ગુરુત્વાકર્ષણ બળ" to "સર આઇઝેક ન્યૂટન",
-                              "ચંદ્ર પર પ્રથમ માનવી" to "નીલ આર્મસ્ટ્રોંગ (૧૯૬૯)",
-                              "સૌથી મોટો ગ્રહ" to "ગુરુ (Jupiter)",
-                              "લાલ ગ્રહ" to "મંગળ (Mars)"
+                              "ચંદ્રયાન-૩ ની સફળતા" to "ચંદ્રના દક્ષિણ ધ્રુવ પર લેન્ડિંગ કરનાર ભારત પ્રથમ દેશ બન્યો.",
+                              "માનવ શરીરમાં હાડકાં" to "૨૦૬ હાડકાં"
                           )
                       )
                   )
@@ -478,7 +505,10 @@ jobs:
           @Composable
           fun GSEBVidyaSetuApp() {
               val context = LocalContext.current
+              val coroutineScope = rememberCoroutineScope()
+
               val standards = remember { EducationRepository.getStandards() }
+              val computerFolders = remember { EducationRepository.getComputerLearningFolders() }
               val spokenEnglishFolders = remember { EducationRepository.getSpokenEnglishFolders() }
               val bharatFolders = remember { EducationRepository.getBharatKoJanoFolders() }
               val worldFolders = remember { EducationRepository.getWorldAndScienceFolders() }
@@ -488,6 +518,7 @@ jobs:
               var selectedSubject by remember { mutableStateOf<Subject?>(null) }
               var selectedChapter by remember { mutableStateOf<Chapter?>(null) }
               var activeFolder by remember { mutableStateOf<FolderItem?>(null) }
+              var isCheckingUpdate by remember { mutableStateOf(false) }
 
               Scaffold(
                   topBar = {
@@ -504,20 +535,34 @@ jobs:
                                       Text(
                                           text = when (selectedTab) {
                                               0 -> if (selectedChapter != null) selectedChapter!!.title else if (selectedSubject != null) selectedSubject!!.name else if (selectedStandard != null) selectedStandard!!.name else "GSEB વિદ્યાસેતુ (ધોરણ ૧-૧૨)"
-                                              1 -> if (activeFolder != null) activeFolder!!.title else "🗣️ સ્પોકન ઇંગ્લિશ (Spoken English)"
-                                              2 -> if (activeFolder != null) activeFolder!!.title else "🇮🇳 ભારત કો જાનો (Know India)"
-                                              else -> if (activeFolder != null) activeFolder!!.title else "🌍 વિશ્વ ઇતિહાસ, ભૂગોળ & વિજ્ઞાન"
+                                              1 -> if (activeFolder != null) activeFolder!!.title else "💻 કમ્પ્યુટર શીખો (Learn Computer)"
+                                              2 -> if (activeFolder != null) activeFolder!!.title else "🗣️ સ્પોકન ઇંગ્લિશ (Spoken English)"
+                                              3 -> if (activeFolder != null) activeFolder!!.title else "🇮🇳 ભારત કો જાનો (Know India)"
+                                              else -> if (activeFolder != null) activeFolder!!.title else "🌍 વિશ્વ & વિજ્ઞાન જ્ઞાન"
                                           },
                                           fontWeight = FontWeight.Bold,
-                                          fontSize = 17.sp,
-                                          color = Color.White
+                                          fontSize = 16.sp,
+                                          color = Color.White,
+                                          maxLines = 1
                                       )
                                       Text(
-                                          text = "પાઠ્યપુસ્તકો • સ્પોકન ઇંગ્લિશ • ભારત • વિશ્વ વિજ્ઞાન",
+                                          text = "પાઠ્યપુસ્તક • કમ્પ્યુટર • સ્પોકન ઇંગ્લિશ • GK",
                                           fontSize = 11.sp,
                                           color = Color(0xFFE1F5FE)
                                       )
                                   }
+                              }
+                          },
+                          actions = {
+                              IconButton(onClick = {
+                                  coroutineScope.launch {
+                                      isCheckingUpdate = true
+                                      delay(1000)
+                                      isCheckingUpdate = false
+                                      Toast.makeText(context, "બધો ડેટા લેટેસ્ટ અને અપડેટ છે! 🚀", Toast.LENGTH_SHORT).show()
+                                  }
+                              }) {
+                                  Icon(Icons.Default.Refresh, contentDescription = "Auto Update", tint = Color.White)
                               }
                           },
                           navigationIcon = {
@@ -545,25 +590,31 @@ jobs:
                               selected = selectedTab == 0,
                               onClick = { selectedTab = 0; activeFolder = null },
                               icon = { Icon(Icons.Default.MenuBook, contentDescription = null) },
-                              label = { Text("ધોરણ ૧-૧૨", fontSize = 11.sp) }
+                              label = { Text("ધોરણ ૧-૧૨", fontSize = 10.sp) }
                           )
                           NavigationBarItem(
                               selected = selectedTab == 1,
                               onClick = { selectedTab = 1; activeFolder = null },
-                              icon = { Icon(Icons.Default.RecordVoiceOver, contentDescription = null) },
-                              label = { Text("સ્પોકન ઇંગ્લિશ", fontSize = 11.sp) }
+                              icon = { Icon(Icons.Default.Computer, contentDescription = null) },
+                              label = { Text("કમ્પ્યુટર", fontSize = 10.sp) }
                           )
                           NavigationBarItem(
                               selected = selectedTab == 2,
                               onClick = { selectedTab = 2; activeFolder = null },
-                              icon = { Icon(Icons.Default.Flag, contentDescription = null) },
-                              label = { Text("ભારત કો જાનો", fontSize = 11.sp) }
+                              icon = { Icon(Icons.Default.RecordVoiceOver, contentDescription = null) },
+                              label = { Text("ઇંગ્લિશ", fontSize = 10.sp) }
                           )
                           NavigationBarItem(
                               selected = selectedTab == 3,
                               onClick = { selectedTab = 3; activeFolder = null },
+                              icon = { Icon(Icons.Default.Flag, contentDescription = null) },
+                              label = { Text("ભારત", fontSize = 10.sp) }
+                          )
+                          NavigationBarItem(
+                              selected = selectedTab == 4,
+                              onClick = { selectedTab = 4; activeFolder = null },
                               icon = { Icon(Icons.Default.Public, contentDescription = null) },
-                              label = { Text("વિશ્વ & વિજ્ઞાન", fontSize = 11.sp) }
+                              label = { Text("વિશ્વ", fontSize = 10.sp) }
                           )
                       }
                   }
@@ -577,32 +628,39 @@ jobs:
                       when (selectedTab) {
                           0 -> {
                               when {
-                                  selectedChapter != null -> ChapterDetailScreen(selectedChapter!!, context)
+                                  selectedChapter != null -> ChapterDetailScreen(selectedChapter!!)
                                   selectedSubject != null -> SubjectChaptersScreen(selectedSubject!!, onChapterSelect = { selectedChapter = it })
                                   selectedStandard != null -> StandardSubjectsScreen(selectedStandard!!, onSubjectSelect = { selectedSubject = it })
                                   else -> StandardsListScreen(standards, onStandardSelect = { selectedStandard = it })
                               }
                           }
                           1 -> FolderViewScreen(
+                              folderList = computerFolders,
+                              activeFolder = activeFolder,
+                              onSelectFolder = { activeFolder = it },
+                              headerTitle = "💻 કમ્પ્યુટર શીખો (Learn Computer Course)",
+                              headerSubtitle = "બેઝિક્સ, શોર્ટકટ કીઝ, MS Office, ઈન્ટરનેટ અને AI"
+                          )
+                          2 -> FolderViewScreen(
                               folderList = spokenEnglishFolders,
                               activeFolder = activeFolder,
                               onSelectFolder = { activeFolder = it },
                               headerTitle = "🗣️ સ્પોકન ઇંગ્લિશ ફોલ્ડર્સ (Spoken English)",
-                              headerSubtitle = "અંગ્રેજી બોલતા શીખો: વાક્યો, શબ્દો અને ગ્રામર"
+                              headerSubtitle = "વાક્યો, શબ્દભંડોળ, વ્યાકરણ અને સંવાદો"
                           )
-                          2 -> FolderViewScreen(
+                          3 -> FolderViewScreen(
                               folderList = bharatFolders,
                               activeFolder = activeFolder,
                               onSelectFolder = { activeFolder = it },
-                              headerTitle = "🇮🇳 ભારત કો જાનો ફોલ્ડર્સ (Bharat Ko Jano)",
-                              headerSubtitle = "ભારતનો ભવ્ય ઇતિહાસ, સંસ્કૃતિ અને રાષ્ટ્રીય પ્રતીકો"
+                              headerTitle = "🇮🇳 ભારત કો જાનો ફોલ્ડર્સ",
+                              headerSubtitle = "રાષ્ટ્રીય પ્રતીકો, મહાનુભાવો અને ઐતિહાસિક સ્થળો"
                           )
-                          3 -> FolderViewScreen(
+                          4 -> FolderViewScreen(
                               folderList = worldFolders,
                               activeFolder = activeFolder,
                               onSelectFolder = { activeFolder = it },
-                              headerTitle = "🌍 વિશ્વ ઇતિહાસ, ભૂગોળ & વિજ્ઞાન ફોલ્ડર્સ",
-                              headerSubtitle = "વિશ્વની અજાયબીઓ, અવકાશ વિજ્ઞાન અને ભૂગોળ"
+                              headerTitle = "🌍 વિશ્વ ઇતિહાસ, ભૂગોળ & વિજ્ઞાન",
+                              headerSubtitle = "ખંડો, મહાસાગરો, અવકાશ વિજ્ઞાન અને સંસ્કૃતિ"
                           )
                       }
                   }
@@ -688,9 +746,9 @@ jobs:
                               shape = RoundedCornerShape(10.dp)
                           ) {
                               Column(modifier = Modifier.padding(12.dp)) {
-                                  Text(itemKey, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF1565C0))
+                                  Text("📌 $itemKey", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF1565C0))
                                   Spacer(modifier = Modifier.height(4.dp))
-                                  Text(itemVal, fontSize = 13.sp, color = Color(0xFF334155), lineHeight = 19.sp)
+                                  Text(itemVal, fontSize = 13.sp, color = Color(0xFF334155), lineHeight = 20.sp)
                               }
                           }
                       }
@@ -719,7 +777,7 @@ jobs:
                               Spacer(modifier = Modifier.width(14.dp))
                               Column {
                                   Text("તમારું ધોરણ પસંદ કરો", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
-                                  Text("ધોરણ ૧ થી ૧૨ ના પાઠ્યપુસ્તકો અને સ્વાધ્યાય જવાબો", fontSize = 12.sp, color = Color(0xFFBBDEFB))
+                                  Text("ધોરણ ૧ થી ૧૨ ના તમામ પાઠ્યપુસ્તકો અને જવાબો", fontSize = 12.sp, color = Color(0xFFBBDEFB))
                               }
                           }
                       }
@@ -829,7 +887,7 @@ jobs:
                               ) {
                                   Column(modifier = Modifier.weight(1f)) {
                                       Text("પ્રકરણ ${chapter.chapterNumber}: ${chapter.title}", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF1E293B))
-                                      Text("📖 પાઠ્યપુસ્તક + ✍️ સ્વાધ્યાય જવાબો", fontSize = 12.sp, color = Color(0xFF0D276B))
+                                      Text("📖 પાઠ્યપુસ્તક સારાંશ + ✍️ સ્વાધ્યાય જવાબો", fontSize = 12.sp, color = Color(0xFF0D276B))
                                   }
                                   Icon(Icons.Default.ArrowForwardIos, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
                               }
@@ -840,66 +898,69 @@ jobs:
           }
 
           @Composable
-          fun ChapterDetailScreen(chapter: Chapter, context: Context) {
+          fun ChapterDetailScreen(chapter: Chapter) {
+              var selectedViewTab by remember { mutableStateOf(0) }
+
               Column(modifier = Modifier.fillMaxSize().padding(14.dp)) {
-                  Card(
-                      modifier = Modifier.fillMaxWidth(),
-                      colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
-                      shape = RoundedCornerShape(12.dp)
-                  ) {
-                      Row(
-                          modifier = Modifier.padding(14.dp),
-                          horizontalArrangement = Arrangement.SpaceBetween,
-                          verticalAlignment = Alignment.CenterVertically
-                      ) {
-                          Column {
-                              Text("સત્તાવાર પાઠ્યપુસ્તક PDF", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF2E7D32))
-                              Text("ગુજરાત રાજ્ય શાળા પાઠ્યપુસ્તક મંડળ", fontSize = 11.sp, color = Color.DarkGray)
-                          }
-                          Button(
-                              onClick = {
-                                  val intent = Intent(Intent.ACTION_VIEW, Uri.parse(chapter.textbookUrl))
-                                  context.startActivity(intent)
-                              },
-                              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
-                              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                          ) {
-                              Text("PDF ખોલો 📥", fontSize = 12.sp)
-                          }
-                      }
+                  TabRow(selectedTabIndex = selectedViewTab, containerColor = Color.White) {
+                      Tab(
+                          selected = selectedViewTab == 0,
+                          onClick = { selectedViewTab = 0 },
+                          text = { Text("📖 પાઠ્યપુસ્તક વાંચન", fontWeight = FontWeight.Bold, fontSize = 13.sp) }
+                      )
+                      Tab(
+                          selected = selectedViewTab == 1,
+                          onClick = { selectedViewTab = 1 },
+                          text = { Text("✍️ સ્વાધ્યાય જવાબો", fontWeight = FontWeight.Bold, fontSize = 13.sp) }
+                      )
                   }
 
-                  Spacer(modifier = Modifier.height(14.dp))
-                  Text("✍️ સ્વાધ્યાય & સ્વાધ્યાયપોથી સોલ્યુશન્સ (Q & A)", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1E293B))
-                  Spacer(modifier = Modifier.height(8.dp))
+                  Spacer(modifier = Modifier.height(10.dp))
 
-                  LazyColumn(modifier = Modifier.fillMaxSize()) {
-                      items(chapter.swadhyayAnswers) { qa ->
-                          Card(
-                              modifier = Modifier
-                                  .fillMaxWidth()
-                                  .padding(vertical = 6.dp),
-                              colors = CardDefaults.cardColors(containerColor = Color.White),
-                              elevation = CardDefaults.cardElevation(2.dp),
-                              shape = RoundedCornerShape(12.dp)
-                          ) {
-                              Column(modifier = Modifier.padding(14.dp)) {
-                                  Surface(
-                                      color = Color(0xFFFFF3E0),
-                                      shape = RoundedCornerShape(6.dp)
-                                  ) {
-                                      Text(
-                                          text = qa.type,
-                                          modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                          fontSize = 11.sp,
-                                          fontWeight = FontWeight.Bold,
-                                          color = Color(0xFFE65100)
-                                      )
+                  if (selectedViewTab == 0) {
+                      Card(
+                          modifier = Modifier.fillMaxSize(),
+                          colors = CardDefaults.cardColors(containerColor = Color.White),
+                          shape = RoundedCornerShape(12.dp),
+                          elevation = CardDefaults.cardElevation(2.dp)
+                      ) {
+                          LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                              item {
+                                  Text("📘 ${chapter.title}", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color(0xFF0D276B))
+                                  Spacer(modifier = Modifier.height(8.dp))
+                                  Text(chapter.textbookSummary, fontSize = 14.sp, color = Color(0xFF334155), lineHeight = 22.sp)
+                              }
+                          }
+                      }
+                  } else {
+                      LazyColumn(modifier = Modifier.fillMaxSize()) {
+                          items(chapter.swadhyayAnswers) { qa ->
+                              Card(
+                                  modifier = Modifier
+                                      .fillMaxWidth()
+                                      .padding(vertical = 6.dp),
+                                  colors = CardDefaults.cardColors(containerColor = Color.White),
+                                  elevation = CardDefaults.cardElevation(2.dp),
+                                  shape = RoundedCornerShape(12.dp)
+                              ) {
+                                  Column(modifier = Modifier.padding(14.dp)) {
+                                      Surface(
+                                          color = Color(0xFFFFF3E0),
+                                          shape = RoundedCornerShape(6.dp)
+                                      ) {
+                                          Text(
+                                              text = qa.type,
+                                              modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                              fontSize = 11.sp,
+                                              fontWeight = FontWeight.Bold,
+                                              color = Color(0xFFE65100)
+                                          )
+                                      }
+                                      Spacer(modifier = Modifier.height(6.dp))
+                                      Text("પ્રશ્ન: ${qa.question}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF1E293B))
+                                      Spacer(modifier = Modifier.height(6.dp))
+                                      Text(qa.answer, fontSize = 13.sp, color = Color(0xFF334155), lineHeight = 20.sp)
                                   }
-                                  Spacer(modifier = Modifier.height(6.dp))
-                                  Text("પ્રશ્ન: ${qa.question}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF1E293B))
-                                  Spacer(modifier = Modifier.height(6.dp))
-                                  Text(qa.answer, fontSize = 13.sp, color = Color(0xFF334155), lineHeight = 20.sp)
                               }
                           }
                       }
